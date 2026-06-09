@@ -1,0 +1,3 @@
+export const BRAND_REPOSITORY = Symbol('BRAND_REPOSITORY');
+export const MODEL_REPOSITORY = Symbol('MODEL_REPOSITORY');
+export const VEHICLE_REPOSITORY = Symbol('VEHICLE_REPOSITORY');
