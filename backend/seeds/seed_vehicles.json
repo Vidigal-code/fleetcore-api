@@ -1,0 +1,26 @@
+[
+  {
+    "licensePlate": "BRA1A23",
+    "chassis": "9BG116GW04C400001",
+    "renavam": "12345678901",
+    "year": 2024,
+    "modelName": "MegaBus Horizon",
+    "brandName": "Aivacol"
+  },
+  {
+    "licensePlate": "FLE2B34",
+    "chassis": "8AG225HX15D500987",
+    "renavam": "23456789012",
+    "year": 2022,
+    "modelName": "Fleetcore Urban LX",
+    "brandName": "UrbanLabs"
+  },
+  {
+    "licensePlate": "LOG3C45",
+    "chassis": "7GF335JX26E600654",
+    "renavam": "34567890123",
+    "year": 2021,
+    "modelName": "RoadRunner Cargo",
+    "brandName": "LogiTrans"
+  }
+]
