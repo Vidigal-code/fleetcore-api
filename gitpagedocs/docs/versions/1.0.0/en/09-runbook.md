@@ -1,70 +1,74 @@
 # Runbook and Troubleshooting
 
+Operational quick-start for reviewers and maintainers.
+
 ## 1. Prepare environment variables
 
 ```bash
 cp .env.example .env
 ```
 
-Key settings:
+Edit the new `.env` and configure:
 
-- `SQLSERVER_*` credentials
-- `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`
-- `RABBITMQ_URI`, `MONGO_URI`, `REDIS_*`
+- `SQLSERVER_*` credentials (user, password, host, port)
+- `REDIS_HOST`, `RABBITMQ_URI`, `AUDIT_MONGO_URI`
+- `JWT_SECRET`, `AUTH_SESSION_TTL_SECONDS`, `FEATURE_FLAGS_*`
 - `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME`
 
-## 2. Boot the Docker stack
+## 2. Start with Docker Compose
 
 ```bash
+docker compose up --build
 ```
 
-Services:
+Endpoints:
 
 - API: `http://localhost:3000/api`
-- Swagger EN: `http://localhost:3000/docs`
-- Swagger PT-BR: `http://localhost:3000/docs-pt`
+- Swagger EN/PT: `http://localhost:3000/docs` and `/docs-pt`
 - Frontend: `http://localhost:3001`
 - RabbitMQ UI: `http://localhost:15672`
+- Mongo Express (if enabled): connect directly to the Mongo container
 
-Seed admin: `aivacol` / `aivacol123!`
+Seed admin credentials: `aivacol` / `aivacol123!`
 
-## 3. Manual execution (without Docker)
+## 3. Run without Docker (optional)
 
 ```bash
 # Backend
 cd backend
 npm install
-npm run build
-npm run start:prod
+npm run start:dev    # or start:prod
 
 # Frontend
-cd frontend
+cd ../frontend
 npm install
 npm run dev
 ```
 
-Ensure SQL Server, Redis, RabbitMQ and MongoDB are available locally or as managed services.
+Ensure SQL Server, Redis, RabbitMQ and MongoDB services are reachable (local or managed).
 
 ## 4. Maintenance commands
 
-- `npm run generate:openapi` — refresh Swagger JSON files.
-- `npm run export:schemas` — regenerate shared Zod schemas.
-- `npm run lint`, `npm test`, `npm run test:e2e` — apply quality gates.
+- `npm run generate:openapi` — regenerate Swagger specs.
+- `npm run export:schemas` — synchronise backend validation with the frontend.
+- `npm run lint`, `npm test`, `npm run test:e2e` — execute quality gates.
+- `npm run gitpagedocs` — rebuild this documentation site.
 
-## 5. Troubleshooting
+## 5. Troubleshooting matrix
 
-| Symptom | Suggested action |
-|---------|------------------|
-| SQL Server connection errors | Confirm `SQLSERVER_*` in `.env` and check container health (`docker compose ps`). |
-| `401 Unauthorized` responses | Issue a new token via `/auth/login` and verify Redis is running (`AUTH_SESSION_TTL_SECONDS`). |
-| Missing audit documents | Inspect `AuditService` logs; when RabbitMQ is down, the fallback writes straight to MongoDB. |
-| Cache not invalidated | Ensure the `repositoryCache` toggle is enabled (`FEATURE_FLAGS`). |
-| Theme always light | Set `NEXT_PUBLIC_START_THEME=dark` and clear `localStorage` (`fleetcore.theme-preference`). |
+| Symptom | Action |
+|---------|--------|
+| API cannot connect to SQL Server | Recheck `SQLSERVER_*` values and container status (`docker compose ps`). |
+| Frequent `401 Unauthorized` | Inspect Redis container; clear the session (`AUTH_SESSION_TTL_SECONDS`) and re-login. |
+| Audit docs missing in Mongo | Tail `backend` logs; ensure `FEATURE_FLAGS_AUDIT_ASYNC_WORKER` is true and RabbitMQ is reachable. |
+| Domain events not emitted | Confirm `FEATURE_FLAGS_DOMAIN_EVENTS=true` and RabbitMQ credentials in `.env`. |
+| Cache not refreshing | Toggle `FEATURE_FLAGS_REPOSITORY_CACHE`; clear Redis keys (`fleetcore:cache:*`). |
+| Theme stuck on light | Set `NEXT_PUBLIC_START_THEME=dark` and remove `fleetcore.theme-preference` from localStorage. |
 
-## 6. Useful references
+## 6. Helpful references
 
-- Swagger docs (EN/PT).
-- Project scripts (`package.json`).
-- This GitPageDocs knowledge base.
+- Swagger UIs (`/docs`, `/docs-pt`)
+- Package scripts (`backend/package.json`, `frontend/package.json`)
+- `docs/versions/1.0.0` in GitPagedocs for architecture deep dives
 
-Follow these steps to spin up, validate and troubleshoot the fleet-management platform end to end.
+Following this checklist you can bootstrap, validate and debug the fleet platform end to end in minutes.

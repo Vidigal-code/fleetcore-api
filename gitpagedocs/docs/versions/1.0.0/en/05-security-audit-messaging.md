@@ -1,37 +1,32 @@
 # Security, Audit and Messaging
 
-Security and observability were treated as first-class concerns. Authentication, audit logging and messaging work together to deliver traceability and reliability.
+Security, observability and integrations are implemented end-to-end so the platform remains trustworthy in production. JWT sessions, audit logging and RabbitMQ messaging operate together while remaining configurable through feature flags.
 
-## Authentication & authorization
+## Authentication and authorization
 
-- **JWT + RBAC**: `AuthController` exposes `POST /auth/login`, `POST /auth/register`, `POST /auth/logout` and `GET /auth/me`. Tokens are validated by `JwtAuthGuard`, while `RolesGuard` enforces role-based access.
-- **Redis-backed sessions**: `AuthSessionService` issues a UUID `sessionId`, stores it with a TTL (`AUTH_SESSION_TTL_SECONDS`) and revokes it on logout. `JwtStrategy` checks Redis before accepting a token.
-- **Sanitization & rate limiting**: `SanitizeInputPipe` removes control characters and `ThrottlerGuard` applies per-route quotas (`SECURITY_RATE_LIMIT_*`).
+- **Endpoints**: `POST /auth/login`, `POST /auth/register`, `POST /auth/logout` and `GET /auth/me` handled by `backend/src/modules/auth/interfaces/http/auth.controller.ts`.
+- **JWT strategy**: `JwtStrategy` validates tokens and checks Redis session state before allowing access.
+- **Session storage**: `AuthSessionService` stores session ids in Redis with TTL defined by `AUTH_SESSION_TTL_SECONDS`; logout and password changes revoke tokens immediately.
+- **Guards and decorators**: `JwtAuthGuard`, `RolesGuard`, `@Roles()` and `@Public()` gates endpoints; rate limiting lives in `backend/src/apps/api/security/security-setup.ts` alongside `SanitizeInputPipe`.
 
-## MongoDB audit trail
+## Audit trail
 
-- `AuditInterceptor` captures every private request/response pair and assigns a `correlationId`.
-- `AuditService` publishes payloads to the `audit.event` queue; on failure it falls back to `AuditWriterService`, persisting directly in MongoDB.
-- Schemas live in `backend/src/modules/audit/schemas`, keeping the audit log queryable.
+- **Interceptor**: `backend/src/modules/audit/interceptors/audit.interceptor.ts` wraps private routes and emits structured events containing request/response metadata and the authenticated actor.
+- **Queue publishing**: `AuditService` pushes payloads to RabbitMQ (`audit.event` routing key).
+- **Fallback writer**: `AuditWriterService` writes directly to MongoDB when the queue is disabled or unavailable; the schema sits in `backend/src/modules/audit/schemas/audit-event.schema.ts`.
+- **Async worker**: `backend/src/apps/audit-worker` consumes messages and persists them when the async worker flag is enabled.
 
-## RabbitMQ messaging
+## Messaging
 
-- `FleetDomainEventListener` listens to domain events and forwards them to the topic exchange `fleetcore.events` with keys such as `vehicle.created`.
-- `MessagingService` wraps `AmqpConnection` with retry and circuit breaker policies (powered by `ResilienceService`).
-- `VehicleEventsConsumer` demonstrates consumption and logging of those events, serving as a blueprint for downstream services.
+- **Domain events**: Fleet services emit events defined under `backend/src/modules/fleet/domain/events`.
+- **Listener**: `FleetDomainEventListener` collects events and forwards them to `MessagingService` if `FEATURE_FLAGS_DOMAIN_EVENTS` is true.
+- **Publisher & consumer**: `MessagingService` publishes to `fleetcore.events`; `VehicleEventsConsumer` logs deliveries and acts as a blueprint for downstream integrations.
+- **Resilience**: All RabbitMQ calls run through `ResilienceService` (retries, circuit breaker, timeout) to avoid cascading failures.
 
-## Logging & metrics
+## Observability and controls
 
-- NestJS `Logger` records retries, circuit breaker trips and audit fallbacks.
-- `DomainMetricsService` increments counters per event, paving the road for Prometheus/Grafana integration.
+- **Metrics**: `DomainMetricsService` tracks counts per event enabling Prometheus/Grafana exporters.
+- **Structured logging**: Nest `Logger` captures audit fallbacks, messaging retries and guard denials.
+- **Feature toggles**: `FeatureToggleService` reads env flags (e.g. `FEATURE_FLAGS_REPOSITORY_CACHE`, `FEATURE_FLAGS_AUDIT_ASYNC_WORKER`, `FEATURE_FLAGS_DOMAIN_EVENTS`) to enable or disable integrations without code changes.
 
-## Configurability
-
-- Environment variables control secrets (`JWT_SECRET`), TTLs, RabbitMQ/Mongo endpoints and feature flags.
-- `FeatureToggleService` lets you disable cache, domain events or the async audit worker without code changes (useful for debugging or constrained environments).
-
-## Why it matters
-
-- Authentication can be revoked per session without invalidating all tokens.
-- Every action is auditable across HTTP, RabbitMQ and MongoDB.
-- Messaging ensures decoupled integrations (notifications, analytics, etc.) while resilience mechanisms guard against infrastructure hiccups.
+With this setup the platform can revoke specific sessions, trace every mutating request, replay audit records and integrate with other services through RabbitMQ while remaining resilient to infrastructure hiccups.

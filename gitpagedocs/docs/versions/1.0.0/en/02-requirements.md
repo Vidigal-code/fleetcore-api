@@ -1,38 +1,41 @@
 # Requirements and Criteria
 
-This chapter maps each item from the assignment to the concrete artefact inside the repository, enabling quick compliance checks.
+The tables below map the challenge checklist to concrete artefacts in the repository. Each item links back to the module or script that satisfies the requirement so reviewers can verify the implementation quickly.
 
-## Functional requirements
+## Functional scope
 
 | Requirement | Implementation | Notes |
 |-------------|----------------|-------|
-| CRUD for **models** | `backend/src/modules/fleet/interfaces/http/models.controller.ts` + `models.service.ts` | DTO + Zod validation, optional brand relationship. |
-| CRUD for **vehicles** | `vehicles.controller.ts` + `vehicles.service.ts` | Redis cache (`RepositoryCacheService`), automatic invalidation and domain events. |
-| CRUD for **brands** (bonus) | `brands.controller.ts` + `brands.service.ts` | Integrated with messaging/audit, linked to models/vehicles. |
-| Vehicle ↔ model ↔ brand relationship | Aggregates under `backend/src/modules/fleet/domain` | Services enforce existence of model/brand before persisting vehicles. |
-| Seed user `aivacol` | `backend/src/apps/api/app-bootstrap.service.ts` + `UsersService.ensureAdminSeed()` | Default admin role, strong password configurable via env. |
+| CRUD for **brands** | `backend/src/modules/fleet/interfaces/http/brands.controller.ts`, `brands.service.ts` | Ensures name uniqueness, publishes domain events. |
+| CRUD for **models** | `models.controller.ts`, `models.service.ts` | Associates models with optional brands, validates payload with Zod-generated DTOs. |
+| CRUD for **vehicles** | `vehicles.controller.ts`, `vehicles.service.ts` | Applies Redis-backed caching (`RepositoryCacheService`) and raises domain events on mutations. |
+| Vehicle ↔ model ↔ brand relationship | Aggregates in `backend/src/modules/fleet/domain` | Repositories enforce referential integrity before persisting. |
+| Seed administrator `aivacol` | `backend/src/apps/api/app-bootstrap.service.ts` + `UsersService.ensureAdminSeed()` | Creates admin on boot with roles from `backend/src/modules/users`. |
+| Authentication endpoints | `backend/src/modules/auth/interfaces/http/auth.controller.ts` | `login`, `register`, `logout`, `me` with session tracking in Redis. |
+| Audit trail | `backend/src/modules/audit/interceptors/audit.interceptor.ts`, `audit-writer.service.ts` | Captures HTTP interactions and persists to Mongo when the queue is unavailable. |
+| Messaging integration | `backend/src/modules/messaging/messaging.service.ts`, `FleetDomainEventListener` | Publishes vehicle events to RabbitMQ and consumes them for observability. |
+| Frontend dashboard | `frontend/src/app/dashboard/page.tsx`, widgets under `frontend/src/widgets` | Displays fleet information, CRUD forms and filters backed by React Query. |
 
-## Technical requirements
+## Technical criteria
 
-- **Clean architecture / DDD**: isolated modules (`auth`, `fleet`, `audit`, `messaging`, `users`, `shared`), aggregates, repositories and `UnitOfWork`.
-- **Robust security**: JWT guard + `RolesGuard`, Redis sessions (`AuthSessionService`), audit interceptor, sanitization pipe.
-- **Standardized modelling**: TypeORM migrations (`backend/src/migrations/1717845600000-InitSchema.ts`) with SQL Server columns and metadata.
-- **Redis cache**: `RepositoryCacheService` storing vehicle search results (`vehicles.search` namespace) with configurable TTL (`REDIS_TTL_SECONDS`).
-- **RabbitMQ messaging** (bonus): dedicated module + `FleetDomainEventListener` forwarding domain events.
-- **MongoDB audit trail** (bonus): `AuditService` produces messages, `AuditWriterService` persists fallback documents via Mongoose.
-- **Full Docker stack**: `docker-compose.yml` bootstraps SQL Server, Redis, RabbitMQ, MongoDB, API and frontend.
+| Criterion | Implementation detail |
+|-----------|----------------------|
+| Clean architecture / DDD | Separate Nest modules for `auth`, `fleet`, `users`, `messaging`, `audit`; shared layer (`backend/src/shared`) provides config, unit of work, cache and resilience services. |
+| SQL Server persistence | Single migration `backend/src/migrations/1717845600000-InitSchema.ts` provisions tables; repositories under `backend/src/modules/fleet/infrastructure`. |
+| Redis cache | `backend/src/shared/cache/repository-cache.service.ts` caches vehicle queries (`vehicles.search`) with TTL from `REDIS_TTL_SECONDS`. |
+| JWT + RBAC | `JwtStrategy`, `JwtAuthGuard`, `RolesGuard` inside `backend/src/modules/auth`; sessions stored by `AuthSessionService`. |
+| Input sanitisation & rate limiting | `SanitizeInputPipe` + Nest throttler setup in `backend/src/apps/api/security/security-setup.ts`. |
+| RabbitMQ messaging | Exchange configuration and publisher in `backend/src/modules/messaging`; vehicle consumer in `consumers/vehicle-events.consumer.ts`. |
+| Mongo audit fallback | Interceptor pipes payloads through `AuditService`; `AuditWriterService` writes to Mongo when queue is down. |
+| Schema sharing | `backend/package.json` exposes `npm run export:schemas`; generated files consumed at `frontend/src/shared/schemas`. |
+| Frontend state & data | Redux store in `frontend/src/processes/app/store`, React Query hooks in `frontend/src/entities/*/api`. |
+| Documentation | Swagger builders (`backend/src/apps/api/swagger/swagger.factory.ts`), GitPagedocs site (`gitpagedocs/`). |
 
-## Evaluation criteria met
+## Validation evidence
 
-- **Code clarity & organization**: consistent naming, modules, documentation (README + gitpagedocs).
-- **Efficiency & low redundancy**: constants for events (`fleet.constants.ts`), shared Zod schemas between backend and frontend.
-- **Proper TypeORM usage**: dedicated entities, repositories and a single migration.
-- **REST best practices**: controllers with verbs, HTTP exceptions, OpenAPI decorators, DTO responses.
-- **Testing**: unit/integration/e2e suites (`backend/tests`) and Playwright/RTL for the frontend (`frontend/tests`).
-- **Error handling**: resilience layer for RabbitMQ, audit fallback, structured logging.
+- **API documentation**: `/docs` (EN) and `/docs-pt` (PT-BR) generated by the Swagger factory.
+- **Automated tests**: backend unit/integration/e2e suites in `backend/tests`; frontend unit + Playwright specs in `frontend/tests`.
+- **Resilience**: retry/circuit breaker policies from `backend/src/shared/resilience/resilience.service.ts` wrap messaging and audit operations.
+- **Operational scripts**: `docker-compose.yml`, `.env.example`, `npm run export:schemas`, `npm run generate:openapi` ensure reproducible environments.
 
-## Additional evidence
-
-- **Swagger documentation** in PT/EN (`/docs-pt`, `/docs`).
-- **Unified `.env`** file to configure backend and frontend.
-- **This GitPageDocs** instance summarising architecture and implementation details for reviewers.
+All requirements, including the optional messaging/audit enhancements and bilingual documentation, are therefore covered by explicit code artefacts in the repository.

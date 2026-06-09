@@ -1,37 +1,31 @@
 # Segurança, Auditoria e Mensageria
 
-A plataforma combina autenticação forte, trilha de auditoria e integração assíncrona para garantir confiabilidade e rastreabilidade.
+Autenticação, rastreabilidade e integrações assíncronas caminham juntas para manter a plataforma segura e observável.
 
 ## Autenticação e autorização
 
-- **JWT + RBAC**: `AuthController` expõe `POST /auth/login`, `POST /auth/register`, `POST /auth/logout` e `GET /auth/me`. O guard `JwtAuthGuard` valida o token, enquanto `RolesGuard` verifica roles (`UserRole.Admin`, `UserRole.Operator`).
-- **Sessões em Redis**: `AuthSessionService` gera `sessionId` (UUID), armazena payload com TTL (`AUTH_SESSION_TTL_SECONDS`) e invalida no logout. O `JwtStrategy` consulta Redis antes de aceitar o token.
-- **Sanitização e rate limiting**: o `SanitizeInputPipe` remove caracteres de controle e o `ThrottlerGuard` aplica limites configuráveis (`SECURITY_RATE_LIMIT_*`).
+- **Endpoints**: `POST /auth/login`, `POST /auth/register`, `POST /auth/logout` e `GET /auth/me` definidos em `backend/src/modules/auth/interfaces/http/auth.controller.ts`.
+- **Estratégia JWT**: `JwtStrategy` valida o token e confirma se o `sessionId` ainda está ativo no Redis antes de liberar o acesso.
+- **Sessões**: `AuthSessionService` armazena dados de sessão com TTL (`AUTH_SESSION_TTL_SECONDS`); logout ou redefinição de senha removem a sessão imediatamente.
+- **Guards e decorators**: `JwtAuthGuard`, `RolesGuard`, `@Roles()` e `@Public()` controlam acesso. `SanitizeInputPipe` + `ThrottlerGuard` (configuração em `backend/src/apps/api/security/security-setup.ts`) evitam ataques simples.
 
-## Auditoria em MongoDB
+## Auditoria
 
-- `AuditInterceptor` inspeciona todas as rotas privadas e registra request/response com `correlationId`.
-- `AuditService` publica eventos na fila `audit.event`. Em caso de falha (ex.: RabbitMQ indisponível) persiste diretamente via `AuditWriterService` no MongoDB.
-- Schemas Mongoose vivem em `backend/src/modules/audit/schemas` permitindo consulta posterior.
+- `AuditInterceptor` envolve rotas privadas, registra request/response, identifica o ator autenticado e gera `correlationId`.
+- `AuditService` publica a mensagem na fila `audit.event`; se RabbitMQ estiver indisponível, `AuditWriterService` grava diretamente em MongoDB.
+- O worker opcional (`backend/src/apps/audit-worker`) processa o backlog quando `FEATURE_FLAGS_AUDIT_ASYNC_WORKER` está habilitado.
 
 ## Mensageria RabbitMQ
 
-- `FleetDomainEventListener` escuta eventos de domínio e envia mensagens para a exchange `fleetcore.events` com rota `vehicle.*`, `brand.*`, `model.*`.
-- `MessagingService` envolve `AmqpConnection` em políticas de retry/circuit breaker (`ResilienceService`).
-- O consumidor `VehicleEventsConsumer` demonstra como integrar outros microsserviços (atualmente loga os payloads recebidos).
+- Eventos de domínio (`VehicleCreatedEvent`, `VehicleUpdatedEvent`, etc.) são emitidos pelos agregados da frota.
+- `FleetDomainEventListener` encaminha os eventos para o `MessagingService`, que publica no exchange `fleetcore.events` (routing keys `vehicle.*`, `brand.*`, `model.*`).
+- `VehicleEventsConsumer` mostra como consumir e processar mensagens, servindo de base para integrações futuras.
+- `ResilienceService` aplica retries, timeout e circuit breaker nas operações com RabbitMQ para evitar falhas em cascata.
 
-## Logs e métricas
+## Observabilidade e feature toggles
 
-- `DomainMetricsService` incrementa contadores por evento publicado, permitindo instrumentação futura.
-- `Logger` padrão do Nest registra fallback de auditoria, erros de mensageria e tentativas de retry.
+- `DomainMetricsService` incrementa contadores de eventos e prepara exposição para Prometheus/Grafana.
+- Logs estruturados do Nest registram fallbacks de auditoria, erros de mensageria e tentativas automáticas.
+- `FeatureToggleService` lê `FEATURE_FLAGS_*` (cache, eventos, worker, swagger), permitindo ligar/desligar recursos sem mudanças de código.
 
-## Configuração por ambiente
-
-- Variáveis no `.env` controlam **segredos** (`JWT_SECRET`), TTL de sessão, URIs de RabbitMQ/Mongo e flags de feature (`FEATURE_FLAGS`).
-- `FeatureToggleService` permite desativar audit worker ou forward de eventos sem alterar código (útil para debug ou ambientes limitados).
-
-## Benefícios
-
-- Autenticação centralizada, com possibilidade de revogar sessão individualmente.
-- Auditoria completa para cumprir exigências de compliance e rastreabilidade.
-- Infraestrutura pronta para processamento assíncrono e replicação de eventos para outros domínios (ex.: billing, telemetria).
+Com esse conjunto, é possível revogar sessões específicas, auditar todas as operações sensíveis e manter integrações assíncronas resilientes, atendendo aos requisitos de segurança e observabilidade do desafio.
