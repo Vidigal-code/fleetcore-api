@@ -23,9 +23,9 @@ import { QueryVehiclesDto } from '../dto/query-vehicles.dto';
 import { UpdateVehicleDto } from '../dto/update-vehicle.dto';
 import { VehicleOrmEntity } from '../infrastructure/entities/vehicle.orm-entity';
 import { VehicleTypeOrmRepository } from '../infrastructure/repositories/vehicle.typeorm.repository';
-import { EventBusService } from '../../../shared/domain/events/event-bus.service';
-import { VehicleCreatedEvent, VehicleDeletedEvent, VehicleUpdatedEvent } from '../domain/events/vehicle-events';
-import { FeatureToggleService } from '../../../shared/features/feature-toggle.service';
+import { EventBusService } from '../../../shared/domain/events';
+import { VehicleCreatedEvent, VehicleDeletedEvent, VehicleUpdatedEvent } from '../domain/events';
+import { FeatureToggleService } from '../../../shared/features';
 
 interface SerializedVehicle {
   id: string;

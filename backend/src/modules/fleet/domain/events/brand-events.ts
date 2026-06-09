@@ -1,4 +1,4 @@
-import { BaseDomainEvent } from '../../../../shared/domain/events/domain-event';
+import { BaseDomainEvent } from '../../../../shared/domain/events';
 import type { Brand } from '../brand.aggregate';
 
 interface BrandEventPayload {

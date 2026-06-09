@@ -1,25 +1,28 @@
+import type { AppConfigService } from '../../../src/shared/config/app-config.service';
+import type { FeatureFlagKey } from '../../../src/shared/config/app-config.types';
 import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
 
 describe('FeatureToggleService', () => {
-  const appConfig = {
-    getFeatureFlag: jest.fn(),
-  } as unknown as Parameters<typeof FeatureToggleService>[0];
+  const getFeatureFlagMock = jest.fn<boolean, [FeatureFlagKey, boolean | undefined]>();
+  const appConfigMock = {
+    getFeatureFlag: getFeatureFlagMock,
+  } as unknown as AppConfigService;
 
-  const service = new FeatureToggleService(appConfig);
+  const service = new FeatureToggleService(appConfigMock);
 
   beforeEach(() => {
-    jest.resetAllMocks();
+    getFeatureFlagMock.mockReset();
   });
 
   it('returns true when flag is enabled', () => {
-    (appConfig.getFeatureFlag as jest.Mock).mockReturnValueOnce(true);
+    getFeatureFlagMock.mockReturnValueOnce(true);
 
     expect(service.isEnabled('domainEvents')).toBe(true);
-    expect(appConfig.getFeatureFlag).toHaveBeenCalledWith('domainEvents', false);
+    expect(getFeatureFlagMock).toHaveBeenCalledWith('domainEvents', false);
   });
 
   it('runs task when flag enabled', async () => {
-    (appConfig.getFeatureFlag as jest.Mock).mockReturnValueOnce(true);
+    getFeatureFlagMock.mockReturnValueOnce(true);
 
     const result = await service.runIfEnabled('domainEvents', async () => 'ok');
 
@@ -27,7 +30,7 @@ describe('FeatureToggleService', () => {
   });
 
   it('runs fallback when flag disabled', async () => {
-    (appConfig.getFeatureFlag as jest.Mock).mockReturnValueOnce(false);
+    getFeatureFlagMock.mockReturnValueOnce(false);
 
     const result = await service.runIfEnabled(
       'domainEvents',
