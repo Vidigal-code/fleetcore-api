@@ -11,6 +11,10 @@ import { UnitOfWork } from '../../../src/shared/unit-of-work/unit-of-work';
 import { BrandTypeOrmRepository } from '../../../src/modules/fleet/infrastructure/repositories/brand.typeorm.repository';
 import { EventBusService } from '../../../src/shared/domain/events/event-bus.service';
 import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
+import {
+  BRAND_EVENT_REMOVED,
+  AUDIT_ENTITY_BRAND,
+} from '../../../src/modules/fleet/fleet.constants';
 
 describe('BrandsService', () => {
   let service: BrandsService;
@@ -87,10 +91,14 @@ describe('BrandsService', () => {
 
     expect(scopedRepository.remove).toHaveBeenCalledWith(brand);
     expect(auditService.record).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'brand.removed', entityId: brand.id }),
+      expect.objectContaining({
+        action: BRAND_EVENT_REMOVED,
+        entity: AUDIT_ENTITY_BRAND,
+        entityId: brand.id,
+      }),
     );
     expect(eventBus.publish).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'brand.removed' }),
+      expect.objectContaining({ name: BRAND_EVENT_REMOVED }),
     );
   });
 

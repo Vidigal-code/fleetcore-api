@@ -1,4 +1,9 @@
 import { BaseDomainEvent } from '../../../../shared/domain/events';
+import {
+  MODEL_EVENT_CREATED,
+  MODEL_EVENT_REMOVED,
+  MODEL_EVENT_UPDATED,
+} from '../../fleet.constants';
 import type { Model } from '../model.aggregate';
 
 interface ModelEventPayload {
@@ -9,18 +14,18 @@ interface ModelEventPayload {
 
 export class ModelCreatedEvent extends BaseDomainEvent<ModelEventPayload> {
   constructor(payload: ModelEventPayload) {
-    super('model.created', payload);
+    super(MODEL_EVENT_CREATED, payload);
   }
 }
 
 export class ModelUpdatedEvent extends BaseDomainEvent<ModelEventPayload> {
   constructor(payload: ModelEventPayload) {
-    super('model.updated', payload);
+    super(MODEL_EVENT_UPDATED, payload);
   }
 }
 
 export class ModelDeletedEvent extends BaseDomainEvent<ModelEventPayload> {
   constructor(payload: ModelEventPayload) {
-    super('model.removed', payload);
+    super(MODEL_EVENT_REMOVED, payload);
   }
 }
