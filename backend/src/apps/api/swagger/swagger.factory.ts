@@ -17,18 +17,18 @@ const TAG_LABELS: Record<string, { name: string; description: string }[]> = {
   'pt-BR': [
     {
       name: 'Authentication',
-      description: 'Fluxos de login e gestão de sessão.',
+      description: 'Login e tokens JWT.',
     },
-    { name: 'Fleet', description: 'Operações com marcas, modelos e veículos.' },
-    { name: 'Audit', description: 'Eventos de auditoria e rastreabilidade.' },
+    { name: 'Fleet', description: 'Marcas, modelos e veículos.' },
+    { name: 'Audit', description: 'Trilhas de auditoria.' },
   ],
   'en-US': [
     {
       name: 'Authentication',
-      description: 'Login, token issuance and session handling.',
+      description: 'Login and JWT tokens.',
     },
-    { name: 'Fleet', description: 'Brands, models and vehicle operations.' },
-    { name: 'Audit', description: 'Audit trail and observability endpoints.' },
+    { name: 'Fleet', description: 'Brands, models and vehicles.' },
+    { name: 'Audit', description: 'Audit trail actions.' },
   ],
 };
 
@@ -54,10 +54,9 @@ const createDocumentBuilder = (
       scheme: 'bearer',
       bearerFormat: 'JWT',
       description:
-        'Informe o token JWT gerado pelo endpoint de login.' +
-        (config.locale === 'en-US'
-          ? ' Provide the JWT issued by the login endpoint.'
-          : ''),
+        config.locale === 'en-US'
+          ? 'Provide the JWT generated on the login endpoint.'
+          : 'Informe o JWT emitido no endpoint de login.',
     });
 
   const tags = TAG_LABELS[config.locale] ?? TAG_LABELS['en-US'];
