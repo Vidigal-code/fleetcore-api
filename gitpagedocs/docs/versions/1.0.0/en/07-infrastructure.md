@@ -47,7 +47,7 @@ The repository ships with everything needed to run the platform locally or in CI
 
 ## Typical local workflow
 
-1. `cp .env.example .env` and adjust secrets.
+1. `cp envexample.txt .env` and adjust secrets.
 2. `docker compose up --build` to start all services.
 3. Visit `http://localhost:3000/api` (API), `/docs` (Swagger EN), `/docs-pt` (Swagger PT-BR), `http://localhost:3001` (frontend) and `http://localhost:15672` (RabbitMQ console).
 
