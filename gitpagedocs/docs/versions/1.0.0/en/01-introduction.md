@@ -1,37 +1,56 @@
 # Challenge Overview
 
-The **Aivacol** technical assessment requests a full fleet-management platform. The `fleetcore-api` repository delivers a NestJS backend, a Next.js frontend, Docker-based infrastructure and operational documentation, evidencing clean architecture, enterprise-grade practices and service orchestration.
+The Aivacol fleet-management challenge asks for a production-ready platform that spans backend services, a web client, asynchronous integrations and complete documentation. The `fleetcore-api` repository fulfils the brief with:
 
-## Goals at a glance
+- **Backend**: NestJS 11, TypeORM (SQL Server), Redis cache, RabbitMQ messaging and MongoDB audit trail.
+- **Frontend**: Next.js 14 (App Router) structured with the Feature-Sliced Design pattern, Redux Toolkit and React Query.
+- **Infrastructure**: Docker Compose for all dependencies, seed data, npm scripts and environment blueprints.
+- **Quality & Ops**: Automated tests, resilience policies, Swagger PT/EN, bilingual GitPageDocs.
 
-- Provide trustworthy REST APIs to create, read, update and delete **models**, **vehicles** and **brands**.
-- Guarantee **enterprise security** (JWT, RBAC, auditing, MongoDB trail and RabbitMQ messaging).
-- Offer a responsive **frontend** built with the FSD pattern, Redux Toolkit, React Query, Axios and configurable themes.
-- Package everything with **Docker Compose**, automation scripts, Jest/Playwright tests and bilingual documentation.
+## Deliverables at a glance
 
-## Main building blocks
+| Deliverable | Description | Source |
+|-------------|-------------|--------|
+| REST API | CRUD for brands, models and vehicles, auth/session management, audit worker | `backend/src/modules`, `backend/src/apps` |
+| Messaging & audit | RabbitMQ publisher/consumer, MongoDB audit writer, resilience wrappers | `backend/src/modules/messaging`, `backend/src/modules/audit` |
+| Web client | FSD layout, authentication shell, fleet dashboards, shared schemas | `frontend/src/app`, `frontend/src/{entities,features,processes,widgets,shared}` |
+| Docs & tooling | GitPagedocs site, Swagger builders, schema export scripts | `gitpagedocs/`, `backend/package.json` scripts |
+| Infrastructure | Compose stack, runtime envs, seed dataset | `docker-compose.yml`, `.env.example`, `backend/src/apps/api/app-bootstrap.service.ts`, `backend/seeds` |
 
-| Pillar | Description | Key folders/files |
-|--------|-------------|-------------------|
-| Backend API | NestJS 11 + TypeORM (SQL Server), DDD, Unit of Work, domain events, Redis cache | `backend/src/modules`, `backend/src/shared`, `backend/src/migrations` |
-| Messaging & Audit | RabbitMQ for fleet events, MongoDB for the audit trail | `backend/src/modules/messaging`, `backend/src/modules/audit` |
-| Security | JWT with RBAC, Redis-backed sessions, audit interceptor, input sanitization | `backend/src/modules/auth`, `backend/src/apps/api/security` |
-| Frontend | Next.js 14 (App Router), FSD, Redux Toolkit, React Query, dual orange themes | `frontend/src/app`, `frontend/src/{entities,features,processes,shared,widgets}` |
-| Infrastructure | Docker Compose (SQL Server, Redis, RabbitMQ, Mongo, API, frontend), npm scripts | `docker-compose.yml`, `.env.example`, `backend/.env.sample`, `frontend/.env.sample` |
-| Quality | Unit/integration/e2e tests, linting, GitHub Pages documentation | `backend/tests`, `frontend/tests`, `gitpagedocs/` |
+## Repository structure (excerpt)
 
-## Documentation structure
+```text
+backend/
+  src/
+    apps/
+      api/                # HTTP bootstrap, guards, Swagger
+      audit-worker/       # Async worker for MongoDB audit fallback
+    modules/
+      auth/               # JWT, sessions, guards
+      fleet/              # Brands, models, vehicles (DDD)
+      audit/              # Interceptor + Mongo writer
+      messaging/          # RabbitMQ integration
+      users/              # Admin seed and user repo
+    shared/               # Config, cache, unit of work, resilience, validation
+frontend/
+  src/
+    app/                  # Next.js routes & layout
+    entities/, features/, widgets/, processes/, shared/
+gitpagedocs/              # This documentation site
+```
 
-This wiki is split into nine chapters that cover the whole challenge:
+## Using these docs
 
-1. **Challenge Overview** – big picture, components and objectives (this page).
-2. **Requirements and Criteria** – the full checklist with direct links to the implementation.
-3. **Backend Architecture** – modules, patterns, data flow and resilience.
-4. **Data and Domain Modeling** – entities, migrations and aggregates.
-5. **Security, Audit and Messaging** – protection mechanisms and observability.
-6. **Frontend and Experience** – FSD structure, client data flow and responsive orange UI.
-7. **Infrastructure and Deployment** – Docker, environment variables, scripts and docs.
-8. **Quality and Testing** – unit/integration/e2e suites, linting and quality gates.
-9. **Runbook and Troubleshooting** – how to run the project and handle failures.
+The chapters follow the same order as the navigation menu. Each section summarises the capability and points to the concrete files in the repository so reviewers can inspect the implementation quickly.
 
-Use the “Next/Previous” navigation or the side index to jump to the topic you need.
+1. **Challenge Overview** – context, deliverables and repository layout (this page).
+2. **Requirements and Criteria** – mapping between the assessment checklist and code.
+3. **Backend Architecture** – module boundaries, flows and supporting services.
+4. **Data and Domain Modeling** – aggregates, migrations and repository contracts.
+5. **Security, Audit and Messaging** – authentication, audit logging and RabbitMQ.
+6. **Frontend and Experience** – FSD slices, state management and UI theming.
+7. **Infrastructure and Deployment** – Docker images, env vars and scripts.
+8. **Quality and Testing** – automated tests, linting and resilience utilities.
+9. **Runbook and Troubleshooting** – commands and operational tips.
+
+Navigate via the header menu or the “Next/Previous” buttons to dive deeper into each capability.

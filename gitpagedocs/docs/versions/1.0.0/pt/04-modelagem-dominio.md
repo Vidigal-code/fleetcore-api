@@ -1,40 +1,35 @@
 # Modelagem de Dados e Domínio
 
-O desafio exige padronização de tabelas, metadados e relacionamentos. A implementação utiliza **TypeORM** com SQL Server, migrando toda a estrutura com o arquivo `1717845600000-InitSchema.ts`.
+O backend usa TypeORM com SQL Server e um modelo orientado a agregados. A migração única `backend/src/migrations/1717845600000-InitSchema.ts` provisiona tabelas, índices, chaves estrangeiras e metadados (`created_at`, `updated_at`, `created_by`).
 
-## Tabelas e colunas
+## Esquema relacional
 
-| Tabela | Campos principais | Observações |
-|--------|-------------------|-------------|
-| `users` | `id`, `nickname`, `name`, `email`, `password_hash`, `roles`, `created_at`, `updated_at`, `created_by` | Seed do usuário `aivacol`; roles salvas como array serializado. |
-| `brands` | `id`, `name`, metadados padrão | Regras de unicidade por nome. |
-| `models` | `id`, `name`, `brand_id`, metadados | `brand_id` opcional (modelo pode existir sem marca) com `FK` `SET NULL`. |
-| `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `year`, `model_id`, metadados | Restrições únicas para placa, chassi e renavam; `FK` para `models` com `CASCADE` em deleção. |
+| Tabela | Campos principais | Relacionamentos |
+|--------|-------------------|-----------------|
+| `users` | `id`, `nickname`, `email`, `password_hash`, `roles` | Usuário admin `aivacol` semeado no bootstrap; roles armazenadas como CSV. |
+| `brands` | `id`, `name` | Nome único; opcionalmente referenciada por modelos. |
+| `models` | `id`, `name`, `brand_id` | FK com `SET NULL` permitindo modelos sem marca. |
+| `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `model_id` | Restrições únicas para identificadores; FK com `CASCADE` em deleções. |
 
-Todas as tabelas seguem o padrão obrigatório do desafio: `created_at`, `updated_at`, `created_by`.
+O arquivo `backend/seeds/seed_vehicles.json` oferece dados simulados para inicialização local.
 
-## Agregados e entidades de domínio
+## Agregados e repositórios
 
-- `User`, `Brand`, `Model`, `Vehicle` (em `backend/src/modules/*/domain`) encapsulam invariantes e oferecem métodos para atualizações controladas (`update`, `changeModel`, etc.).
-- Eventos de domínio (`VehicleCreatedEvent`, `BrandUpdatedEvent`, etc.) acompanham snapshots do agregado para mensageria/auditoria.
+- Agregados `Brand`, `Model`, `Vehicle` e `User` (pasta `backend/src/modules/**/domain`) garantem invariantes como unicidade, validação de placa e composição de roles.
+- Repositórios TypeORM (`backend/src/modules/fleet/infrastructure/repositories`) implementam contratos definidos na camada de domínio.
+- `UnitOfWork` (`backend/src/shared/unit-of-work/unit-of-work.ts`) administra transações do `EntityManager`, mantendo operações atômicas.
+- Eventos de domínio em `backend/src/modules/fleet/domain/events` alimentam cache, auditoria e mensageria.
 
-## DTOs e validações
+## Validação compartilhada
 
-- DTOs em `backend/src/modules/fleet/dto` combinam `class-validator` com schemas Zod exportados para o frontend (`backend/scripts/export-schemas.ts`).
-- Campos como `licensePlate` passam por normalização (`toUpperCase`) e regex Mercosul definida uma única vez (`fleet.schema.ts`).
+- DTOs combinam `class-validator` com esquemas Zod definidos em `backend/src/shared/validation/fleet.schema.ts`.
+- `npm run export:schemas` gera versões consumidas pelo frontend em `frontend/src/shared/schemas`, garantindo mensagens idênticas nas duas camadas.
+- Regras como regex Mercosul, tamanho do chassi, estrutura do RENAVAM e faixa de anos vivem nesses esquemas reutilizáveis.
 
-## Repositórios TypeORM
+## Fluxo típico
 
-- Repositórios específicos (`VehicleTypeOrmRepository`, `ModelTypeOrmRepository`, etc.) traduzem agregados para entidades TypeORM (`infrastructure/entities`).
-- `UnitOfWork` recebe `EntityManager` do TypeORM e garante rollback em caso de erro.
+1. Controllers recebem DTOs e encaminham para os services.
+2. Services carregam agregados via repositórios dentro de um `UnitOfWork`, aplicam regras e persistem mudanças.
+3. Agregados emitem eventos (`VehicleCreatedEvent`, `ModelUpdatedEvent`, etc.) que disparam cache, auditoria e mensageria.
 
-## Seed e dados de exemplo
-
-- `UsersService.ensureAdminSeed()` cria o usuário admin.
-- `backend/seeds/seed_vehicles.json` contém dados simulados para importação manual (bonus exigido no enunciado).
-
-## Por que atende aos requisitos
-
-- A modelagem cobre as tabelas obrigatórias (`models`, `vehicles`) e os bônus (`brands`, `users`).
-- Regras de integridade (FK, unique) asseguram padronização e evitam duplicidade.
-- As entidades de domínio encapsulam as regras de negócio, mantendo os controladores enxutos e testáveis.
+Essa abordagem mantém regras de negócio próximas ao domínio, reduz duplicidade entre camadas e possibilita que backend e frontend compartilhem a mesma lógica de validação.

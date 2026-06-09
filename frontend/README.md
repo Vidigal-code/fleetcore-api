@@ -1,97 +1,85 @@
 # Fleetcore Web
 
+Client web construído com Next.js 14 utilizando o padrão Feature-Sliced Design (FSD). Consome a API Fleetcore, compartilha validações Zod geradas no backend e oferece dashboards responsivos para gestão da frota.
+
 ## 🇧🇷 Descrição em Português
 <details>
-<summary><strong>Ver Detalhes</strong></summary>
+<summary><strong>Ver detalhes</strong></summary>
 
-### Visão Geral
-- Interface Next.js 14 com arquitetura Feature-Sliced Design para o módulo de gestão de frota.
-- Consome a API NestJS via Redux Toolkit (auth) e React Query (dados), usando Axios com interceptors.
-- Design responsivo com Tailwind, tema claro/escuro em laranjas e componentes reutilizáveis.
-
-### Estrutura FSD
-- `shared/` – utilitários, providers, tokens de design, UI base.
-- `entities/` – hooks e modelos de domínio (brand, model, vehicle).
-- `features/` – formulários e filtros reutilizáveis.
-- `widgets/` – composições de alto nível (ex.: `vehicle-workbench`, `reference-data-board`).
-- `processes/` – providers globais, guards (`RequireAuth`).
-- `app/` – páginas App Router (`layout.tsx`, rotas protegidas, login).
+### Arquitetura
+- App Router (`src/app`) com layouts protegidos e página de login.
+- Slices FSD:
+  - `entities/` – tipos, hooks e UI base por entidade (vehicle, brand, model).
+  - `features/` – formulários, filtros e toggle de tema reutilizáveis.
+  - `widgets/` – composições (ex.: `vehicle-workbench`, `reference-data-board`).
+  - `processes/` – providers globais (Redux, React Query, Theme), guards `RequireAuth`.
+  - `shared/` – componentes de UI, clientes Axios/React Query, schemas compartilhados, utilitários.
 
 ### Execução
 ```bash
 npm install
 npm run dev          # desenvolvimento (porta configurada em .env)
-npm run build        # build standalone
-npm run start        # servir build produzido
+npm run build        # build de produção
+npm run start        # serve o build gerado
 ```
 
-### Variáveis de Ambiente
-Consulte `frontend/.env.sample`.
+### Variáveis de ambiente (`frontend/.env.sample`)
+| Variável | Uso |
+|----------|-----|
+| `NEXT_PUBLIC_API_URL` | Endpoint público da API (ex.: `http://localhost:3000/api`) |
+| `NEXT_PUBLIC_START_THEME` | Tema inicial (`light` ou `dark`) |
+| `NEXT_PUBLIC_APP_NAME` | Nome exibido na UI |
 
-| Variável | Descrição |
-| --- | --- |
-| `NEXT_PUBLIC_API_URL` | Endpoint público da API (`http://host:port/api`) |
-| `NEXT_PUBLIC_APP_NAME` | Nome exibido no cabeçalho/UI |
-| `NEXT_PUBLIC_CACHE_TTL_SECONDS` | TTL base para React Query |
+### Qualidade
+- `npm run lint` – ESLint (Next.js + TypeScript).
+- `npm test` – Jest + React Testing Library.
+- `npm run test:e2e` – Playwright (requer API e web em execução).
 
-### Segurança e Qualidade
-- Login via JWT com persistência client-side segura (axios + interceptors).
-- Guards de rota (`RequireAuth`) e hidratação de sessão.
-- Todos os componentes seguem princípios DRY, sem hardcodes de cores/strings.
-
-### Testes
-```bash
-npm run lint
-npm test            # Jest + Testing Library
-npm run test:e2e    # Playwright (requer app em execução)
-```
+### Pontos de destaque
+- Autenticação via Redux Toolkit (`processes/app/store`, `processes/auth`).
+- Fetching e cache com React Query (`entities/*/api`).
+- Esquemas Zod compartilhados com o backend (`shared/schemas`).
+- Tema laranja claro/escuro controlado por `ThemeProvider` e guardado em `localStorage`.
 
 </details>
 
 ## 🇺🇸 English Description
 <details>
-<summary><strong>View Details</strong></summary>
+<summary><strong>View details</strong></summary>
 
-### Overview
-- Next.js 14 interface built with Feature-Sliced Design for the fleet management module.
-- Integrates with the NestJS API using Redux Toolkit (auth) and React Query (data) backed by Axios interceptors.
-- Responsive UI powered by Tailwind, light/dark orange themes and reusable components.
-
-### FSD Layout
-- `shared/` – utilities, providers, design tokens, base UI components.
-- `entities/` – domain-specific hooks/models (brand, model, vehicle).
-- `features/` – reusable forms and filter bars.
-- `widgets/` – high-level compositions (e.g., `vehicle-workbench`, `reference-data-board`).
-- `processes/` – global providers, auth guards (`RequireAuth`).
-- `app/` – App Router pages (`layout.tsx`, protected routes, login).
+### Architecture
+- App Router project (`src/app`) with protected layouts and login page.
+- FSD slices:
+  - `entities/` – domain-layer hooks/types/UI (vehicle, brand, model).
+  - `features/` – reusable forms, filter bars, theme toggle.
+  - `widgets/` – page-level compositions (dashboard, vehicle workbench).
+  - `processes/` – global providers (Redux, React Query, Theme), auth guards (`RequireAuth`).
+  - `shared/` – UI kit, Axios/React Query clients, shared schemas, utilities.
 
 ### Running
 ```bash
 npm install
-npm run dev          # development (port defined in .env)
-npm run build        # standalone build
+npm run dev          # development
+npm run build        # production build
 npm run start        # serve the built app
 ```
 
-### Environment Variables
-See `frontend/.env.sample`.
-
+### Environment variables (`frontend/.env.sample`)
 | Variable | Purpose |
-| --- | --- |
-| `NEXT_PUBLIC_API_URL` | Public API endpoint (`http://host:port/api`) |
+|----------|---------|
+| `NEXT_PUBLIC_API_URL` | Public API endpoint (e.g. `http://localhost:3000/api`) |
+| `NEXT_PUBLIC_START_THEME` | Initial theme (`light` or `dark`) |
 | `NEXT_PUBLIC_APP_NAME` | Display name in the UI |
-| `NEXT_PUBLIC_CACHE_TTL_SECONDS` | Base TTL for React Query |
 
-### Security & Quality
-- JWT login with secure client persistence using Axios interceptors.
-- Route guards (`RequireAuth`) and session hydration ensure protected navigation.
-- Components remain DRY with centralized tokens (no hardcoded strings/colors).
+### Quality
+- `npm run lint` – ESLint (Next.js + TypeScript).
+- `npm test` – Jest + Testing Library.
+- `npm run test:e2e` – Playwright end-to-end coverage (API + app must be running).
 
-### Tests
-```bash
-npm run lint
-npm test            # Jest + Testing Library
-npm run test:e2e    # Playwright (app must be running)
-```
+### Highlights
+- Authentication handled via Redux Toolkit store and hooks.
+- Data fetching with React Query (see `entities/*/api`).
+- Validation schemas shared with the backend (`shared/schemas`).
+- Light/dark orange themes controlled by `ThemeProvider` and stored in `localStorage`.
 
 </details>

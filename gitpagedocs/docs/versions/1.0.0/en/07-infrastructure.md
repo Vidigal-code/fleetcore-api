@@ -1,50 +1,54 @@
 # Infrastructure and Deployment
 
-The project runs smoothly either inside Docker or directly on the host. This section summarises the moving parts and scripts.
+The repository ships with everything needed to run the platform locally or in CI: Docker images, environment templates, scripts and documentation builders.
 
-## Docker Compose stack
+## Docker Compose services
 
-`docker-compose.yml` orchestrates the full environment:
+`docker-compose.yml` provisions the full stack:
 
-- `sqlserver` — official 2022 Developer image with persistent volume and configurable password.
-- `redis` — append-only mode; used for caching and session storage.
-- `mongo` — persists the audit trail.
-- `rabbitmq` — broker with management UI (`15672`).
-- `backend` — NestJS app built through a multistage `backend/Dockerfile`; depends on all data services.
-- `frontend` — Next.js app (multistage `frontend/Dockerfile`) served on port 3001.
+- `sqlserver` — Microsoft SQL Server 2022 Developer edition with persistent volume and credentials from `SQLSERVER_*` env vars.
+- `redis` — Redis 7 in append-only mode to store sessions and cached queries.
+- `mongo` — MongoDB for the audit fallback worker.
+- `rabbitmq` — RabbitMQ with management UI exposed on `15672`.
+- `backend` — Multistage Nest build defined in `backend/Dockerfile`; depends on the data services above.
+- `frontend` — Multistage Next.js build (`frontend/Dockerfile`) serving the web client on `3001`.
 
-## Environment variables
+## Environment configuration
 
-- Root `.env.example` provides shared values for backend and frontend (`SQLSERVER_*`, `JWT_SECRET`, `AUTH_SESSION_TTL_SECONDS`, `NEXT_PUBLIC_*`).
-- `backend/.env.sample` and `frontend/.env.sample` illustrate stand-alone runs.
-- New additions: `AUTH_SESSION_TTL_SECONDS` (Redis sessions) and `NEXT_PUBLIC_START_THEME` (default theme).
+- Copy `.env.example` → `.env` to run the compose stack; it exposes shared variables for both apps (SQL Server, Redis, RabbitMQ, Mongo, JWT, feature flags, theme settings).
+- `backend/.env.sample` and `frontend/.env.sample` target standalone execution without Docker.
+- Key variables:
+  - `AUTH_SESSION_TTL_SECONDS`, `JWT_SECRET`, `FEATURE_FLAGS_*` control security behaviour.
+  - `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME` configure the frontend runtime.
+  - `AUDIT_MONGO_URI`, `RABBITMQ_URI` wire audit/messaging.
 
-## Helpful scripts
+## Build & tooling scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run build` / `npm run start:prod` (backend) | Production build/start.
-| `npm run generate:openapi` | Generates Swagger JSON artefacts.
-| `npm run export:schemas` | Exports Zod schemas to the frontend.
-| `npm run dev` (frontend) | Starts Next.js with HMR.
-| `npm run lint`, `npm test`, `npm run test:e2e` | Quality gates for both apps.
+| Command | Location | Purpose |
+|---------|----------|---------|
+| `npm run start:dev` / `npm run start:prod` | `backend/` | Run Nest API (watch or production). |
+| `npm run generate:openapi` | `backend/` | Rebuild Swagger JSON/PT-BR docs. |
+| `npm run export:schemas` | `backend/` | Export Zod schemas to `frontend/src/shared/schemas`. |
+| `npm run lint`, `npm test`, `npm run test:e2e` | `backend/` | Lint, unit/integration tests, e2e tests with SuperTest. |
+| `npm run dev`, `npm run build`, `npm start` | `frontend/` | Next.js development and production builds. |
+| `npm run test`, `npm run test:e2e` | `frontend/` | Unit tests (RTL) and Playwright scenarios. |
+| `npm run gitpagedocs` | repo root | Build the static documentation site under `gitpagedocs/.output`. |
 
-## Documentation (GitPageDocs)
+## Documentation pipeline
 
-- The `gitpagedocs/` folder powers this documentation site.
-- Site settings were updated to mirror the challenge (PT/EN languages, new navigation, no audio/video extras).
-- Can be published through GitHub Pages (`https://vidigal-code.github.io/fleetcore-api/`).
+- GitPagedocs configuration lives under `gitpagedocs/`; multilingual content is stored in `docs/versions/1.0.0/{pt,en,es}`.
+- Deploy by pushing to GitHub Pages (`https://vidigal-code.github.io/fleetcore-api/`) or serving the generated static files.
 
-## Observability
+## Observability hooks
 
-- NestJS logs highlight retries, circuit breaker openings and audit fallbacks.
-- Audit data stored in MongoDB; RabbitMQ provides a full event trail.
-- Domain metrics allow straightforward integration with Prometheus/Grafana.
+- NestJS logging surfaces resilience retries, audit fallbacks and domain event publishing failures.
+- Audit payloads persist in MongoDB for post-mortem analysis, and RabbitMQ retains message history when durable queues are enabled.
+- `DomainMetricsService` exposes counters that can be scraped by Prometheus when the optional exporter is attached.
 
-## Recommended deployment flow
+## Typical local workflow
 
-1. Copy `.env.example` to `.env` and adjust secrets.
-2. Execute `docker compose up --build`.
-3. Access `http://localhost:3000/api` (API), `/docs` (Swagger EN), `/docs-pt` (Swagger PT-BR), `http://localhost:3001` (frontend) and `http://localhost:15672` (RabbitMQ).
+1. `cp .env.example .env` and adjust secrets.
+2. `docker compose up --build` to start all services.
+3. Visit `http://localhost:3000/api` (API), `/docs` (Swagger EN), `/docs-pt` (Swagger PT-BR), `http://localhost:3001` (frontend) and `http://localhost:15672` (RabbitMQ console).
 
-This setup satisfies the challenge requirements and is ready to be ported to cloud-native environments if needed.
+The same compose stack is used in CI smoke tests, making it straightforward to deploy the platform to other environments or cloud-managed services.

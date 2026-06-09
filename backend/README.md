@@ -1,79 +1,61 @@
 # Fleetcore API
 
+API NestJS 11 baseada em DDD para o domínio de gestão de frota. Inclui autenticação com sessões em Redis, eventos RabbitMQ, trilha de auditoria em MongoDB e documentação Swagger bilíngue.
+
 ## 🇧🇷 Descrição em Português
 <details>
-<summary><strong>Ver Detalhes</strong></summary>
+<summary><strong>Ver detalhes</strong></summary>
 
-### Visão Geral
-- API NestJS 10+ estruturada em DDD para o módulo de Gestão de Frota.
-- Persistência em SQL Server via TypeORM, cache Redis, eventos RabbitMQ e auditoria MongoDB.
-- Segurança enterprise: JWT + RBAC, headers com Helmet (CSP/HSTS), rate limiting, correlação de requisições e CORS com allow-list.
-
-### Tecnologias
-- NestJS, TypeORM, SQL Server, Redis, RabbitMQ, MongoDB.
-- JWT + Passport, `@nestjs/throttler`, `cache-manager-redis-yet`.
-- Testes com Jest (unitários, integração, e2e com Supertest).
-
-### Modelagem e Domínio
-- Tabelas obrigatórias (`models`, `vehicles`) com metadados `created_at`, `updated_at`, `created_by`.
-- Bônus implementados: `brands`, `users` e seeds (`ensureAdminSeed`).
-- `UnitOfWork` garante rollback nas operações de escrita; serviços reutilizam presenters e mappers.
+### Arquitetura
+- **Módulos**: `auth`, `fleet`, `users`, `messaging`, `audit` e camada `shared` (config, cache, unit of work, resiliência, métricas).
+- **Aplicações**: `apps/api` (HTTP) e `apps/audit-worker` (processamento assíncrono de auditoria).
+- **DDD**: agregados (`Brand`, `Model`, `Vehicle`, `User`), eventos (`VehicleCreatedEvent`, etc.) e repositórios TypeORM customizados.
 
 ### Execução
 ```bash
 npm install
-npm run build
-npm run start:prod
-# modo dev: npm run start:dev
-# worker de auditoria: npm run start:audit-worker
+npm run start:dev          # desenvolvimento
+npm run start:prod         # produção
+npm run start:audit-worker # worker de auditoria (opcional)
 ```
 
-### Documentação
-- Swagger PT-BR: `http://localhost:3000/docs-pt`
-- Swagger EN: `http://localhost:3000/docs`
-- Sincronizar cliente TypeScript (API em execução):
-  ```bash
-  npm run generate:client
-  ```
+### Scripts úteis
+- `npm run generate:openapi` – atualiza Swagger PT/EN.
+- `npm run export:schemas` – exporta schemas Zod para o frontend.
+- `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov` – qualidade e cobertura.
 
-### Variáveis de Ambiente (ver `backend/.env.sample`)
+### Variáveis de ambiente (ver `backend/.env.sample`)
 | Variável | Descrição |
-| --- | --- |
-| `SQLSERVER_HOST/PORT/USER/PASSWORD/DB` | Conexão com SQL Server |
-| `REDIS_HOST/PORT/REDIS_TTL_SECONDS` | Cache de veículos (TTL configurável) |
-| `JWT_SECRET`, `JWT_EXPIRES_IN` | Assinatura e expiração do token |
-| `MONGO_URI` | Audit log em MongoDB |
-| `RABBITMQ_URI`, `RABBITMQ_EXCHANGE`, `RABBITMQ_QUEUE` | Eventos `vehicle.*` |
-| `RABBITMQ_AUDIT_QUEUE` | Fila dedicada para eventos de auditoria |
-| `SECURITY_CORS_ALLOWED_ORIGINS` | Lista CSV de origens permitidas |
-| `SECURITY_RATE_LIMIT_TTL`, `SECURITY_RATE_LIMIT_MAX` | Janela e limite do rate limiting |
-| `ADMIN_*` | Credenciais do usuário administrador seed |
+|----------|-----------|
+| `SQLSERVER_*` | Conexão com SQL Server |
+| `REDIS_HOST`, `REDIS_PORT`, `REDIS_TTL_SECONDS` | Cache de repositório/sessões |
+| `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS` | Autenticação JWT/Redis |
+| `RABBITMQ_URI`, `RABBITMQ_EXCHANGE`, `RABBITMQ_QUEUE`, `RABBITMQ_AUDIT_QUEUE` | Mensageria de domínio/auditoria |
+| `MONGO_URI` | Persistência da trilha de auditoria |
+| `FEATURE_FLAGS_*` | Cache, eventos, worker assíncrono, swagger |
 
-### Segurança e Observabilidade
-- Helmet aplica CSP, HSTS, frameguard e `Permissions-Policy`.
-- Middleware gera `X-Request-Id` e `X-Correlation-Id` reutilizados pela auditoria.
-- CORS bloqueia origens fora da allow-list e registra tentativas rejeitadas.
-- Rate limiting global com `@nestjs/throttler`.
-- Auditoria persistida em MongoDB com payload e metadados (IP, user-agent, correlação).
-- Proxy TLS + gestão de segredos documentados em `docs/security/tls-and-secrets.md`.
+### Documentação
+- Swagger EN: `http://localhost:3000/docs`
+- Swagger PT-BR: `http://localhost:3000/docs-pt`
+- GitPagedocs: `../gitpagedocs/docs/versions/1.0.0/pt`
 
-### Mensageria e Cache
-- `MessagingService` publica `vehicle.*` e `audit.event` no RabbitMQ, com resiliência (retry + circuit breaker).
-- `FleetDomainEventListener` unifica publicação de eventos de domínio e incrementa métricas compartilhadas.
-- `AuditEventsConsumer` roda no worker (`npm run start:audit-worker`) e persiste auditoria fora do request.
-- `RepositoryCacheService` provê cache reutilizável por repositório com invalidação segmentada (`vehicles.search`).
-
-### Estrutura de Pastas
-- `apps/api` – bootstrap, guards globais, interceptors.
-- `modules/auth`, `modules/users` – autenticação, RBAC, seed.
-- `modules/fleet` – agregados, DTOs, services e controllers de brands/models/vehicles.
-- `modules/messaging` – configuração RabbitMQ.
-- `modules/audit` – serviço com fila assíncrona, interceptor e writer Mongo.
-- `shared` – configs, cache, unit-of-work, validação de ambiente.
+### Estrutura de diretórios
+```text
+apps/
+  api/           # Bootstrap HTTP, guards, interceptors
+  audit-worker/  # Worker para persistir auditoria
+modules/
+  auth/          # JWT, sessões Redis, guards/decorators
+  fleet/         # Domínio da frota (services, DTOs, agregados, eventos)
+  messaging/     # Integração RabbitMQ
+  audit/         # Interceptor e writer MongoDB
+  users/         # Seed e operações com usuários
+shared/          # Configs, cache, unit-of-work, resiliência, métricas, validação
+```
 
 ### Seeds
-- `UsersService.ensureAdminSeed()` cria `aivacol / aivacol123!`.
-- `seeds/seed_vehicles.json` fornece dados iniciais de veículos.
+- Usuário administrador: `aivacol / aivacol123!` via `UsersService.ensureAdminSeed()`.
+- Dataset opcional: `seeds/seed_vehicles.json`.
 
 ### Testes
 ```bash
@@ -81,95 +63,69 @@ npm run lint
 npm test
 npm run test:e2e
 npm run test:cov
-npm run build
 ```
-Cobertura inclui regras de negócio, rollback, cache e headers de segurança.
 
 </details>
 
 ## 🇺🇸 English Description
 <details>
-<summary><strong>View Details</strong></summary>
+<summary><strong>View details</strong></summary>
 
-### Overview
-- NestJS 10+ API built with DDD for the Fleet Management module.
-- SQL Server via TypeORM, Redis cache, RabbitMQ events, MongoDB audit log.
-- Enterprise security: JWT + RBAC, Helmet (CSP/HSTS), rate limiting, request correlation, allow-listed CORS.
-
-### Technologies
-- NestJS, TypeORM, SQL Server, Redis, RabbitMQ, MongoDB.
-- JWT/Passport, `@nestjs/throttler`, `cache-manager-redis-yet`.
-- Jest tests (unit, integration, e2e with Supertest).
-
-### Data Model and Domain
-- Mandatory tables (`models`, `vehicles`) with metadata `created_at`, `updated_at`, `created_by`.
-- Bonus tables implemented: `brands`, `users`, including seeds (`ensureAdminSeed`).
-- `UnitOfWork` enforces transactional rollback; services rely on reusable presenters/mappers.
+### Architecture
+- **Modules**: `auth`, `fleet`, `users`, `messaging`, `audit`, and a `shared` layer with config, cache, unit of work, resilience and metrics services.
+- **Applications**: `apps/api` (HTTP gateway) and `apps/audit-worker` (async audit processor).
+- **DDD**: aggregates (`Brand`, `Model`, `Vehicle`, `User`), domain events, TypeORM repositories, Redis cache per repository.
 
 ### Running
 ```bash
 npm install
-npm run build
-npm run start:prod
-# dev mode: npm run start:dev
-# audit worker: npm run start:audit-worker
+npm run start:dev          # development
+npm run start:prod         # production
+npm run start:audit-worker # audit worker (optional)
 ```
 
-### Documentation
-- Swagger (PT-BR): `http://localhost:3000/docs-pt`
-- Swagger (EN): `http://localhost:3000/docs`
-- Sync TypeScript client (API running):
-  ```bash
-  npm run generate:client
-  ```
+### Handy scripts
+- `npm run generate:openapi` – rebuild bilingual Swagger docs.
+- `npm run export:schemas` – share validation schemas with the frontend.
+- Testing: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`.
 
-### Environment Variables (see `backend/.env.sample`)
+### Environment variables (`backend/.env.sample`)
 | Variable | Purpose |
-| --- | --- |
-| `SQLSERVER_HOST/PORT/USER/PASSWORD/DB` | SQL Server connection |
-| `REDIS_HOST/PORT/REDIS_TTL_SECONDS` | Vehicle cache configuration |
-| `JWT_SECRET`, `JWT_EXPIRES_IN` | Token signing/expiration |
+|----------|---------|
+| `SQLSERVER_*` | SQL Server connection |
+| `REDIS_HOST`, `REDIS_PORT`, `REDIS_TTL_SECONDS` | Repository/session cache configuration |
+| `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS` | JWT & Redis session settings |
+| `RABBITMQ_URI`, `RABBITMQ_EXCHANGE`, `RABBITMQ_QUEUE`, `RABBITMQ_AUDIT_QUEUE` | Domain + audit messaging |
 | `MONGO_URI` | MongoDB audit storage |
-| `RABBITMQ_URI`, `RABBITMQ_EXCHANGE`, `RABBITMQ_QUEUE` | `vehicle.*` events |
-| `RABBITMQ_AUDIT_QUEUE` | Dedicated audit event queue |
-| `SECURITY_CORS_ALLOWED_ORIGINS` | CORS allow-list |
-| `SECURITY_RATE_LIMIT_TTL`, `SECURITY_RATE_LIMIT_MAX` | Rate limiting window/limit |
-| `ADMIN_*` | Seeded admin credentials |
+| `FEATURE_FLAGS_*` | Toggle cache, domain events, async audit worker, swagger |
 
-### Security & Observability
-- Helmet enforces CSP, HSTS, frameguard, `Permissions-Policy`.
-- Middleware emits `X-Request-Id` and `X-Correlation-Id`, consumed by the audit interceptor.
-- CORS deny non allow-listed origins and logs attempts.
-- `@nestjs/throttler` provides global rate limiting.
-- Audit interceptor writes every authenticated request with payload and metadata into MongoDB.
-- TLS proxy & secrets playbook: see `docs/security/tls-and-secrets.md`.
+### Documentation
+- Swagger EN: `http://localhost:3000/docs`
+- Swagger PT-BR: `http://localhost:3000/docs-pt`
+- GitPagedocs: `../gitpagedocs/docs/versions/1.0.0/en`
 
-### Messaging & Cache
-- `MessagingService` publishes `vehicle.*` + `audit.event` with built-in retry/circuit breaker policies.
-- `FleetDomainEventListener` centralizes domain event forwarding and shared metrics increments.
-- `AuditEventsConsumer` runs in the worker (`npm run start:audit-worker`) to persist audit logs asynchronously.
-- `RepositoryCacheService` delivers reusable repository-level caching with namespace invalidation (`vehicles.search`).
-
-### Folder Layout
-- `apps/api` – bootstrap layer and global guards/interceptors.
-- `modules/auth`, `modules/users` – authentication, RBAC, seed routines.
-- `modules/fleet` – aggregates, DTOs, services, controllers for brands/models/vehicles.
-- `modules/messaging` – RabbitMQ configuration.
-- `modules/audit` – async audit pipeline service, interceptor, Mongo writer.
-- `shared` – configuration, Redis wrapper, unit-of-work, env validation.
+### Folder layout
+```text
+apps/api            # HTTP bootstrap, global guards/interceptors
+apps/audit-worker   # Async worker (audit fallback)
+modules/auth        # JWT, Redis sessions, guards/decorators
+modules/fleet       # Brands/Models/Vehicles domain (services, DTOs, aggregates)
+modules/messaging   # RabbitMQ integration
+modules/audit       # Audit interceptor, service, Mongo writer
+modules/users       # Admin seed, user repository
+shared              # Config, cache, unit-of-work, resilience, metrics, validation
+```
 
 ### Seeds
-- `UsersService.ensureAdminSeed()` provision admin user (`aivacol / aivacol123!`).
-- `seeds/seed_vehicles.json` supplies sample vehicle data.
+- Admin user `aivacol / aivacol123!` created by `UsersService.ensureAdminSeed()`.
+- Optional dataset `seeds/seed_vehicles.json` for local development.
 
-### Test Commands
+### Tests
 ```bash
 npm run lint
 npm test
 npm run test:e2e
 npm run test:cov
-npm run build
 ```
-Coverage spans business rules, transactional rollback, Redis cache and security headers.
 
 </details>

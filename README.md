@@ -1,125 +1,131 @@
 # Fleetcore Fleet Management Platform
 
+Plataforma full-stack construída para o desafio técnico da Aivacol, composta por um backend NestJS (DDD + SQL Server + Redis + RabbitMQ + MongoDB) e um frontend Next.js (FSD + Redux Toolkit + React Query). O repositório também inclui um site GitPagedocs bilíngue, scripts de automação e stack Docker completa.
+
 ## 🇧🇷 Descrição em Português
 <details>
-<summary><strong>Ver Detalhes</strong></summary>
+<summary><strong>Ver detalhes</strong></summary>
 
-### Visão Geral
-- Plataforma de gestão de frota com backend NestJS e frontend Next.js.
-- Arquitetura limpa, DDD, cache distribuído, mensageria RabbitMQ e auditoria MongoDB.
-- Segurança enterprise (CSP, HSTS, rate limiting, correlação de requisições, CORS com allow-list).
+### Visão geral
+- APIs NestJS 11 com autenticação JWT/RBAC, cache Redis, auditoria MongoDB e mensageria RabbitMQ.
+- Web app Next.js 14 (App Router) usando Feature-Sliced Design, Redux Toolkit e React Query.
+- Docker Compose levanta toda a infraestrutura (SQL Server, Redis, RabbitMQ, MongoDB, API e Web).
+- Documentação completa em `gitpagedocs/` (PT/EN/ES) — gerar com `npm run gitpagedocs`.
 
-### Stack
-- Backend: NestJS 10+, TypeORM (SQL Server), Redis, RabbitMQ, MongoDB, JWT, RBAC.
-- Frontend: Next.js 14 (App Router), Feature-Sliced Design, Redux Toolkit, React Query, Axios, Tailwind.
-- Infra: Docker Compose com SQL Server, Redis, MongoDB, RabbitMQ, API e Web.
+### Estrutura do projeto
+```text
+backend/    # API NestJS (auth, fleet, users, messaging, audit, shared)
+frontend/   # App Next.js em FSD (entities, features, widgets, processes, shared)
+gitpagedocs/ # Documentação GitPagedocs 1.0.0 (PT/EN/ES)
+.env.example
+```
 
-### Execução
-**Docker**
+### Como executar
+**Docker (recomendado)**
 ```bash
 cp .env.example .env
 docker compose up --build
 ```
-Serviços: Frontend `http://localhost:${FRONTEND_PORT:-3001}`, Backend `http://localhost:${HTTP_PORT:-3000}/api`, RabbitMQ UI `http://localhost:15672`.
+Serviços: API `http://localhost:${HTTP_PORT:-3000}/api`, Swagger (`/docs`, `/docs-pt`), Frontend `http://localhost:${FRONTEND_PORT:-3001}`, RabbitMQ UI `http://localhost:15672`.
 
-**Manual**
+**Execução manual**
 ```bash
-# Backend
-cd backend && npm install && npm run build && npm run start:prod
+# API
+cd backend
+npm install
+npm run start:dev   # ou npm run start:prod
 
 # Frontend
-cd frontend && npm install && npm run dev
+cd ../frontend
+npm install
+npm run dev
 ```
 
-**Gerar cliente TypeScript (Swagger)**
-```bash
-# Com a API rodando em http://localhost:3000
-cd backend
-npm run generate:client
-```
+### Scripts úteis
+- `npm run generate:openapi` (backend) – atualiza Swagger PT/EN.
+- `npm run export:schemas` (backend) – exporta schemas Zod consumidos pelo frontend.
+- `npm run gitpagedocs` (raiz) – gera o site estático da documentação.
 
-### Variáveis Principais
-Confira `.env.example` para:
-- `HTTP_PORT`, `FRONTEND_PORT`
-- `SQLSERVER_*`, `REDIS_*`, `MONGO_URI`, `RABBITMQ_*`
-- `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`
-- `SECURITY_CORS_ALLOWED_ORIGINS`, `SECURITY_RATE_LIMIT_*`
-- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_START_THEME`
+### Variáveis principais (`.env.example`)
+- `SQLSERVER_*`, `REDIS_*`, `MONGO_URI`, `RABBITMQ_URI`
+- `JWT_SECRET`, `AUTH_SESSION_TTL_SECONDS`, `FEATURE_FLAGS_*`
+- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME`
 
 ### Testes
-- Backend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`, `npm run build`.
-- Frontend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run build`.
+- Backend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`.
+- Frontend: `npm run lint`, `npm test`, `npm run test:e2e`.
 
-### Estrutura
-- `backend/` – API NestJS (auth, fleet, messaging, audit, shared).
-- `frontend/` – Web Next.js estruturada em FSD.
-- `docs/` – referências de arquitetura.
-- `docker-compose.yml` – orquestração completa.
-
-### Credenciais Seed
+### Credenciais seed
 - Usuário: `aivacol`
 - Senha: `aivacol123!`
+
+Para detalhes aprofundados consulte `gitpagedocs/docs/versions/1.0.0/pt`.
 
 </details>
 
 ## 🇺🇸 English Description
 <details>
-<summary><strong>View Details</strong></summary>
+<summary><strong>View details</strong></summary>
 
 ### Overview
-- Fleet management platform powered by NestJS backend and Next.js frontend.
-- Clean architecture, DDD, distributed cache, RabbitMQ messaging, MongoDB auditing.
-- Enterprise-grade security (CSP, HSTS, rate limiting, request correlation, allow-listed CORS).
+- NestJS 11 API with JWT/RBAC, Redis cache, RabbitMQ messaging and MongoDB audit trail.
+- Next.js 14 web client (App Router + FSD) powered by Redux Toolkit and React Query.
+- Docker Compose spins up SQL Server, Redis, RabbitMQ, MongoDB, API and web app.
+- Comprehensive multilingual docs in `gitpagedocs/` (build using `npm run gitpagedocs`).
 
-### Stack
-- Backend: NestJS 10+, TypeORM (SQL Server), Redis, RabbitMQ, MongoDB, JWT, RBAC.
-- Frontend: Next.js 14 (App Router), Feature-Sliced Design, Redux Toolkit, React Query, Axios, Tailwind.
-- Infra: Docker Compose bundling SQL Server, Redis, MongoDB, RabbitMQ, API, and Web app.
+### Project layout
+```text
+backend/    # NestJS API (auth, fleet, users, messaging, audit, shared)
+frontend/   # Next.js app (entities, features, widgets, processes, shared)
+gitpagedocs/ # GitPagedocs site version 1.0.0 (PT/EN/ES)
+.env.example
+```
 
-### Running
-**Docker**
+### Getting started
+**Docker (recommended)**
 ```bash
 cp .env.example .env
-docker compose up --build
 ```
-Services: Frontend `http://localhost:${FRONTEND_PORT:-3001}`, Backend `http://localhost:${HTTP_PORT:-3000}/api`, RabbitMQ UI `http://localhost:15672`.
+Services: API `http://localhost:${HTTP_PORT:-3000}/api`, Swagger (`/docs`, `/docs-pt`), frontend `http://localhost:${FRONTEND_PORT:-3001}`, RabbitMQ UI `http://localhost:15672`.
 
-**Manual**
+**Manual run**
 ```bash
-# Backend
-cd backend && npm install && npm run build && npm run start:prod
+# API
+cd backend
+npm install
+npm run start:dev   # or npm run start:prod
 
 # Frontend
-cd frontend && npm install && npm run dev
+cd ../frontend
+npm install
+npm run dev
 ```
 
-**Generate TypeScript client (Swagger)**
-```bash
-# With the API running at http://localhost:3000
-cd backend
-npm run generate:client
-```
+### Handy scripts
+- `npm run generate:openapi` (backend) – rebuild Swagger PT/EN specs.
+- `npm run export:schemas` (backend) – sync validation schemas with the frontend.
+- `npm run gitpagedocs` (root) – compile the documentation site.
 
-### Key Environment Variables
-See `.env.example` for:
-- `HTTP_PORT`, `FRONTEND_PORT`
-- `SQLSERVER_*`, `REDIS_*`, `MONGO_URI`, `RABBITMQ_*`
-- `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`
-- `SECURITY_CORS_ALLOWED_ORIGINS`, `SECURITY_RATE_LIMIT_*`
-- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_START_THEME`
+### Key environment variables (`.env.example`)
+- `SQLSERVER_*`, `REDIS_*`, `MONGO_URI`, `RABBITMQ_URI`
+- `JWT_SECRET`, `AUTH_SESSION_TTL_SECONDS`, `FEATURE_FLAGS_*`
+- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME`
 
 ### Tests
-- Backend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`, `npm run build`.
-- Frontend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run build`.
+- Backend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`.
+- Frontend: `npm run lint`, `npm test`, `npm run test:e2e`.
 
-### Structure
-- `backend/` – NestJS API (auth, fleet, messaging, audit, shared).
-- `frontend/` – Next.js Web app following FSD.
-- `docs/` – architecture docs.
-- `docker-compose.yml` – full stack orchestration.
-
-### Seed Credentials
+### Seed credentials
 - User: `aivacol`
 - Password: `aivacol123!`
 
+Refer to `gitpagedocs/docs/versions/1.0.0/en` for deeper architectural documentation.
+
 </details>
+
+## 📚 Documentação complementar
+- GitPagedocs (PT/EN/ES): `gitpagedocs/docs/versions/1.0.0`
+- Backend README: `backend/README.md`
+- Frontend README: `frontend/README.md`
+
+Sinta-se à vontade para abrir issues ou PRs com melhorias. Boa avaliação! 🚀

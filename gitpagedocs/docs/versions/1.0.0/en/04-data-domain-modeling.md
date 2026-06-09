@@ -1,38 +1,37 @@
 # Data and Domain Modeling
 
-The system relies on **TypeORM** with SQL Server. A single migration (`backend/src/migrations/1717845600000-InitSchema.ts`) provisions every required table and metadata column (`created_at`, `updated_at`, `created_by`).
+The backend uses TypeORM on SQL Server with a pure DDD layer. Persistence is set up through a single migration (`backend/src/migrations/1717845600000-InitSchema.ts`) that defines tables, constraints and audit metadata (`created_at`, `updated_at`, `created_by`).
 
-## Database tables
+## Relational schema
 
-| Table | Key columns | Notes |
-|-------|-------------|-------|
-| `users` | `id`, `nickname`, `name`, `email`, `password_hash`, `roles`, metadata | Seeds admin `aivacol`; roles stored as CSV. |
-| `brands` | `id`, `name`, metadata | Unique constraint on `name`. |
-| `models` | `id`, `name`, `brand_id`, metadata | `brand_id` optional; FK uses `SET NULL`. |
-| `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `year`, `model_id`, metadata | Unique constraints on plate/chassis/renavam; FK cascades deletions to keep referential integrity. |
+| Table | Key columns | Relationships |
+|-------|-------------|----------------|
+| `users` | `id`, `nickname`, `email`, `password_hash`, `roles` | Seeded admin (`aivacol`) with role set stored as CSV; referenced by audit metadata. |
+| `brands` | `id`, `name` | Unique constraint on `name`; optional parent for models. |
+| `models` | `id`, `name`, `brand_id` | Foreign key to `brands` (SET NULL on delete) enabling orphan models. |
+| `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `model_id` | Unique constraints on identifiers; cascade delete keeps referential integrity. |
+| `audit_events` (Mongo) | `correlationId`, `context`, `payload` | Stored via `AuditWriterService` whenever queue fallback triggers. |
 
-## Domain layer
+`backend/seeds/seed_vehicles.json` contains sample fleet data for local development.
 
-- Aggregates (`User`, `Brand`, `Model`, `Vehicle`) encapsulate invariants and provide mutation methods with guarded state transitions.
-- Domain events (`VehicleCreatedEvent`, etc.) carry snapshots for messaging and auditing.
+## Aggregates and repositories
 
-## Validation pipeline
+- **Aggregates**: `Brand`, `Model`, `Vehicle`, `User` live in `backend/src/modules/**/domain`. They enforce invariants such as unique brand names, valid license plates and role checks.
+- **Repositories**: TypeORM repositories in `backend/src/modules/fleet/infrastructure/repositories` load/persist aggregates; interfaces reside in `domain/*.repository.ts`.
+- **Unit of Work**: `backend/src/shared/unit-of-work/unit-of-work.ts` wraps TypeORM transactions, ensuring multiple repository operations stay atomic.
+- **Domain events**: Emitted from aggregates (e.g. `VehicleCreatedEvent`, `VehicleUpdatedEvent`) and centralised under `backend/src/modules/fleet/domain/events`.
 
-- DTOs rely on `class-validator` plus Zod schemas generated from the backend and consumed by the frontend (`backend/scripts/export-schemas.ts`).
-- Critical rules (Mercosur plate regex, chassis length, RENAVAM structure) are defined once in `backend/src/shared/validation/fleet.schema.ts`.
+## Validation and schemas
 
-## Repositories & Unit of Work
+- **Backend DTOs** use `class-validator` plus shared Zod schemas declared in `backend/src/shared/validation/fleet.schema.ts`.
+- **Schema export**: `npm run export:schemas` generates JSON/Zod artefacts consumed by the frontend (`frontend/src/shared/schemas`).
+- **Business rules**: plate regex, RENAVAM validation, chassis length and year bounds are defined once and reused by both API and UI layers.
 
-- Custom repositories (`VehicleTypeOrmRepository`, `ModelTypeOrmRepository`, ...) translate aggregates to persistence rows.
-- `UnitOfWork` wraps `EntityManager.transaction()` so complex operations (create/update/delete) stay atomic.
+## Patterns in practice
 
-## Seeds and sample data
+1. Controllers accept DTOs and hand them to application services.
+2. Services load aggregates via repositories inside a `UnitOfWork` transaction.
+3. Aggregates mutate state, emit domain events and hand persistence back to repositories.
+4. Domain events fan out to caches, messaging and audit pipelines.
 
-- `UsersService.ensureAdminSeed()` provisions the administrator on bootstrap.
-- `backend/seeds/seed_vehicles.json` delivers the mock dataset requested by the challenge.
-
-## Compliance
-
-- Required tables (`models`, `vehicles`) plus bonus tables (`brands`, `users`) are present.
-- Integrity rules ensure consistent data and reduce duplication.
-- Domain objects keep business rules close to the core, easing testing and future evolution.
+This structure keeps business rules close to the domain, minimises duplication across layers and allows the frontend to share the same validation rules as the API.
