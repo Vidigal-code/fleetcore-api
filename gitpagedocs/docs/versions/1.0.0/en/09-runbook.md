@@ -5,7 +5,7 @@ Operational quick-start for reviewers and maintainers.
 ## 1. Prepare environment variables
 
 ```bash
-cp .env.example .env
+cp envexample.txt .env
 ```
 
 Edit the new `.env` and configure:

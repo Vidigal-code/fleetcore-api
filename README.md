@@ -23,7 +23,7 @@ gitpagedocs/ # Documentação GitPagedocs 1.0.0 (PT/EN/ES)
 ### Como executar
 **Docker (recomendado)**
 ```bash
-cp .env.example .env
+cp envexample.txt .env
 docker compose up --build
 ```
 Serviços: API `http://localhost:${HTTP_PORT:-3000}/api`, Swagger (`/docs`, `/docs-pt`), Frontend `http://localhost:${FRONTEND_PORT:-3001}`, RabbitMQ UI `http://localhost:15672`.
@@ -84,7 +84,7 @@ gitpagedocs/ # GitPagedocs site version 1.0.0 (PT/EN/ES)
 ### Getting started
 **Docker (recommended)**
 ```bash
-cp .env.example .env
+cp envexample.txt .env
 ```
 Services: API `http://localhost:${HTTP_PORT:-3000}/api`, Swagger (`/docs`, `/docs-pt`), frontend `http://localhost:${FRONTEND_PORT:-3001}`, RabbitMQ UI `http://localhost:15672`.
 

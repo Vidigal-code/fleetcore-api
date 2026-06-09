@@ -3,7 +3,7 @@
 ## 1. Preparar variables de entorno
 
 ```bash
-cp .env.example .env
+cp envexample.txt .env
 ```
 
 Configuraciones clave:
