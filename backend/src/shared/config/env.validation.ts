@@ -1,4 +1,4 @@
-import { plainToInstance } from 'class-transformer';
+import { Transform, plainToInstance } from 'class-transformer';
 import {
   IsEnum,
   IsInt,
@@ -19,6 +19,20 @@ class EnvironmentVariables {
   @IsEnum(Environment)
   NODE_ENV: Environment = Environment.Development;
 
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      return 3000;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    const match = `${value}`.match(/\d+/);
+    if (!match) {
+      return 3000;
+    }
+    const parsed = Number.parseInt(match[0], 10);
+    return Number.isNaN(parsed) ? 3000 : parsed;
+  })
   @IsInt()
   @IsPositive()
   HTTP_PORT = 3000;
@@ -49,6 +63,20 @@ class EnvironmentVariables {
   @IsInt()
   REDIS_PORT!: number;
 
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      return 60;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    const match = `${value}`.match(/\d+/);
+    if (!match) {
+      return 60;
+    }
+    const parsed = Number.parseInt(match[0], 10);
+    return Number.isNaN(parsed) ? 60 : parsed;
+  })
   @IsInt()
   @IsPositive()
   REDIS_TTL_SECONDS = 60;
