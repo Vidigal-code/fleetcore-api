@@ -303,7 +303,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -340,7 +340,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -377,7 +377,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -414,7 +414,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -451,7 +451,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -488,7 +488,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -525,7 +525,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -562,7 +562,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -599,7 +599,7 @@
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
-      "blockLink": false,
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
@@ -713,6 +713,141 @@
       "es": {
         "title": "Preguntas",
         "path-click": "gitpagedocs/docs/versions/1.0.0/es/preguntas-conceptuales.md"
+      }
+    },
+    {
+      "id": 8,
+      "pt": {
+        "title": "Introdução ao Desafio",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/01-introducao.md"
+      },
+      "en": {
+        "title": "Challenge Overview",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/01-introduction.md"
+      },
+      "es": {
+        "title": "Introducción al Desafío",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/01-introduccion.md"
+      }
+    },
+    {
+      "id": 9,
+      "pt": {
+        "title": "Requisitos e Critérios",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/02-requisitos.md"
+      },
+      "en": {
+        "title": "Requirements and Criteria",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/02-requirements.md"
+      },
+      "es": {
+        "title": "Requisitos y Criterios",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/02-requisitos.md"
+      }
+    },
+    {
+      "id": 10,
+      "pt": {
+        "title": "Arquitetura Backend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/03-arquitetura-backend.md"
+      },
+      "en": {
+        "title": "Backend Architecture",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/03-backend-architecture.md"
+      },
+      "es": {
+        "title": "Arquitectura Backend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/03-arquitectura-backend.md"
+      }
+    },
+    {
+      "id": 11,
+      "pt": {
+        "title": "Modelagem de Dados",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/04-modelagem-dominio.md"
+      },
+      "en": {
+        "title": "Data and Domain Modeling",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/04-data-domain-modeling.md"
+      },
+      "es": {
+        "title": "Modelado de Datos",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/04-modelado-dominio.md"
+      }
+    },
+    {
+      "id": 12,
+      "pt": {
+        "title": "Segurança & Mensageria",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/05-seguranca-mensageria.md"
+      },
+      "en": {
+        "title": "Security, Audit and Messaging",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/05-security-audit-messaging.md"
+      },
+      "es": {
+        "title": "Seguridad, Auditoría y Mensajería",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/05-seguridad-auditoria-mensajeria.md"
+      }
+    },
+    {
+      "id": 13,
+      "pt": {
+        "title": "Frontend e Experiência",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/06-frontend.md"
+      },
+      "en": {
+        "title": "Frontend and Experience",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/06-frontend.md"
+      },
+      "es": {
+        "title": "Frontend y Experiencia",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/06-frontend.md"
+      }
+    },
+    {
+      "id": 14,
+      "pt": {
+        "title": "Infraestrutura",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/07-infraestrutura.md"
+      },
+      "en": {
+        "title": "Infrastructure and Deployment",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/07-infrastructure.md"
+      },
+      "es": {
+        "title": "Infraestructura y Despliegue",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/07-infraestructura-despliegue.md"
+      }
+    },
+    {
+      "id": 15,
+      "pt": {
+        "title": "Qualidade e Testes",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/08-testes-observabilidade.md"
+      },
+      "en": {
+        "title": "Quality and Testing",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/08-quality-testing.md"
+      },
+      "es": {
+        "title": "Calidad y Pruebas",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/08-calidad-pruebas.md"
+      }
+    },
+    {
+      "id": 16,
+      "pt": {
+        "title": "Guia de Execução",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/09-guia-execucao.md"
+      },
+      "en": {
+        "title": "Runbook",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/09-runbook.md"
+      },
+      "es": {
+        "title": "Runbook",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/09-runbook-resolucion.md"
       }
     }
   ],
