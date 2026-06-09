@@ -1,0 +1,35 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import type { RabbitMQConfig } from '@golevelup/nestjs-rabbitmq';
+
+import { MessagingService } from './messaging.service';
+import { VehicleEventsConsumer } from './consumers/vehicle-events.consumer';
+import { AppConfigService } from '../../shared/config/app-config.service';
+import { SharedModule } from '../../shared/shared.module';
+
+@Module({
+  imports: [
+    ConfigModule,
+    SharedModule,
+    RabbitMQModule.forRootAsync({
+      inject: [AppConfigService],
+      useFactory: (configService: AppConfigService): RabbitMQConfig => {
+        const { uri, exchange } = configService.messaging;
+
+        return {
+          uri,
+          exchanges: [
+            {
+              name: exchange,
+              type: 'topic',
+            },
+          ],
+        } satisfies RabbitMQConfig;
+      },
+    }),
+  ],
+  providers: [MessagingService, VehicleEventsConsumer],
+  exports: [MessagingService],
+})
+export class MessagingModule {}
