@@ -349,5 +349,126 @@
     }
   ],
   "routes-html": [],
-  "routes-video": []
+  "routes-video": [],
+  "menus-header-md": [
+    {
+      "id": 1,
+      "pt": {
+        "title": "Início",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/index.md"
+      },
+      "en": {
+        "title": "Home",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/index.md"
+      },
+      "es": {
+        "title": "Inicio",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/index.md"
+      }
+    },
+    {
+      "id": 2,
+      "pt": {
+        "title": "Visão geral",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/visao-geral.md"
+      },
+      "en": {
+        "title": "Project overview",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/project-overview.md"
+      },
+      "es": {
+        "title": "Visión general",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/vision-general.md"
+      }
+    },
+    {
+      "id": 3,
+      "pt": {
+        "title": "Arquitetura",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/arquitetura.md"
+      },
+      "en": {
+        "title": "Architecture",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/architecture.md"
+      },
+      "es": {
+        "title": "Arquitectura",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/arquitectura.md"
+      }
+    },
+    {
+      "id": 4,
+      "pt": {
+        "title": "Back-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/backend.md"
+      },
+      "en": {
+        "title": "Back-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/backend.md"
+      },
+      "es": {
+        "title": "Back-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/backend.md"
+      }
+    },
+    {
+      "id": 5,
+      "pt": {
+        "title": "Front-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/frontend.md"
+      },
+      "en": {
+        "title": "Front-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/frontend.md"
+      },
+      "es": {
+        "title": "Front-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/frontend.md"
+      }
+    },
+    {
+      "id": 6,
+      "pt": {
+        "title": "Qualidade",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/qualidade-operacoes.md"
+      },
+      "en": {
+        "title": "Quality & ops",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/quality-ops.md"
+      },
+      "es": {
+        "title": "Calidad",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/calidad-operaciones.md"
+      }
+    },
+    {
+      "id": 7,
+      "pt": {
+        "title": "Perguntas",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/perguntas-conceituais.md"
+      },
+      "en": {
+        "title": "Conceptual answers",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/conceptual-answers.md"
+      },
+      "es": {
+        "title": "Preguntas",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/preguntas-conceptuales.md"
+      }
+    }
+  ],
+  "menus-header-html": [],
+  "menus-header-video": [],
+  "hierarchyPage": {
+    "video": 0,
+    "md": 1,
+    "html": 2,
+    "audio": 3
+  },
+  "hierarchyMenu": {
+    "video": 0,
+    "md": 1,
+    "html": 2,
+    "audio": 3
+  }
 }
