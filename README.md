@@ -17,7 +17,7 @@
 ### Execução
 **Docker**
 ```bash
-cp .env.example .env
+cp envexample.txt .env
 docker compose up --build
 ```
 Serviços: Frontend `http://localhost:${FRONTEND_PORT:-3001}`, Backend `http://localhost:${HTTP_PORT:-3000}/api`, RabbitMQ UI `http://localhost:15672`.
@@ -72,7 +72,7 @@ Confira `.env.example` para:
 ### Running
 **Docker**
 ```bash
-cp .env.example .env
+cp envexample.txt .env
 docker compose up --build
 ```
 Services: Frontend `http://localhost:${FRONTEND_PORT:-3001}`, Backend `http://localhost:${HTTP_PORT:-3000}/api`, RabbitMQ UI `http://localhost:15672`.
