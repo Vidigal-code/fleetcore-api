@@ -1,34 +1,25 @@
-# Git Page Docs
+# Plataforma de Gestão de Frota · Aivacol
 
-Git Page Docs e um runtime de documentacao multi-idioma para repositorios que possuem a pasta `gitpagedocs/`.
+Este espaço documenta, em detalhes, a solução entregue para o teste técnico de backend da Aivacol. O objetivo é demonstrar transparência sobre decisões técnicas, mapear cada requisito do desafio e servir como referência rápida para manutenção ou auditoria.
 
-## O que este projeto entrega
+## Como navegar
 
-- Renderizacao markdown em varios idiomas (`en`, `pt`, `es`)
-- Roteamento por versao (`/v/:versao`)
-- Sistema de temas por templates JSON
-- Execucao local e em GitHub Pages
-- Busca de repositorio + renderizacao remota opcional
+- [Introdução ao Desafio](./01-introducao.md) — visão macro do produto, objetivos e artefatos.
+- [Requisitos e Critérios](./02-requisitos.md) — checklist completo do enunciado e onde cada item foi atendido.
+- [Arquitetura Backend](./03-arquitetura-backend.md) — módulos NestJS, camadas DDD e mecanismos de resiliência.
+- [Modelagem de Dados e Domínio](./04-modelagem-dominio.md) — entidades, migrations e relacionamento entre tabelas.
+- [Segurança, Auditoria e Mensageria](./05-seguranca-mensageria.md) — JWT, RBAC, Redis, RabbitMQ e trilha em MongoDB.
+- [Frontend e Experiência](./06-frontend.md) — Next.js FSD, React Query, Redux Toolkit e design responsivo laranja.
+- [Infraestrutura e Deployment](./07-infraestrutura.md) — Docker Compose, variáveis de ambiente, scripts e documentação.
+- [Qualidade e Testes](./08-testes-observabilidade.md) — matriz de testes unitários/integrados/e2e, linting e monitoramento.
+- [Guia de Execução e Troubleshooting](./09-guia-execucao.md) — passo a passo para subir ambientes e lidar com falhas.
 
-## Contrato de pastas
+## Stack em alto nível
 
-O runtime espera esta estrutura:
+- **Backend:** NestJS 11, TypeORM, SQL Server, Redis, RabbitMQ, MongoDB, Zod.
+- **Frontend:** Next.js 14 (App Router), Redux Toolkit, React Query, Axios, Tailwind, Playwright.
+- **Infra:** Docker Compose, scripts NPM, GitHub Pages para documentação GitPageDocs.
 
-- `gitpagedocs/config.json`
-- `gitpagedocs/docs/<lang>/*.md`
-- `gitpagedocs/docs/versions/<versao>/config.json`
-- `gitpagedocs/docs/versions/<versao>/<lang>/*.md`
-- `gitpagedocs/layouts/layoutsConfig.json`
-- `gitpagedocs/layouts/templates/*.json`
+Cada página aprofunda o tópico correspondente e aponta diretamente para os arquivos e comandos relevantes dentro do repositório.
 
-## Navegacao rapida
-
-- Abra **Primeiros passos** para setup local.
-- Abra **Configuracao** para detalhes completos do `config.json`.
-- Abra **Publicacao** para comportamento local/producao/GitHub Pages.
-- Abra **Arquitetura** para mapa de codigo e fluxo de dados.
-- Abra **Temas e layouts** para autoria de templates.
-- Abra **Rotas autorizadas** para configurar chave, papeis e autenticacao externa.
-- Abra **FAQ** para troubleshooting.
-
-> Versao: 1.0.0
+> Versão: 1.0.0
