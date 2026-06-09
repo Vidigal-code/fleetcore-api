@@ -19,6 +19,12 @@ import { ModelTypeOrmRepository } from '../infrastructure/repositories/model.typ
 import { EventBusService } from '../../../shared/domain/events';
 import { FeatureToggleService } from '../../../shared/features';
 import { ModelCreatedEvent, ModelDeletedEvent, ModelUpdatedEvent } from '../domain/events';
+import {
+  AUDIT_ENTITY_MODEL,
+  MODEL_EVENT_CREATED,
+  MODEL_EVENT_REMOVED,
+  MODEL_EVENT_UPDATED,
+} from '../fleet.constants';
 
 @Injectable()
 export class ModelsService {
@@ -67,8 +73,8 @@ export class ModelsService {
     );
 
     await this.auditService.record({
-      action: 'model.created',
-      entity: 'model',
+      action: MODEL_EVENT_CREATED,
+      entity: AUDIT_ENTITY_MODEL,
       entityId: created.id,
       actor,
       payload: { name: created.name, brandId: created.brandId },
@@ -118,8 +124,8 @@ export class ModelsService {
     );
 
     await this.auditService.record({
-      action: 'model.updated',
-      entity: 'model',
+      action: MODEL_EVENT_UPDATED,
+      entity: AUDIT_ENTITY_MODEL,
       entityId: updated.id,
       actor,
       payload: { name: updated.name, brandId: updated.brandId },
@@ -149,8 +155,8 @@ export class ModelsService {
     });
 
     await this.auditService.record({
-      action: 'model.removed',
-      entity: 'model',
+      action: MODEL_EVENT_REMOVED,
+      entity: AUDIT_ENTITY_MODEL,
       entityId: id,
       actor,
       payload: { name: model.name },

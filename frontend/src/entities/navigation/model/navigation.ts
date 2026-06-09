@@ -22,10 +22,10 @@ export const supportNavigation: NavigationLink[] = [
   {
     id: 'docs',
     label: 'Documentação',
-    href: 'https://docs.aivacol.com/fleetcore',
+    href: 'https://vidigal-code.github.io/fleetcore-api/docs/',
     external: true,
   },
-  { id: 'status', label: 'Status', href: 'https://status.aivacol.com', external: true },
+  { id: 'status', label: 'Status', href: 'https://github.com/Vidigal-code/fleetcore-api', external: true },
 ];
 
 export const footerGroups: NavigationGroup[] = [
@@ -38,8 +38,8 @@ export const footerGroups: NavigationGroup[] = [
     id: 'company',
     label: 'Companhia',
     links: [
-      { id: 'about', label: 'Sobre a Aivacol', href: 'https://aivacol.com', external: true },
-      { id: 'careers', label: 'Carreiras', href: 'https://aivacol.com/carreiras', external: true },
+      { id: 'about', label: 'Fleetcore', href: 'https://github.com/Vidigal-code/fleetcore-api', external: true },
+      { id: 'careers', label: 'Fleetcore Docs', href: 'https://vidigal-code.github.io/fleetcore-api/docs/', external: true },
     ],
   },
   {

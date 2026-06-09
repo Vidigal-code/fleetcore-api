@@ -17,7 +17,17 @@ import { BrandOrmEntity } from '../infrastructure/entities/brand.orm-entity';
 import { BrandTypeOrmRepository } from '../infrastructure/repositories/brand.typeorm.repository';
 import { EventBusService } from '../../../shared/domain/events';
 import { FeatureToggleService } from '../../../shared/features';
-import { BrandCreatedEvent, BrandDeletedEvent, BrandUpdatedEvent } from '../domain/events';
+import {
+  BrandCreatedEvent,
+  BrandDeletedEvent,
+  BrandUpdatedEvent,
+} from '../domain/events';
+import {
+  AUDIT_ENTITY_BRAND,
+  BRAND_EVENT_CREATED,
+  BRAND_EVENT_REMOVED,
+  BRAND_EVENT_UPDATED,
+} from '../fleet.constants';
 
 @Injectable()
 export class BrandsService {
@@ -50,8 +60,8 @@ export class BrandsService {
     );
 
     await this.auditService.record({
-      action: 'brand.created',
-      entity: 'brand',
+      action: BRAND_EVENT_CREATED,
+      entity: AUDIT_ENTITY_BRAND,
       entityId: created.id,
       actor: createdBy,
       payload: { name: created.name },
@@ -89,8 +99,8 @@ export class BrandsService {
     );
 
     await this.auditService.record({
-      action: 'brand.updated',
-      entity: 'brand',
+      action: BRAND_EVENT_UPDATED,
+      entity: AUDIT_ENTITY_BRAND,
       entityId: updated.id,
       actor,
       payload: { name: updated.name },
@@ -120,8 +130,8 @@ export class BrandsService {
     });
 
     await this.auditService.record({
-      action: 'brand.removed',
-      entity: 'brand',
+      action: BRAND_EVENT_REMOVED,
+      entity: AUDIT_ENTITY_BRAND,
       entityId: id,
       actor,
       payload: { name: brand.name },
