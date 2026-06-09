@@ -21,4 +21,6 @@ export const themeOptions: ThemeOption[] = [
   },
 ];
 
-export const DEFAULT_THEME: ThemeMode = 'light';
+const START_THEME = (process.env.NEXT_PUBLIC_START_THEME ?? '').toLowerCase();
+
+export const DEFAULT_THEME: ThemeMode = START_THEME === 'dark' ? 'dark' : 'light';

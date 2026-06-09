@@ -33,7 +33,7 @@ export const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
     <div className="fixed inset-0 z-50 bg-background/90 backdrop-blur-xl md:hidden">
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between border-b border-border/60 px-6 py-4">
-          <div className="flex flex-col">
+          <div className="flex flex-col items-center text-center">
             <span className="text-sm font-semibold text-foreground">{user?.name ?? 'Usuário'}</span>
             <span className="text-xs text-muted">{user?.email ?? '---'}</span>
           </div>
@@ -65,7 +65,7 @@ export const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             })}
           </nav>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap justify-center gap-3">
             {supportNavigation.map((link) => (
               <Link
                 key={link.id}
@@ -90,7 +90,9 @@ export const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             </div>
           ) : null}
 
-          <ThemeToggle />
+          <div className="flex justify-center">
+            <ThemeToggle />
+          </div>
 
           <Button
             type="button"

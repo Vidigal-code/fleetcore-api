@@ -44,7 +44,7 @@ Confira `.env.example` para:
 - `SQLSERVER_*`, `REDIS_*`, `MONGO_URI`, `RABBITMQ_*`
 - `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`
 - `SECURITY_CORS_ALLOWED_ORIGINS`, `SECURITY_RATE_LIMIT_*`
-- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_APP_NAME`
+- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_START_THEME`
 
 ### Testes
 - Backend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`, `npm run build`.
@@ -106,7 +106,7 @@ See `.env.example` for:
 - `SQLSERVER_*`, `REDIS_*`, `MONGO_URI`, `RABBITMQ_*`
 - `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`
 - `SECURITY_CORS_ALLOWED_ORIGINS`, `SECURITY_RATE_LIMIT_*`
-- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_APP_NAME`
+- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_APP_NAME`, `NEXT_PUBLIC_START_THEME`
 
 ### Tests
 - Backend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`, `npm run build`.

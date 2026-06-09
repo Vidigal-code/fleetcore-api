@@ -50,7 +50,7 @@ export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderPro
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-          <div className="flex flex-col">
+          <div className="flex flex-col items-center text-center md:items-start md:text-left">
             <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted">
               {appConfig.appName}
             </span>

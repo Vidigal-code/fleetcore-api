@@ -30,7 +30,9 @@ export const AppShell = ({ children }: AppShellProps) => {
       />
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
       <main className="flex-1 bg-transparent pb-16 pt-10">
-        <div className="container flex flex-col gap-10 lg:gap-12">{children}</div>
+        <div className="container mx-auto flex flex-col items-center gap-10 px-4 sm:px-6 lg:gap-12 lg:px-8">
+          {children}
+        </div>
       </main>
       <MainFooter />
     </div>

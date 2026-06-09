@@ -18,13 +18,13 @@ export const Card = ({ className, header, footer, children, ...props }: CardProp
     {...props}
   >
     {header ? (
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-surface-strong/80 px-6 py-4 text-sm font-semibold uppercase tracking-[0.18em] text-muted">
+      <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-surface-strong/80 px-6 py-4 text-center text-sm font-semibold uppercase tracking-[0.18em] text-muted sm:flex-row sm:justify-between sm:text-left">
         {header}
       </div>
     ) : null}
     <div className={cn('flex flex-col gap-6', header ? 'px-6 pt-6 pb-6' : 'p-6')}>{children}</div>
     {footer ? (
-      <div className="mt-4 flex items-center justify-between gap-3 px-6 pb-6 text-xs uppercase tracking-[0.18em] text-muted">
+      <div className="mt-4 flex flex-col items-center justify-center gap-3 px-6 pb-6 text-center text-xs uppercase tracking-[0.18em] text-muted sm:flex-row sm:justify-between sm:text-left">
         {footer}
       </div>
     ) : null}

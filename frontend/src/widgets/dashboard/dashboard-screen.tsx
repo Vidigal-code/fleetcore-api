@@ -8,7 +8,10 @@ import { Badge } from '@/shared/ui/badge';
 
 export const DashboardScreen = () => (
   <AppShell>
-    <section className="grid gap-6 lg:grid-cols-[1.4fr_1fr]" id="dashboard">
+    <section
+      className="grid w-full max-w-5xl place-items-center gap-6 text-center lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] lg:text-left"
+      id="dashboard"
+    >
       <SectionHeader
         className="col-span-full lg:col-span-1"
         title="Comando operacional da frota"
@@ -20,8 +23,8 @@ export const DashboardScreen = () => (
         }
         actions={<Badge variant="accent">Atualização em cache inteligente</Badge>}
       />
-      <div className="flex flex-col gap-4 rounded-3xl border border-border/50 bg-surface/70 px-6 py-6 shadow-[var(--shadow-elevated)] backdrop-blur-xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">
+      <div className="flex w-full max-w-5xl flex-col gap-4 rounded-3xl border border-border/50 bg-surface/70 px-6 py-6 text-center shadow-[var(--shadow-elevated)] backdrop-blur-xl lg:text-left">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-accent">
           Boas práticas
         </p>
         <h2 className="text-2xl font-semibold text-foreground">
