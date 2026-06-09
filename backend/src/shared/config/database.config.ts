@@ -25,6 +25,14 @@ export default registerAs('database', () => {
     autoLoadEntities: true,
     logging: process.env.NODE_ENV === 'development',
     migrationsRun: true,
-    migrations: ['dist/migrations/*.js'],
+    migrations: ['dist/src/migrations/*.js'],
+    options: {
+      encrypt: true,
+      trustServerCertificate: true,
+    },
+    extra: {
+      trustServerCertificate: true,
+      encrypt: true,
+    },
   };
 });

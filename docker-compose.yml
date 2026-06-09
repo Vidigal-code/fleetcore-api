@@ -11,8 +11,9 @@ services:
       - '${SQLSERVER_PORT:-1433}:1433'
     volumes:
       - sqlserver_data:/var/opt/mssql
+      - ./docker/sqlserver:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ['CMD-SHELL', '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "$${SA_PASSWORD}" -Q "SELECT 1"']
+      test: ['CMD-SHELL', '/bin/bash -c "</dev/tcp/127.0.0.1/1433"']
       interval: 10s
       timeout: 5s
       retries: 10
