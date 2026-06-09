@@ -120,9 +120,12 @@ export const VehicleWorkbench = () => {
     createVehicle.isPending || updateVehicle.isPending || deleteVehicle.isPending;
 
   return (
-    <section id="veiculos" className="grid gap-6 xl:grid-cols-[1.12fr_1fr]">
+    <section
+      id="veiculos"
+      className="grid w-full max-w-5xl place-items-center gap-8 xl:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)]"
+    >
       <VehicleForm
-        className="rounded-3xl border border-border/50 bg-surface/70 px-6 py-6 shadow-[var(--shadow-elevated)] backdrop-blur-xl"
+        className="w-full max-w-3xl rounded-3xl border border-border/50 bg-surface/70 px-6 py-6 text-center shadow-[var(--shadow-elevated)] backdrop-blur-xl md:text-left"
         mode={editingVehicle ? 'edit' : 'create'}
         brands={brands}
         models={models}
@@ -133,7 +136,7 @@ export const VehicleWorkbench = () => {
         onSubmit={editingVehicle ? handleUpdate : handleCreate}
         onCancel={editingVehicle ? handleCancelEdit : undefined}
       />
-      <div className="flex flex-col gap-6">
+      <div className="flex w-full max-w-3xl flex-col gap-6">
         <VehicleFilterBar
           brands={brands}
           models={models}

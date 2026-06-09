@@ -125,7 +125,7 @@ export const VehicleTable = ({
       key: 'actions',
       header: 'Ações',
       render: (row) => (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2 sm:justify-start">
           <Button type="button" size="sm" variant="ghost" onClick={() => onEdit(row.raw)}>
             <Pencil className="h-4 w-4" />
           </Button>
@@ -144,15 +144,15 @@ export const VehicleTable = ({
   ];
 
   return (
-    <section className="space-y-6 rounded-3xl border border-border/50 bg-surface/70 px-6 py-6 shadow-[var(--shadow-elevated)] backdrop-blur-xl">
-      <div className="flex flex-col gap-4 border-b border-border/40 pb-4 sm:flex-row sm:items-center sm:justify-between">
+    <section className="mx-auto w-full max-w-3xl space-y-6 rounded-3xl border border-border/50 bg-surface/70 px-6 py-6 text-center shadow-[var(--shadow-elevated)] backdrop-blur-xl">
+      <div className="flex flex-col gap-4 border-b border-border/40 pb-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-foreground">Veículos cadastrados</h2>
           <p className="text-sm text-muted">
             Monitoramento em tempo real da frota com cache em Redis.
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-full border border-border/50 bg-background/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted">
+        <div className="mx-auto flex items-center gap-2 rounded-full border border-border/50 bg-background/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted sm:mx-0">
           <CalendarCheck className="h-4 w-4" />
           {total} registro(s)
         </div>
@@ -164,7 +164,7 @@ export const VehicleTable = ({
         emptyState="Nenhum veículo encontrado com estes filtros."
       />
       <Pagination
-        className="ml-auto max-w-md"
+        className="mx-auto max-w-md"
         page={page}
         total={total}
         limit={limit}

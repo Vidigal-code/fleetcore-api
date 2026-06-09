@@ -10,8 +10,8 @@ export const MainFooter = () => {
 
   return (
     <footer className="border-t border-border/50 bg-surface/70 backdrop-blur-xl">
-      <div className="container grid gap-10 py-12 md:grid-cols-[1.2fr_1fr]">
-        <div className="max-w-lg space-y-4">
+      <div className="container mx-auto grid gap-10 py-12 text-center md:grid-cols-[1.2fr_1fr] md:text-left">
+        <div className="mx-auto max-w-lg space-y-4">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
             {appConfig.appName}
           </p>
@@ -24,9 +24,9 @@ export const MainFooter = () => {
           </p>
         </div>
 
-        <div className="grid gap-8 sm:grid-cols-2">
+        <div className="grid gap-8 place-items-center sm:grid-cols-2">
           {footerGroups.map((group) => (
-            <div key={group.id} className="space-y-3">
+            <div key={group.id} className="w-full max-w-xs space-y-3 text-center sm:text-left">
               <h3 className="text-xs font-bold uppercase tracking-[0.32em] text-muted">
                 {group.label}
               </h3>
@@ -49,7 +49,7 @@ export const MainFooter = () => {
         </div>
       </div>
       <div className="border-t border-border/40 bg-background/70">
-        <div className="container flex flex-col gap-2 py-6 text-xs uppercase tracking-[0.24em] text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="container mx-auto flex flex-col items-center gap-2 py-6 text-center text-xs uppercase tracking-[0.24em] text-muted sm:flex-row sm:items-center sm:justify-between sm:text-left">
           <span>
             © {currentYear} {appConfig.appName}. Todos os direitos reservados.
           </span>

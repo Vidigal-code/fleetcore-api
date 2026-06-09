@@ -97,7 +97,7 @@ export const VehicleFilterBar = ({
 
   return (
     <form
-      className="grid grid-cols-1 gap-4 rounded-3xl border border-border/40 bg-surface/50 px-6 py-5 shadow-sm backdrop-blur-xl lg:grid-cols-[repeat(3,minmax(0,1fr))_auto]"
+      className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-4 rounded-3xl border border-border/40 bg-surface/50 px-6 py-5 text-center shadow-sm backdrop-blur-xl lg:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:text-left"
       onSubmit={handleSubmit}
     >
       <InputField
@@ -117,7 +117,7 @@ export const VehicleFilterBar = ({
         options={modelOptions}
         {...form.register('modelId')}
       />
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-col items-center justify-center gap-3 lg:flex-row lg:justify-end">
         <Button type="button" variant="ghost" size="sm" onClick={handleReset} disabled={loading}>
           Limpar
         </Button>

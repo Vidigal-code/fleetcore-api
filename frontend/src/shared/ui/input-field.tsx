@@ -17,7 +17,10 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
   ({ className, label, hint, error, id, ...props }, ref) => {
     const inputId = id ?? props.name;
     return (
-      <label className={cn('flex flex-col gap-2', className)} htmlFor={inputId}>
+      <label
+        className={cn('flex flex-col items-center gap-2 text-center sm:items-start sm:text-left', className)}
+        htmlFor={inputId}
+      >
         {label ? (
           <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted">
             {label}
