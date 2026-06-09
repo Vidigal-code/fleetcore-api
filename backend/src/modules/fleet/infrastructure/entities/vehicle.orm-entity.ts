@@ -1,4 +1,11 @@
-import { Column, Entity, Index, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  RelationId,
+} from 'typeorm';
 
 import { AuditableEntity } from '../../../../shared/domain/base.entity';
 import { ModelOrmEntity } from './model.orm-entity';
@@ -23,8 +30,9 @@ export class VehicleOrmEntity extends AuditableEntity {
   @ManyToOne(() => ModelOrmEntity, (model) => model.vehicles, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'model_id' })
   model!: ModelOrmEntity;
 
-  @Column({ name: 'model_id', type: 'uuid' })
+  @RelationId((vehicle: VehicleOrmEntity) => vehicle.model)
   modelId!: string;
 }

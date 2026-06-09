@@ -1,5 +1,6 @@
 import { Vehicle } from '../../domain/vehicle.aggregate';
 import { VehicleOrmEntity } from '../entities/vehicle.orm-entity';
+import { ModelOrmEntity } from '../entities/model.orm-entity';
 
 export const VehicleMapper = {
   toDomain(entity: VehicleOrmEntity): Vehicle {
@@ -22,6 +23,7 @@ export const VehicleMapper = {
     entity.chassis = vehicle.chassis;
     entity.renavam = vehicle.renavam;
     entity.year = vehicle.year;
+    entity.model = { id: vehicle.modelId } as ModelOrmEntity;
     entity.modelId = vehicle.modelId;
     entity.createdAt = vehicle.createdAt;
     entity.updatedAt = vehicle.updatedAt;

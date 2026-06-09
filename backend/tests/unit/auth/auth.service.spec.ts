@@ -21,7 +21,7 @@ const createUserAggregate = async () => {
     name: 'Tester',
     email: 'tester@example.com',
     passwordHash,
-    roles: [UserRole.Operator],
+    roles: [UserRole.Admin],
     createdBy: 'system',
   });
 };
@@ -102,7 +102,7 @@ describe('AuthService', () => {
     expect(options?.jwtid).toBe('session-123');
   });
 
-  it('registers a new operator with strong password', async () => {
+  it('registers a new administrator with strong password', async () => {
     const created = await createUserAggregate();
     usersService.createUser.mockResolvedValue(created);
 
@@ -121,7 +121,7 @@ describe('AuthService', () => {
     const [payload] = createCalls[0];
 
     expect(payload.nickname).toBe('tester');
-    expect(payload.roles).toEqual([UserRole.Operator]);
+    expect(payload.roles).toEqual([UserRole.Admin]);
     expect(payload.createdBy).toBe('tester');
     expect(result.email).toBe(created.email);
   });

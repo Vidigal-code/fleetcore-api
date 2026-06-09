@@ -1,162 +1,109 @@
 'use client';
 
-import { startTransition, useEffect, useState } from 'react';
-
-import { useBrandsQuery } from '@/entities/brand/api/brand-api';
-import { useModelsQuery } from '@/entities/model/api/model-api';
-import {
-  useCreateVehicleMutation,
-  useDeleteVehicleMutation,
-  useUpdateVehicleMutation,
-  useVehiclesQuery,
-} from '@/entities/vehicle/api/vehicle-api';
-import type { Vehicle, VehicleFilters } from '@/entities/vehicle/model/types';
-import { VehicleForm } from '@/features/vehicles/manage/ui/vehicle-form';
-import { VehicleFilterBar } from '@/features/vehicles/filter/ui/vehicle-filter-bar';
+import type { Vehicle } from '@/entities/vehicle/model/types';
 import { VehicleTable } from '@/entities/vehicle/ui/vehicle-table';
-import type { VehicleFormValues } from '@/features/vehicles/manage/model/vehicle-schema';
+import { VehicleFilterBar } from '@/features/vehicles/filter/ui/vehicle-filter-bar';
+import { VehicleForm } from '@/features/vehicles/manage/ui/vehicle-form';
+import { PageSection, Stack, Surface } from '@/shared/ui/layout-primitives';
 
-const DEFAULT_FILTERS: VehicleFilters = {
-  page: 1,
-  limit: 10,
-};
+import { useVehicleWorkbench } from '@/widgets/fleet/vehicle-workbench/model/use-vehicle-workbench';
 
 export const VehicleWorkbench = () => {
-  const [filters, setFilters] = useState<VehicleFilters>(DEFAULT_FILTERS);
-  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [state, actions] = useVehicleWorkbench();
+  const {
+    filters,
+    editingVehicle,
+    brands,
+    models,
+    collection,
+    isLoading,
+    isSubmitting,
+    feedback,
+  } = state;
 
-  const vehiclesQuery = useVehiclesQuery(filters);
-  const brandsQuery = useBrandsQuery();
-  const modelsQuery = useModelsQuery();
-
-  const createVehicle = useCreateVehicleMutation();
-  const updateVehicle = useUpdateVehicleMutation();
-  const deleteVehicle = useDeleteVehicleMutation();
-
-  useEffect(() => {
-    startTransition(() => {
-      setFormError(null);
-      setFormSuccess(null);
-    });
-  }, [editingVehicle]);
-
-  const handleCreate = async (payload: VehicleFormValues) => {
-    try {
-      setFormError(null);
-      await createVehicle.mutateAsync(payload);
-      setFormSuccess('Veículo registrado com sucesso.');
-      setFilters((prev) => ({ ...prev, page: 1 }));
-    } catch (error) {
-      setFormSuccess(null);
-      setFormError(error instanceof Error ? error.message : 'Falha ao registrar veículo.');
-    }
-  };
-
-  const handleUpdate = async (payload: VehicleFormValues) => {
-    if (!editingVehicle) return;
-    try {
-      setFormError(null);
-      await updateVehicle.mutateAsync({ id: editingVehicle.id, input: payload });
-      setFormSuccess('Veículo atualizado com sucesso.');
-      setEditingVehicle(null);
-    } catch (error) {
-      setFormSuccess(null);
-      setFormError(error instanceof Error ? error.message : 'Falha ao atualizar o veículo.');
-    }
-  };
-
-  const handleDelete = async (vehicle: Vehicle) => {
+  const handleDelete = (vehicle: Vehicle) => {
     const confirmation = window.confirm(
       `Remover definitivamente o veículo ${vehicle.licensePlate}? Essa ação não pode ser desfeita.`,
     );
     if (!confirmation) return;
-    try {
-      setFormError(null);
-      await deleteVehicle.mutateAsync(vehicle.id);
-      setFormSuccess(`Veículo ${vehicle.licensePlate} removido.`);
-      if (editingVehicle?.id === vehicle.id) {
-        setEditingVehicle(null);
-      }
-    } catch (error) {
-      setFormSuccess(null);
-      setFormError(error instanceof Error ? error.message : 'Falha ao remover o veículo.');
-    }
+    void actions.deleteVehicle(vehicle.id);
   };
-
-  const handleFiltersChange = (patch: VehicleFilters) => {
-    setFilters((prev) => ({
-      ...prev,
-      licensePlate: patch.licensePlate,
-      brandId: patch.brandId,
-      modelId: patch.modelId,
-      page: patch.page ?? 1,
-      limit: patch.limit ?? prev.limit ?? DEFAULT_FILTERS.limit,
-    }));
-  };
-
-  const handlePageChange = (page: number) => {
-    setFilters((prev) => ({ ...prev, page }));
-  };
-
-  const handleCancelEdit = () => {
-    setEditingVehicle(null);
-    setFormError(null);
-    setFormSuccess(null);
-  };
-
-  const brands = brandsQuery.data ?? [];
-  const models = modelsQuery.data ?? [];
-  const vehicleList = vehiclesQuery.data ?? {
-    items: [],
-    total: 0,
-    page: filters.page ?? 1,
-    limit: filters.limit ?? DEFAULT_FILTERS.limit!,
-  };
-
-  const isLoading = vehiclesQuery.isLoading || vehiclesQuery.isFetching;
-  const submitting =
-    createVehicle.isPending || updateVehicle.isPending || deleteVehicle.isPending;
 
   return (
-    <section
-      id="veiculos"
-      className="grid w-full max-w-5xl place-items-center gap-8 xl:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)]"
-    >
-      <VehicleForm
-        className="w-full max-w-3xl rounded-3xl border border-border/50 bg-surface/70 px-6 py-6 text-center shadow-[var(--shadow-elevated)] backdrop-blur-xl md:text-left"
-        mode={editingVehicle ? 'edit' : 'create'}
-        brands={brands}
-        models={models}
-        initialVehicle={editingVehicle}
-        submitting={submitting}
-        errorMessage={formError}
-        successMessage={formSuccess}
-        onSubmit={editingVehicle ? handleUpdate : handleCreate}
-        onCancel={editingVehicle ? handleCancelEdit : undefined}
-      />
-      <div className="flex w-full max-w-3xl flex-col gap-6">
-        <VehicleFilterBar
+    <>
+      <PageSection width="xl" layout="stack" className="gap-8">
+        <Surface
+          tone="base"
+          elevation="floating"
+          padding="lg"
+          radius="xl"
+          className="space-y-4 text-center lg:text-left"
+        >
+          <Stack gap="sm" className="items-center text-center lg:items-start lg:text-left">
+            <span className="text-xs font-semibold uppercase tracking-[0.24em] text-muted">
+              Operação da frota
+            </span>
+            <h1 className="text-3xl font-semibold text-foreground">Cadastro e gestão de veículos</h1>
+            <p className="max-w-3xl text-sm text-muted">
+              Registre novos veículos, sincronize atributos de modelos e mantenha auditoria completa de
+              quem alterou cada informação.
+            </p>
+          </Stack>
+        </Surface>
+      </PageSection>
+
+      <PageSection id="vehicles" width="xl" layout="grid" split="wide-left">
+        <Surface
+          tone="base"
+          radius="xl"
+          align="center"
+          className="col-span-full space-y-6 lg:col-span-1"
+      >
+        <VehicleForm
+          mode={editingVehicle ? 'edit' : 'create'}
           brands={brands}
           models={models}
-          filters={filters}
-          loading={isLoading}
-          onChange={handleFiltersChange}
+          initialVehicle={editingVehicle}
+          submitting={isSubmitting}
+          errorMessage={feedback.error}
+          successMessage={feedback.success}
+          onSubmit={editingVehicle ? actions.updateVehicle : actions.createVehicle}
+          onCancel={
+            editingVehicle
+              ? () => {
+                  actions.setEditingVehicle(null);
+                  actions.resetFeedback();
+                }
+              : undefined
+          }
         />
-        <VehicleTable
-          vehicles={vehicleList.items}
-          brands={brands}
-          models={models}
-          loading={isLoading}
-          page={vehicleList.page}
-          limit={vehicleList.limit}
-          total={vehicleList.total}
-          onPageChange={handlePageChange}
-          onEdit={setEditingVehicle}
-          onDelete={handleDelete}
-        />
-      </div>
-    </section>
+      </Surface>
+      <Stack gap="lg" className="col-span-full lg:col-span-1">
+        <Surface tone="base" elevation="low" padding="sm" radius="lg">
+          <VehicleFilterBar
+            brands={brands}
+            models={models}
+            filters={filters}
+            loading={isLoading}
+            onChange={actions.applyFilters}
+          />
+        </Surface>
+        <Surface tone="base" radius="xl" className="space-y-6">
+          <VehicleTable
+            vehicles={collection.items}
+            brands={brands}
+            models={models}
+            loading={isLoading}
+            page={collection.page}
+            limit={collection.limit}
+            total={collection.total}
+            onPageChange={actions.changePage}
+            onEdit={actions.setEditingVehicle}
+            onDelete={handleDelete}
+          />
+        </Surface>
+      </Stack>
+      </PageSection>
+    </>
   );
 };

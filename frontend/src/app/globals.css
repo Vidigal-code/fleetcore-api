@@ -4,32 +4,74 @@
 
 :root {
   color-scheme: light;
-  --color-background: 255 250 243;
-  --color-surface: 255 246 229;
-  --color-surface-strong: 255 239 209;
-  --color-border: 248 214 179;
-  --color-accent: 255 178 102;
-  --color-accent-strong: 255 140 66;
-  --color-warning: 249 115 22;
-  --color-danger: 239 68 68;
-  --color-foreground: 41 26 14;
-  --color-foreground-muted: 132 96 70;
-  --shadow-elevated: 0 28px 80px rgba(255, 140, 66, 0.18);
+  --palette-light-background: 248 247 239;
+  --palette-light-surface: 255 252 242;
+  --palette-light-surface-strong: 246 233 197;
+  --palette-light-border: 214 188 126;
+  --palette-light-foreground: 42 32 18;
+  --palette-light-foreground-muted: 122 97 50;
+  --palette-light-accent: 229 166 19;
+  --palette-light-accent-strong: 186 127 9;
+  --palette-light-warning: 248 188 96;
+  --palette-light-danger: 218 98 68;
+  --palette-light-positive: 41 135 85;
+
+  --color-background: var(--palette-light-background);
+  --color-surface: var(--palette-light-surface);
+  --color-surface-strong: var(--palette-light-surface-strong);
+  --color-border: var(--palette-light-border);
+  --color-foreground: var(--palette-light-foreground);
+  --color-foreground-muted: var(--palette-light-foreground-muted);
+  --color-accent: var(--palette-light-accent);
+  --color-accent-strong: var(--palette-light-accent-strong);
+  --color-warning: var(--palette-light-warning);
+  --color-danger: var(--palette-light-danger);
+  --color-positive: var(--palette-light-positive);
+
+  --gradient-app:
+    radial-gradient(circle at 6% 20%, rgb(var(--color-accent) / 0.15), transparent 55%),
+    radial-gradient(circle at 82% 18%, rgb(var(--color-accent-strong) / 0.12), transparent 58%),
+    linear-gradient(140deg, rgb(var(--color-surface) / 0.68), rgb(var(--color-background)));
+  --shadow-elevated: 0 28px 72px rgba(210, 182, 96, 0.18);
+  --shadow-floating: 0 18px 46px rgba(210, 182, 96, 0.16);
+  --blur-glass-md: 18px;
+  --blur-glass-lg: 24px;
 }
 
 .dark {
   color-scheme: dark;
-  --color-background: 28 14 4;
-  --color-surface: 45 20 6;
-  --color-surface-strong: 66 28 8;
-  --color-border: 138 74 30;
-  --color-accent: 255 140 66;
-  --color-accent-strong: 255 185 105;
-  --color-warning: 251 146 60;
-  --color-danger: 248 113 113;
-  --color-foreground: 254 237 226;
-  --color-foreground-muted: 240 206 180;
-  --shadow-elevated: 0 28px 90px rgba(0, 0, 0, 0.45);
+  --palette-dark-background: 20 16 8;
+  --palette-dark-surface: 33 27 14;
+  --palette-dark-surface-strong: 54 39 17;
+  --palette-dark-border: 148 107 42;
+  --palette-dark-foreground: 249 239 219;
+  --palette-dark-foreground-muted: 201 174 126;
+  --palette-dark-accent: 241 188 64;
+  --palette-dark-accent-strong: 255 213 102;
+  --palette-dark-warning: 252 201 112;
+  --palette-dark-danger: 234 122 90;
+  --palette-dark-positive: 80 178 122;
+
+  --color-background: var(--palette-dark-background);
+  --color-surface: var(--palette-dark-surface);
+  --color-surface-strong: var(--palette-dark-surface-strong);
+  --color-border: var(--palette-dark-border);
+  --color-foreground: var(--palette-dark-foreground);
+  --color-foreground-muted: var(--palette-dark-foreground-muted);
+  --color-accent: var(--palette-dark-accent);
+  --color-accent-strong: var(--palette-dark-accent-strong);
+  --color-warning: var(--palette-dark-warning);
+  --color-danger: var(--palette-dark-danger);
+  --color-positive: var(--palette-dark-positive);
+
+  --gradient-app:
+    radial-gradient(circle at 12% 16%, rgb(var(--color-accent) / 0.2), transparent 52%),
+    radial-gradient(circle at 84% 12%, rgb(var(--color-accent-strong) / 0.18), transparent 55%),
+    linear-gradient(130deg, rgb(var(--color-surface) / 0.8), rgb(var(--color-background)));
+  --shadow-elevated: 0 28px 80px rgba(0, 0, 0, 0.6);
+  --shadow-floating: 0 18px 46px rgba(0, 0, 0, 0.55);
+  --blur-glass-md: 18px;
+  --blur-glass-lg: 26px;
 }
 
 @layer base {
@@ -45,10 +87,8 @@
 
   body {
     @apply min-h-screen bg-background font-sans text-foreground antialiased;
-    background-image:
-      radial-gradient(circle at 6% 18%, rgb(var(--color-accent-strong) / 0.18), transparent 55%),
-      radial-gradient(circle at 90% 0%, rgb(var(--color-accent) / 0.12), transparent 60%),
-      linear-gradient(135deg, rgb(var(--color-surface) / 0.6), rgb(var(--color-background)));
+    background-color: rgb(var(--color-background));
+    background-image: var(--gradient-app);
     background-attachment: fixed;
   }
 
@@ -70,12 +110,21 @@
 
 @layer utilities {
   .surface-glass {
-    background: rgb(var(--color-surface) / 0.72);
-    backdrop-filter: blur(18px);
+    background: rgb(var(--color-surface) / 0.78);
+    backdrop-filter: blur(var(--blur-glass-md));
   }
 
   .surface-glass-strong {
-    background: rgb(var(--color-surface-strong) / 0.82);
-    backdrop-filter: blur(24px);
+    background: rgb(var(--color-surface-strong) / 0.88);
+    backdrop-filter: blur(var(--blur-glass-lg));
+  }
+
+  .nav-pill {
+    background: rgb(var(--color-surface) / 0.9);
+    box-shadow: inset 0 0 0 1px rgb(var(--color-border) / 0.6);
+  }
+
+  .app-gradient {
+    background-image: var(--gradient-app);
   }
 }
