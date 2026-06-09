@@ -4,32 +4,32 @@
 
 :root {
   color-scheme: light;
-  --color-background: 251 248 243;
-  --color-surface: 255 255 255;
-  --color-surface-strong: 255 247 236;
-  --color-border: 238 225 210;
-  --color-accent: 255 168 92;
-  --color-accent-strong: 255 119 43;
+  --color-background: 255 250 243;
+  --color-surface: 255 246 229;
+  --color-surface-strong: 255 239 209;
+  --color-border: 248 214 179;
+  --color-accent: 255 178 102;
+  --color-accent-strong: 255 140 66;
   --color-warning: 249 115 22;
   --color-danger: 239 68 68;
-  --color-foreground: 36 24 18;
-  --color-foreground-muted: 118 96 82;
-  --shadow-elevated: 0 28px 80px rgba(255, 119, 43, 0.14);
+  --color-foreground: 41 26 14;
+  --color-foreground-muted: 132 96 70;
+  --shadow-elevated: 0 28px 80px rgba(255, 140, 66, 0.18);
 }
 
 .dark {
   color-scheme: dark;
-  --color-background: 21 14 8;
-  --color-surface: 39 24 15;
-  --color-surface-strong: 53 30 18;
-  --color-border: 112 65 33;
-  --color-accent: 255 119 43;
-  --color-accent-strong: 255 171 86;
+  --color-background: 28 14 4;
+  --color-surface: 45 20 6;
+  --color-surface-strong: 66 28 8;
+  --color-border: 138 74 30;
+  --color-accent: 255 140 66;
+  --color-accent-strong: 255 185 105;
   --color-warning: 251 146 60;
   --color-danger: 248 113 113;
-  --color-foreground: 249 242 235;
-  --color-foreground-muted: 236 201 176;
-  --shadow-elevated: 0 28px 90px rgba(0, 0, 0, 0.4);
+  --color-foreground: 254 237 226;
+  --color-foreground-muted: 240 206 180;
+  --shadow-elevated: 0 28px 90px rgba(0, 0, 0, 0.45);
 }
 
 @layer base {

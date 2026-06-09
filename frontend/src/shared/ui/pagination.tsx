@@ -28,7 +28,7 @@ export const Pagination = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-4 rounded-full border border-border/50 bg-surface/70 px-5 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted shadow-sm backdrop-blur-xl',
+        'flex flex-col items-center justify-center gap-3 rounded-full border border-border/50 bg-surface/70 px-5 py-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-muted shadow-sm backdrop-blur-xl sm:flex-row sm:justify-between',
         className,
       )}
       {...props}

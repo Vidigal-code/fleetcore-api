@@ -51,7 +51,7 @@ export const BrandForm = ({
   });
 
   return (
-    <form className="grid grid-cols-1 gap-4" onSubmit={handleSubmit}>
+    <form className="grid w-full grid-cols-1 gap-4 text-center" onSubmit={handleSubmit}>
       <InputField
         label="Marca"
         placeholder="Ex.: Volare"
@@ -68,7 +68,7 @@ export const BrandForm = ({
           {successMessage}
         </InlineMessage>
       ) : null}
-      <div className="mt-2 flex flex-wrap items-center justify-end gap-3">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:justify-end">
         {mode === 'edit' ? (
           <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={submitting}>
             Cancelar

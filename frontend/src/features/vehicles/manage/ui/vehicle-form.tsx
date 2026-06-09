@@ -128,8 +128,8 @@ export const VehicleForm = ({
   );
 
   return (
-    <div className={cn('flex flex-col gap-6', className)}>
-      <div className="flex items-start gap-4 rounded-2xl border border-border/40 bg-surface/80 px-5 py-4 shadow-sm">
+    <div className={cn('flex w-full flex-col gap-6', className)}>
+      <div className="flex flex-col items-center gap-4 rounded-2xl border border-border/40 bg-surface/80 px-5 py-4 text-center shadow-sm md:flex-row md:items-start md:text-left">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
           <Wrench className="h-5 w-5" />
         </div>
@@ -195,7 +195,7 @@ export const VehicleForm = ({
           </InlineMessage>
         ) : null}
 
-        <div className="mt-1 flex flex-wrap items-center justify-end gap-3 md:col-span-2">
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-3 md:col-span-2 md:justify-end">
           {mode === 'edit' ? (
             <Button
               type="button"

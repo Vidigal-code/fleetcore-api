@@ -60,7 +60,7 @@ export const ModelForm = ({
   const brandOptions = [{ value: '', label: 'Sem marca' }, ...brands.map((brand) => ({ value: brand.id, label: brand.name }))];
 
   return (
-    <form className="grid grid-cols-1 gap-4" onSubmit={handleSubmit}>
+    <form className="grid w-full grid-cols-1 gap-4 text-center" onSubmit={handleSubmit}>
       <InputField
         label="Modelo"
         placeholder="Ex.: V8 Fly"
@@ -83,7 +83,7 @@ export const ModelForm = ({
           {successMessage}
         </InlineMessage>
       ) : null}
-      <div className="mt-2 flex flex-wrap items-center justify-end gap-3">
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-3 sm:justify-end">
         {mode === 'edit' ? (
           <Button type="button" variant="ghost" size="sm" onClick={onCancel} disabled={submitting}>
             Cancelar

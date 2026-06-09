@@ -25,7 +25,10 @@ export const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
   ({ className, label, options, error, hint, placeholder, id, ...props }, ref) => {
     const selectId = id ?? props.name;
     return (
-      <label className={cn('flex flex-col gap-2', className)} htmlFor={selectId}>
+      <label
+        className={cn('flex flex-col items-center gap-2 text-center sm:items-start sm:text-left', className)}
+        htmlFor={selectId}
+      >
         {label ? (
           <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted">
             {label}

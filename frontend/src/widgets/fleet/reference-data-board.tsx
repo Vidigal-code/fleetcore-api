@@ -131,11 +131,11 @@ export const ReferenceDataBoard = () => {
     createModel.isPending || updateModel.isPending || deleteModel.isPending;
 
   return (
-    <section className="grid gap-6 xl:grid-cols-2">
+    <section className="grid w-full max-w-5xl place-items-center gap-8 xl:grid-cols-2">
       <Card
-        className="p-0"
+        className="w-full max-w-3xl p-0 text-center xl:text-left"
         header={
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 text-center xl:text-left">
             <h3 className="text-lg font-semibold text-foreground" id="marcas">
               Marcas
             </h3>
@@ -168,7 +168,7 @@ export const ReferenceDataBoard = () => {
             {brands.map((brand) => (
               <div
                 key={brand.id}
-                className="flex items-start justify-between gap-3 rounded-2xl border border-border/40 bg-surface/70 px-4 py-4 shadow-sm"
+                className="flex flex-col items-center justify-between gap-3 rounded-2xl border border-border/40 bg-surface/70 px-4 py-4 text-center shadow-sm sm:flex-row sm:text-left"
               >
                 <div className="space-y-1">
                   <p className="text-sm font-semibold text-foreground">{brand.name}</p>
@@ -177,7 +177,7 @@ export const ReferenceDataBoard = () => {
                     {new Date(brand.updatedAt).toLocaleDateString('pt-BR')}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center gap-2">
                   <Button
                     type="button"
                     variant="ghost"
@@ -206,9 +206,9 @@ export const ReferenceDataBoard = () => {
       </Card>
 
       <Card
-        className="p-0"
+        className="w-full max-w-3xl p-0 text-center xl:text-left"
         header={
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 text-center xl:text-left">
             <h3 className="text-lg font-semibold text-foreground" id="modelos">
               Modelos
             </h3>
@@ -246,7 +246,7 @@ export const ReferenceDataBoard = () => {
               return (
                 <div
                   key={model.id}
-                  className="flex items-start justify-between gap-3 rounded-2xl border border-border/40 bg-surface/70 px-4 py-4 shadow-sm"
+                  className="flex flex-col items-center justify-between gap-3 rounded-2xl border border-border/40 bg-surface/70 px-4 py-4 text-center shadow-sm sm:flex-row sm:text-left"
                 >
                   <div className="space-y-1">
                     <p className="text-sm font-semibold text-foreground">{model.name}</p>
@@ -254,7 +254,7 @@ export const ReferenceDataBoard = () => {
                       {brand ? `Marca · ${brand.name}` : 'Sem marca associada'}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-center gap-2">
                     <Button
                       type="button"
                       variant="ghost"
