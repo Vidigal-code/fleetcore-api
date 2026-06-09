@@ -1,6 +1,6 @@
 import type { AppConfigService } from '../../../src/shared/config/app-config.service';
 import type { FeatureFlagKey } from '../../../src/shared/config/app-config.types';
-import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
+import { FeatureToggleService } from '../../../src/shared/features';
 
 describe('FeatureToggleService', () => {
   const getFeatureFlagMock = jest.fn<
@@ -8,8 +8,8 @@ describe('FeatureToggleService', () => {
     [FeatureFlagKey, boolean | undefined]
   >();
   const appConfigMock = {
-    getFeatureFlag: getFeatureFlagMock,
-  } as AppConfigService;
+      getFeatureFlag: getFeatureFlagMock,
+  } as unknown as AppConfigService;
 
   const service = new FeatureToggleService(appConfigMock);
 

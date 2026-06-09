@@ -12,8 +12,8 @@ import type { ModelRepository } from '../../../src/modules/fleet/domain/model.re
 import type { BrandRepository } from '../../../src/modules/fleet/domain/brand.repository';
 import { UnitOfWork } from '../../../src/shared/unit-of-work/unit-of-work';
 import { ModelTypeOrmRepository } from '../../../src/modules/fleet/infrastructure/repositories/model.typeorm.repository';
-import { EventBusService } from '../../../src/shared/domain/events/event-bus.service';
-import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
+import { EventBusService } from '../../../src/shared/domain/events';
+import { FeatureToggleService } from '../../../src/shared/features';
 import {
   AUDIT_ENTITY_MODEL,
   MODEL_EVENT_CREATED,

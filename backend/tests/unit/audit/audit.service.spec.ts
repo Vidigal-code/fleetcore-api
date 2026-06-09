@@ -4,7 +4,7 @@ import {
 } from '../../../src/modules/audit/audit.service';
 import { VEHICLE_EVENT_CREATED } from '../../../src/modules/fleet/fleet.constants';
 import { MessagingService } from '../../../src/modules/messaging/messaging.service';
-import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
+import { FeatureToggleService } from '../../../src/shared/features';
 import { AuditWriterService } from '../../../src/modules/audit/audit-writer.service';
 
 describe('AuditService', () => {
@@ -22,35 +22,35 @@ describe('AuditService', () => {
 
   beforeEach(() => {
     messaging = {
-      publish: jest
-        .fn<
-          ReturnType<MessagingService['publish']>,
-          Parameters<MessagingService['publish']>
-        >()
-        .mockResolvedValue(undefined),
-    } as jest.Mocked<MessagingService>;
+        publish: jest
+            .fn<
+                ReturnType<MessagingService['publish']>,
+                Parameters<MessagingService['publish']>
+            >()
+            .mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<MessagingService>;
 
     featureToggles = {
-      isEnabled: jest
-        .fn<
-          ReturnType<FeatureToggleService['isEnabled']>,
-          Parameters<FeatureToggleService['isEnabled']>
-        >()
-        .mockReturnValue(true),
-      runIfEnabled: jest.fn<
-        ReturnType<FeatureToggleService['runIfEnabled']>,
-        Parameters<FeatureToggleService['runIfEnabled']>
-      >(),
-    } as jest.Mocked<FeatureToggleService>;
+        isEnabled: jest
+            .fn<
+                ReturnType<FeatureToggleService['isEnabled']>,
+                Parameters<FeatureToggleService['isEnabled']>
+            >()
+            .mockReturnValue(true),
+        runIfEnabled: jest.fn<
+            ReturnType<FeatureToggleService['runIfEnabled']>,
+            Parameters<FeatureToggleService['runIfEnabled']>
+        >(),
+    } as unknown as jest.Mocked<FeatureToggleService>;
 
     writer = {
-      persist: jest
-        .fn<
-          ReturnType<AuditWriterService['persist']>,
-          Parameters<AuditWriterService['persist']>
-        >()
-        .mockResolvedValue(undefined),
-    } as jest.Mocked<AuditWriterService>;
+        persist: jest
+            .fn<
+                ReturnType<AuditWriterService['persist']>,
+                Parameters<AuditWriterService['persist']>
+            >()
+            .mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<AuditWriterService>;
 
     service = new AuditService(messaging, featureToggles, writer);
   });
