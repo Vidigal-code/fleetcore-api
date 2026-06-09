@@ -16,5 +16,5 @@ Resumen de las rutinas automatizadas y operativas que sostienen la plataforma.
 
 ## Referencias
 
-- [Calidad y Pruebas](./08-calidad-pruebas.md)
-- [Runbook y Resolución de Problemas](./09-runbook-resolucion.md)
+- **Calidad y Pruebas**
+- **Runbook y Resolución de Problemas**

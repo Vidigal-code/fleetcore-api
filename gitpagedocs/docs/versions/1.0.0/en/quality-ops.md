@@ -16,5 +16,5 @@ Condensed view of the automation and operational routines that keep the solution
 
 ## References
 
-- [Quality and Testing](./08-quality-testing.md)
-- [Runbook and Troubleshooting](./09-runbook.md)
+- **Quality and Testing**
+- **Runbook and Troubleshooting**

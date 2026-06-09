@@ -16,5 +16,5 @@ Visión general del cliente Next.js y su integración con la plataforma.
 
 ## Más recursos
 
-- [Frontend y Experiencia](./06-frontend.md)
-- [Calidad y Pruebas](./08-calidad-pruebas.md)
+- **Frontend y Experiencia**
+- **Calidad y Pruebas**

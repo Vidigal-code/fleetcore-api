@@ -16,6 +16,6 @@ Referencia rápida de la API NestJS, sus reglas de negocio y mecanismos de sopor
 
 ## Profundiza
 
-- [Arquitectura Backend](./03-arquitetura-backend.md)
-- [Modelado de Datos y Dominio](./04-modelado-dominio.md)
-- [Seguridad, Auditoría y Mensajería](./05-seguridad-auditoria-mensajeria.md)
+- **Arquitectura Backend**
+- **Modelado de Datos y Dominio**
+- **Seguridad, Auditoría y Mensajería**
