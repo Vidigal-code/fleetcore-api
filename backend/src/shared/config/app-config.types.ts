@@ -14,7 +14,7 @@ export interface RedisConfig {
   readonly ttlSeconds: number;
 }
 
-export interface DatabaseConfig extends DataSourceOptions {}
+export type DatabaseConfig = DataSourceOptions;
 
 export interface JwtConfig {
   readonly secret: string;

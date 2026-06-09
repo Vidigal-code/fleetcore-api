@@ -3,19 +3,15 @@ import {
   CircuitBreakerPolicy,
   ConsecutiveBreaker,
   ExponentialBackoff,
-  Policy,
   RetryPolicy,
   TimeoutPolicy,
+  TimeoutStrategy,
   circuitBreaker,
   handleAll,
   retry,
   timeout,
-  wrap,
+  ConstantBackoff,
 } from 'cockatiel';
-import {
-  decorrelatedJitterGenerator,
-  noJitterGenerator,
-} from 'cockatiel/dist/backoff/ExponentialBackoffGenerators.js';
 
 import type {
   CircuitBreakerConfig,
@@ -44,14 +40,27 @@ export class ResilienceService {
     task: () => Promise<TResult>,
     options: ExecuteOptions,
   ): Promise<TResult> {
-    const policies = this.resolvePolicies(options);
+    const { timeoutPolicy, retryPolicy, circuitBreakerPolicy } =
+      this.resolvePolicies(options);
 
-    if (policies.length === 0) {
-      return task();
+    let operation = () => task();
+
+    if (circuitBreakerPolicy) {
+      const previous = operation;
+      operation = () => circuitBreakerPolicy.execute(() => previous());
     }
 
-    const chained = wrap(...policies);
-    return chained.execute(() => task());
+    if (retryPolicy) {
+      const previous = operation;
+      operation = () => retryPolicy.execute(() => previous());
+    }
+
+    if (timeoutPolicy) {
+      const previous = operation;
+      operation = () => timeoutPolicy.execute(() => previous());
+    }
+
+    return operation();
   }
 
   getDefaultMessagingPolicy(): ResiliencePolicyConfig {
@@ -67,31 +76,28 @@ export class ResilienceService {
     retry: retryOverrides,
     circuitBreaker: circuitOverrides,
     timeoutMs,
-  }: ExecuteOptions): Policy[] {
-    const list: Policy[] = [];
-
-    if (timeoutMs && timeoutMs > 0) {
-      list.push(this.getTimeoutPolicy(name, timeoutMs));
-    }
+  }: ExecuteOptions) {
+    const timeoutPolicy =
+      timeoutMs && timeoutMs > 0 ? this.getTimeoutPolicy(name, timeoutMs) : undefined;
 
     const defaults = this.resolveDefaults(name);
     const retryConfig: RetryPolicyConfig = {
       ...defaults.retry,
       ...(retryOverrides ?? {}),
     };
-    if (retryConfig.attempts > 1) {
-      list.push(this.getRetryPolicy(name, retryConfig));
-    }
+    const retryPolicy =
+      retryConfig.attempts > 1 ? this.getRetryPolicy(name, retryConfig) : undefined;
 
     const circuitConfig: CircuitBreakerConfig = {
       ...defaults.circuitBreaker,
       ...(circuitOverrides ?? {}),
     };
-    if (circuitConfig.failureThreshold > 0) {
-      list.push(this.getCircuitBreakerPolicy(name, circuitConfig));
-    }
+    const circuitBreakerPolicy =
+      circuitConfig.failureThreshold > 0
+        ? this.getCircuitBreakerPolicy(name, circuitConfig)
+        : undefined;
 
-    return list;
+    return { timeoutPolicy, retryPolicy, circuitBreakerPolicy };
   }
 
   private getTimeoutPolicy(name: string, timeoutMs: number): TimeoutPolicy {
@@ -102,7 +108,7 @@ export class ResilienceService {
     }
 
     const created = timeout(timeoutMs, {
-      strategy: 'Cooperative',
+      strategy: TimeoutStrategy.Cooperative,
       abortOnReturn: false,
     });
     this.timeoutPolicies.set(key, created);
@@ -116,11 +122,12 @@ export class ResilienceService {
       return cached;
     }
 
-    const backoff = new ExponentialBackoff({
-      initialDelay: options.initialDelayMs,
-      maxDelay: options.maxDelayMs,
-      generator: options.jitter ? decorrelatedJitterGenerator : noJitterGenerator,
-    });
+    const backoff = options.jitter
+      ? new ExponentialBackoff({
+          initialDelay: options.initialDelayMs,
+          maxDelay: options.maxDelayMs,
+        })
+      : new ConstantBackoff(options.initialDelayMs);
 
     const created = retry(handleAll, {
       maxAttempts: options.attempts,

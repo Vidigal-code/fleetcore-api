@@ -15,9 +15,9 @@ import { CreateBrandDto } from '../dto/create-brand.dto';
 import { UpdateBrandDto } from '../dto/update-brand.dto';
 import { BrandOrmEntity } from '../infrastructure/entities/brand.orm-entity';
 import { BrandTypeOrmRepository } from '../infrastructure/repositories/brand.typeorm.repository';
-import { EventBusService } from '../../../shared/domain/events/event-bus.service';
-import { FeatureToggleService } from '../../../shared/features/feature-toggle.service';
-import { BrandCreatedEvent, BrandDeletedEvent, BrandUpdatedEvent } from '../domain/events/brand-events';
+import { EventBusService } from '../../../shared/domain/events';
+import { FeatureToggleService } from '../../../shared/features';
+import { BrandCreatedEvent, BrandDeletedEvent, BrandUpdatedEvent } from '../domain/events';
 
 @Injectable()
 export class BrandsService {

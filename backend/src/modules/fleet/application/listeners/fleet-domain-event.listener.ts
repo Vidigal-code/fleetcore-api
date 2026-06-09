@@ -1,8 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
-import { EventBusService } from '../../../../shared/domain/events/event-bus.service';
+import { EventBusService } from '../../../../shared/domain/events';
 import { DomainMetricsService } from '../../../../shared/metrics/domain-metrics.service';
-import { FeatureToggleService } from '../../../../shared/features/feature-toggle.service';
+import { FeatureToggleService } from '../../../../shared/features';
 import { MessagingService } from '../../../messaging/messaging.service';
 import {
   BrandCreatedEvent,

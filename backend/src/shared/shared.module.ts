@@ -10,9 +10,9 @@ import { RedisService } from './cache/redis.service';
 import { RepositoryCacheService } from './cache/repository-cache.service';
 import { UnitOfWork } from './unit-of-work/unit-of-work';
 import { AppConfigService } from './config/app-config.service';
-import { FeatureToggleService } from './features/feature-toggle.service';
+import { FeatureToggleService } from './features';
 import { FeatureFlagGuard } from './features/feature-enabled.decorator';
-import { EventBusService } from './domain/events/event-bus.service';
+import { EventBusService } from './domain/events';
 import { ResilienceService } from './resilience/resilience.service';
 import { DomainMetricsService } from './metrics/domain-metrics.service';
 
