@@ -95,8 +95,13 @@ export const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
           <Button
             type="button"
             onClick={() => {
-              logout();
-              onClose();
+              void (async () => {
+                try {
+                  await logout();
+                } finally {
+                  onClose();
+                }
+              })();
             }}
             variant="ghost"
             icon={<LogOut className="h-5 w-5" />}

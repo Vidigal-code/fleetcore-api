@@ -144,7 +144,9 @@ describe('VehiclesService', () => {
 
     expect(modelRepository.findById).toHaveBeenCalledWith('model-1');
     expect(scopedRepository.save).toHaveBeenCalled();
-    expect(repositoryCache.invalidate).toHaveBeenCalledWith(VEHICLE_CACHE_NAMESPACE);
+    expect(repositoryCache.invalidate).toHaveBeenCalledWith(
+      VEHICLE_CACHE_NAMESPACE,
+    );
     expect(auditService.record).toHaveBeenCalledWith(
       expect.objectContaining({
         action: VEHICLE_EVENT_CREATED,

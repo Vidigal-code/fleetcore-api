@@ -19,10 +19,9 @@ export class FeatureFlagGuard implements CanActivate {
   constructor(private readonly moduleRef: ModuleRef) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const flag = Reflect.getMetadata(
-      FEATURE_KEY,
-      context.getHandler(),
-    ) as FeatureFlagKey | undefined;
+    const flag = Reflect.getMetadata(FEATURE_KEY, context.getHandler()) as
+      | FeatureFlagKey
+      | undefined;
     if (!flag) {
       return true;
     }

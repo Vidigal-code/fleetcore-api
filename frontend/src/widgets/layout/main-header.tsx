@@ -115,7 +115,9 @@ export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderPro
             type="button"
             variant="ghost"
             size="sm"
-            onClick={logout}
+            onClick={() => {
+              void logout();
+            }}
             icon={<LogOut className="h-4 w-4" />}
             className="hidden border border-border/60 bg-surface/70 px-3 py-1.5 text-sm font-semibold uppercase tracking-[0.18em] text-muted hover:border-accent/60 hover:text-accent lg:inline-flex"
           >

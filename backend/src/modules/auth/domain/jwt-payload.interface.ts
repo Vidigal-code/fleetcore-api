@@ -5,4 +5,5 @@ export interface JwtPayload {
   email: string;
   roles: UserRole[];
   nickname: string;
+  sessionId: string;
 }

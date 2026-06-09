@@ -4,9 +4,9 @@ export interface DomainEvent<TPayload = unknown> {
   readonly payload: TPayload;
 }
 
-export abstract class BaseDomainEvent<TPayload = unknown>
-  implements DomainEvent<TPayload>
-{
+export abstract class BaseDomainEvent<
+  TPayload = unknown,
+> implements DomainEvent<TPayload> {
   readonly occurredAt = new Date();
 
   protected constructor(

@@ -4,6 +4,13 @@ import { Injectable } from '@nestjs/common';
 
 import { RedisService } from './redis.service';
 
+const repositoryCacheReplacer = (_: string, value: unknown) => {
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+  return value;
+};
+
 interface CacheFetchOptions<T> {
   readonly namespace: string;
   readonly key: unknown;
@@ -46,15 +53,8 @@ export class RepositoryCacheService {
     }
 
     const hash = createHash('sha1')
-      .update(JSON.stringify(key, this.replacer, 2))
+      .update(JSON.stringify(key, repositoryCacheReplacer, 2))
       .digest('hex');
     return `${namespace}:${hash}`;
-  }
-
-  private replacer(_: string, value: unknown) {
-    if (value instanceof Date) {
-      return value.toISOString();
-    }
-    return value;
   }
 }

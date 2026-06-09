@@ -4,6 +4,7 @@ import {
   Get,
   NotFoundException,
   Post,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -14,6 +15,7 @@ import { CurrentUser } from '../../decorators/current-user.decorator';
 import type { JwtPayload } from '../../domain/jwt-payload.interface';
 import { AuthService } from '../../application/auth.service';
 import { LoginDto } from '../../dto/login.dto';
+import { RegisterDto } from '../../dto/register.dto';
 import { Public } from '../../decorators/public.decorator';
 
 @ApiTags('Authentication')
@@ -50,5 +52,25 @@ export class AuthController {
       email: found.email,
       roles: found.roles,
     };
+  }
+
+  @Public()
+  @Post('register')
+  @ApiOperation({ summary: 'Register a new user account.' })
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Invalidate the current session.' })
+  async logout(@CurrentUser() user: JwtPayload | undefined) {
+    if (!user?.sessionId) {
+      throw new UnauthorizedException('Invalid session context');
+    }
+
+    await this.authService.logout(user.sessionId);
+    return { success: true };
   }
 }

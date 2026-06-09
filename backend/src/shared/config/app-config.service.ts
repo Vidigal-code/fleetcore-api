@@ -6,6 +6,7 @@ import type { SecurityConfig } from './security.config';
 import type { SwaggerConfig } from './swagger.config';
 import {
   AppConfig,
+  AuthConfig,
   AuditConfig,
   DatabaseConfig,
   FeatureFlagKey,
@@ -23,15 +24,19 @@ export class AppConfigService {
   constructor(private readonly configService: ConfigService) {}
 
   get environment(): Environment {
-    return this.configService.get<Environment>('NODE_ENV') ?? Environment.Development;
+    return (
+      this.configService.get<Environment>('NODE_ENV') ?? Environment.Development
+    );
   }
 
   get app(): AppConfig {
-    return this.configService.get<AppConfig>('app') ?? {
-      name: 'fleetcore-api',
-      port: 3000,
-      globalPrefix: 'api',
-    };
+    return (
+      this.configService.get<AppConfig>('app') ?? {
+        name: 'fleetcore-api',
+        port: 3000,
+        globalPrefix: 'api',
+      }
+    );
   }
 
   get redis(): RedisConfig {
@@ -40,6 +45,14 @@ export class AppConfigService {
       port: this.configService.get<number>('redis.port', 6379),
       ttlSeconds: this.configService.get<number>('redis.ttlSeconds', 60),
     };
+  }
+
+  get auth(): AuthConfig {
+    const config = this.configService.get<AuthConfig>('auth');
+    if (!config) {
+      throw new Error('Auth configuration is missing');
+    }
+    return config;
   }
 
   get database(): DatabaseConfig {
@@ -61,9 +74,18 @@ export class AppConfigService {
   get messaging(): MessagingConfig {
     return {
       uri: this.configService.getOrThrow<string>('messaging.uri'),
-      exchange: this.configService.get<string>('messaging.exchange', 'fleetcore.events'),
-      queue: this.configService.get<string>('messaging.queue', 'fleetcore.vehicles'),
-      auditQueue: this.configService.get<string>('messaging.auditQueue', 'fleetcore.audit'),
+      exchange: this.configService.get<string>(
+        'messaging.exchange',
+        'fleetcore.events',
+      ),
+      queue: this.configService.get<string>(
+        'messaging.queue',
+        'fleetcore.vehicles',
+      ),
+      auditQueue: this.configService.get<string>(
+        'messaging.auditQueue',
+        'fleetcore.audit',
+      ),
     };
   }
 
@@ -78,7 +100,9 @@ export class AppConfigService {
   }
 
   get swagger(): SwaggerConfig {
-    return this.configService.get<SwaggerConfig>('swagger') ?? { documents: [] };
+    return (
+      this.configService.get<SwaggerConfig>('swagger') ?? { documents: [] }
+    );
   }
 
   get features(): FeatureToggleConfig {
