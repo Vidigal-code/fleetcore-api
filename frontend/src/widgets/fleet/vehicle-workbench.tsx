@@ -4,7 +4,7 @@ import type { Vehicle } from '@/entities/vehicle/model/types';
 import { VehicleTable } from '@/entities/vehicle/ui/vehicle-table';
 import { VehicleFilterBar } from '@/features/vehicles/filter/ui/vehicle-filter-bar';
 import { VehicleForm } from '@/features/vehicles/manage/ui/vehicle-form';
-import { PageSection, Stack, Surface } from '@/shared/ui/layout-primitives';
+import { PageSection, ResponsiveGrid, Stack, Surface } from '@/shared/ui/layout-primitives';
 
 import { useVehicleWorkbench } from '@/widgets/fleet/vehicle-workbench/model/use-vehicle-workbench';
 
@@ -52,57 +52,54 @@ export const VehicleWorkbench = () => {
         </Surface>
       </PageSection>
 
-      <PageSection id="vehicles" width="xl" layout="grid" split="wide-left">
-        <Surface
-          tone="base"
-          radius="xl"
-          align="center"
-          className="col-span-full space-y-6 lg:col-span-1"
-      >
-        <VehicleForm
-          mode={editingVehicle ? 'edit' : 'create'}
-          brands={brands}
-          models={models}
-          initialVehicle={editingVehicle}
-          submitting={isSubmitting}
-          errorMessage={feedback.error}
-          successMessage={feedback.success}
-          onSubmit={editingVehicle ? actions.updateVehicle : actions.createVehicle}
-          onCancel={
-            editingVehicle
-              ? () => {
-                  actions.setEditingVehicle(null);
-                  actions.resetFeedback();
-                }
-              : undefined
-          }
-        />
-      </Surface>
-      <Stack gap="lg" className="col-span-full lg:col-span-1">
-        <Surface tone="base" elevation="low" padding="sm" radius="lg">
-          <VehicleFilterBar
-            brands={brands}
-            models={models}
-            filters={filters}
-            loading={isLoading}
-            onChange={actions.applyFilters}
-          />
-        </Surface>
-        <Surface tone="base" radius="xl" className="space-y-6">
-          <VehicleTable
-            vehicles={collection.items}
-            brands={brands}
-            models={models}
-            loading={isLoading}
-            page={collection.page}
-            limit={collection.limit}
-            total={collection.total}
-            onPageChange={actions.changePage}
-            onEdit={actions.setEditingVehicle}
-            onDelete={handleDelete}
-          />
-        </Surface>
-      </Stack>
+      <PageSection id="vehicles" width="xl" layout="stack" className="gap-10">
+        <ResponsiveGrid columns="wide-left" className="w-full">
+          <Surface tone="base" radius="xl" align="center" className="w-full space-y-6">
+            <VehicleForm
+              mode={editingVehicle ? 'edit' : 'create'}
+              brands={brands}
+              models={models}
+              initialVehicle={editingVehicle}
+              submitting={isSubmitting}
+              errorMessage={feedback.error}
+              successMessage={feedback.success}
+              onSubmit={editingVehicle ? actions.updateVehicle : actions.createVehicle}
+              onCancel={
+                editingVehicle
+                  ? () => {
+                      actions.setEditingVehicle(null);
+                      actions.resetFeedback();
+                    }
+                  : undefined
+              }
+            />
+          </Surface>
+          <Stack gap="lg" className="w-full">
+            <Surface tone="base" elevation="low" padding="sm" radius="lg" className="w-full">
+              <VehicleFilterBar
+                brands={brands}
+                models={models}
+                filters={filters}
+                loading={isLoading}
+                onChange={actions.applyFilters}
+              />
+            </Surface>
+            <Surface tone="base" radius="xl" className="w-full space-y-6 overflow-hidden">
+              <VehicleTable
+                vehicles={collection.items}
+                brands={brands}
+                models={models}
+                loading={isLoading}
+                page={collection.page}
+                limit={collection.limit}
+                total={collection.total}
+                onPageChange={actions.changePage}
+                onEdit={actions.setEditingVehicle}
+                onDelete={handleDelete}
+              />
+            </Surface>
+          </Stack>
+        </ResponsiveGrid>
       </PageSection>
     </>
   );

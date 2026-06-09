@@ -80,7 +80,7 @@ export const UpdatePasswordForm = () => {
         </InlineMessage>
       ) : null}
 
-      <div className="flex justify-end">
+      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-end">
         <Button type="submit" loading={updatePassword.isPending} variant="danger">
           Atualizar senha
         </Button>

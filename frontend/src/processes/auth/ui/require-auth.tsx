@@ -32,7 +32,7 @@ export const RequireAuth = ({ children }: RequireAuthProps) => {
   if (!isHydrated || status === 'authenticating') {
     return (
       <div
-        className="flex min-h-[60vh] flex-col items-center justify-center gap-3 text-sm text-muted"
+        className="flex min-h-[60vh] flex-col items-center justify-center gap-3 px-4 text-center text-sm text-muted"
         role="status"
         aria-live="polite"
       >

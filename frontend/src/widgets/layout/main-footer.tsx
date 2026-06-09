@@ -10,8 +10,8 @@ export const MainFooter = () => {
 
   return (
     <footer className="border-t border-border/50 bg-surface/70 backdrop-blur-xl">
-      <div className="container mx-auto grid gap-10 py-12 text-center md:grid-cols-[1.2fr_1fr] md:text-left">
-        <div className="mx-auto max-w-lg space-y-4">
+      <div className="mx-auto w-full max-w-6xl grid gap-12 px-4 py-12 text-center sm:px-6 md:grid-cols-[1.2fr_1fr] md:text-left lg:px-8 xl:px-12">
+        <div className="mx-auto max-w-xl space-y-4">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">
             {appConfig.appName}
           </p>
@@ -37,7 +37,7 @@ export const MainFooter = () => {
                       href={link.href}
                       target={link.external ? '_blank' : undefined}
                       rel={link.external ? 'noreferrer' : undefined}
-                      className="text-sm font-semibold text-foreground transition hover:text-accent"
+                      className="inline-flex w-full items-center justify-center rounded-full border border-transparent px-4 py-2 text-sm font-semibold text-foreground transition hover:border-accent/40 hover:text-accent sm:justify-start"
                     >
                       {link.label}
                     </Link>
@@ -49,11 +49,11 @@ export const MainFooter = () => {
         </div>
       </div>
       <div className="border-t border-border/40 bg-background/70">
-        <div className="container mx-auto flex flex-col items-center gap-2 py-6 text-center text-xs uppercase tracking-[0.24em] text-muted sm:flex-row sm:items-center sm:justify-between sm:text-left">
-          <span>
+        <div className="mx-auto w-full max-w-6xl flex flex-col items-center gap-2 px-4 py-6 text-center text-xs uppercase tracking-[0.24em] text-muted sm:flex-row sm:items-center sm:justify-between sm:text-left sm:px-6 lg:px-8 xl:px-12">
+          <span className="whitespace-pre-line">
             © {currentYear} {appConfig.appName}. Todos os direitos reservados.
           </span>
-          <span>Versão frontend · Next.js · React Query · Redux Toolkit</span>
+          <span className="text-[0.65rem]">Versão frontend · Next.js · React Query · Redux Toolkit</span>
         </div>
       </div>
     </footer>

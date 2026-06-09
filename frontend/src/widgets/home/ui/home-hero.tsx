@@ -18,20 +18,20 @@ export const HomeHero = () => (
       elevation="floating"
       padding="lg"
       radius="xl"
-      className="flex flex-col items-center gap-6 text-center lg:flex-row lg:items-start lg:text-left"
+      className="flex flex-col items-center gap-6 text-center lg:flex-row lg:items-center lg:justify-between lg:text-left"
     >
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
-        <Sparkles className="h-5 w-5" />
+      <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-3xl bg-accent/15 text-accent">
+        <Sparkles className="h-7 w-7" />
       </div>
-      <Stack gap="lg" className="w-full">
+      <Stack gap="lg" className="w-full max-w-3xl">
         <Stack gap="sm" className="items-center text-center lg:items-start lg:text-left">
           <span className="rounded-full border border-accent/40 bg-accent/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
             Fleetcore Enterprise Suite
           </span>
-          <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
             Operações de frota com orquestração de dados e auditoria contínua
           </h1>
-          <p className="max-w-2xl text-base text-muted sm:text-lg">
+          <p className="max-w-3xl text-base text-muted sm:text-lg">
             Conecte veículos, modelos e marcas em um ecossistema modular, preparado para integrações,
             mensageria em tempo real e governança de segurança.
           </p>

@@ -93,7 +93,7 @@ export const UpdateProfileForm = () => {
         </InlineMessage>
       ) : null}
 
-      <div className="flex justify-end">
+      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-end">
         <Button type="submit" loading={updateProfile.isPending}>
           Salvar alterações
         </Button>
