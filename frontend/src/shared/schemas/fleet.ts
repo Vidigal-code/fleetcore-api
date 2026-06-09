@@ -3,6 +3,10 @@ import { z } from 'zod';
 export const VEHICLE_YEAR_MIN = 1900;
 export const VEHICLE_YEAR_MAX = 2100;
 export const LICENSE_PLATE_REGEX = /^[A-Z]{3}[0-9][A-Z0-9][0-9]{2}$/i;
+export const BRAND_NAME_MIN_LENGTH = 1;
+export const BRAND_NAME_MAX_LENGTH = 120;
+export const MODEL_NAME_MIN_LENGTH = 1;
+export const MODEL_NAME_MAX_LENGTH = 120;
 
 export const createVehicleSchema = z.object({
   licensePlate: z
@@ -41,7 +45,7 @@ export const queryVehiclesSchema = z.object({
 });
 
 export const createBrandSchema = z.object({
-  name: z.string().min(1).max(120),
+  name: z.string().min(BRAND_NAME_MIN_LENGTH).max(BRAND_NAME_MAX_LENGTH),
 });
 
 export const updateBrandSchema = createBrandSchema.partial();
@@ -54,7 +58,7 @@ export const brandEntitySchema = createBrandSchema.extend({
 });
 
 export const createModelSchema = z.object({
-  name: z.string().min(1).max(120),
+  name: z.string().min(MODEL_NAME_MIN_LENGTH).max(MODEL_NAME_MAX_LENGTH),
   brandId: z.string().uuid().optional(),
 });
 

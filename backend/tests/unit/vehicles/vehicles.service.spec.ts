@@ -19,6 +19,10 @@ import { UnitOfWork } from '../../../src/shared/unit-of-work/unit-of-work';
 import { VehicleTypeOrmRepository } from '../../../src/modules/fleet/infrastructure/repositories/vehicle.typeorm.repository';
 import { EventBusService } from '../../../src/shared/domain/events/event-bus.service';
 import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
+import {
+  VEHICLE_EVENT_CREATED,
+  VEHICLE_CACHE_NAMESPACE,
+} from '../../../src/modules/fleet/fleet.constants';
 
 describe('VehiclesService', () => {
   let service: VehiclesService;
@@ -140,15 +144,15 @@ describe('VehiclesService', () => {
 
     expect(modelRepository.findById).toHaveBeenCalledWith('model-1');
     expect(scopedRepository.save).toHaveBeenCalled();
-    expect(repositoryCache.invalidate).toHaveBeenCalledWith('vehicles.search');
+    expect(repositoryCache.invalidate).toHaveBeenCalledWith(VEHICLE_CACHE_NAMESPACE);
     expect(auditService.record).toHaveBeenCalledWith(
       expect.objectContaining({
-        action: 'vehicle.created',
+        action: VEHICLE_EVENT_CREATED,
         entityId: result.id,
       }),
     );
     expect(eventBus.publish).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'vehicle.created' }),
+      expect.objectContaining({ name: VEHICLE_EVENT_CREATED }),
     );
     expect(result.licensePlate).toBe('ABC1D23');
   });

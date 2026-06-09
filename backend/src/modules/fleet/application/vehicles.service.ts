@@ -10,7 +10,15 @@ import { EntityManager } from 'typeorm';
 import { AuditService } from '../../audit/audit.service';
 import { RepositoryCacheService } from '../../../shared/cache/repository-cache.service';
 import { UnitOfWork } from '../../../shared/unit-of-work/unit-of-work';
-import { MODEL_REPOSITORY, VEHICLE_REPOSITORY } from '../fleet.constants';
+import {
+  MODEL_REPOSITORY,
+  VEHICLE_REPOSITORY,
+  VEHICLE_EVENT_CREATED,
+  VEHICLE_EVENT_UPDATED,
+  VEHICLE_EVENT_REMOVED,
+  AUDIT_ENTITY_VEHICLE,
+  VEHICLE_CACHE_NAMESPACE,
+} from '../fleet.constants';
 import type { ModelRepository } from '../domain/model.repository';
 import { Vehicle } from '../domain/vehicle.aggregate';
 import type {
@@ -74,7 +82,7 @@ export class VehiclesService {
 
     if (this.featureToggleService.isEnabled('repositoryCache', true)) {
       return this.repositoryCache.fetch({
-        namespace: 'vehicles.search',
+        namespace: VEHICLE_CACHE_NAMESPACE,
         key: filters,
         ttlSeconds: this.cacheTtl,
         loader: () => this.repository.search(filters),
@@ -115,8 +123,8 @@ export class VehiclesService {
 
     await this.invalidateCache();
     await this.auditService.record({
-      action: 'vehicle.created',
-      entity: 'vehicle',
+      action: VEHICLE_EVENT_CREATED,
+      entity: AUDIT_ENTITY_VEHICLE,
       entityId: created.id,
       actor,
       payload: {
@@ -125,15 +133,15 @@ export class VehiclesService {
       },
     });
 
-    if (this.featureToggleService.isEnabled('domainEvents', true)) {
-      await this.eventBus.publish(
+    await this.featureToggleService.runIfEnabled('domainEvents', () =>
+      this.eventBus.publish(
         new VehicleCreatedEvent({
           vehicleId: created.id,
           actor,
           snapshot: created,
         }),
-      );
-    }
+      ),
+    );
 
     return created;
   }
@@ -188,8 +196,8 @@ export class VehiclesService {
 
     await this.invalidateCache();
     await this.auditService.record({
-      action: 'vehicle.updated',
-      entity: 'vehicle',
+      action: VEHICLE_EVENT_UPDATED,
+      entity: AUDIT_ENTITY_VEHICLE,
       entityId: updated.id,
       actor,
       payload: {
@@ -198,15 +206,15 @@ export class VehiclesService {
       },
     });
 
-    if (this.featureToggleService.isEnabled('domainEvents', true)) {
-      await this.eventBus.publish(
+    await this.featureToggleService.runIfEnabled('domainEvents', () =>
+      this.eventBus.publish(
         new VehicleUpdatedEvent({
           vehicleId: updated.id,
           actor,
           snapshot: updated,
         }),
-      );
-    }
+      ),
+    );
 
     return updated;
   }
@@ -223,8 +231,8 @@ export class VehiclesService {
 
     await this.invalidateCache();
     await this.auditService.record({
-      action: 'vehicle.removed',
-      entity: 'vehicle',
+      action: VEHICLE_EVENT_REMOVED,
+      entity: AUDIT_ENTITY_VEHICLE,
       entityId: vehicle.id,
       actor,
       payload: {
@@ -232,15 +240,15 @@ export class VehiclesService {
       },
     });
 
-    if (this.featureToggleService.isEnabled('domainEvents', true)) {
-      await this.eventBus.publish(
+    await this.featureToggleService.runIfEnabled('domainEvents', () =>
+      this.eventBus.publish(
         new VehicleDeletedEvent({
           vehicleId: vehicle.id,
           actor,
           snapshot: vehicle,
         }),
-      );
-    }
+      ),
+    );
   }
 
   private async ensureModelExists(modelId: string) {
@@ -278,7 +286,7 @@ export class VehiclesService {
 
   private async invalidateCache() {
     if (this.featureToggleService.isEnabled('repositoryCache', true)) {
-      await this.repositoryCache.invalidate('vehicles.search');
+      await this.repositoryCache.invalidate(VEHICLE_CACHE_NAMESPACE);
     }
   }
 

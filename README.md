@@ -17,7 +17,7 @@
 ### Execução
 **Docker**
 ```bash
-cp envexample.txt .env
+cp .env.example .env
 docker compose up --build
 ```
 Serviços: Frontend `http://localhost:${FRONTEND_PORT:-3001}`, Backend `http://localhost:${HTTP_PORT:-3000}/api`, RabbitMQ UI `http://localhost:15672`.
@@ -29,6 +29,13 @@ cd backend && npm install && npm run build && npm run start:prod
 
 # Frontend
 cd frontend && npm install && npm run dev
+```
+
+**Gerar cliente TypeScript (Swagger)**
+```bash
+# Com a API rodando em http://localhost:3000
+cd backend
+npm run generate:client
 ```
 
 ### Variáveis Principais
@@ -72,7 +79,7 @@ Confira `.env.example` para:
 ### Running
 **Docker**
 ```bash
-cp envexample.txt .env
+cp .env.example .env
 docker compose up --build
 ```
 Services: Frontend `http://localhost:${FRONTEND_PORT:-3001}`, Backend `http://localhost:${HTTP_PORT:-3000}/api`, RabbitMQ UI `http://localhost:15672`.
@@ -84,6 +91,13 @@ cd backend && npm install && npm run build && npm run start:prod
 
 # Frontend
 cd frontend && npm install && npm run dev
+```
+
+**Generate TypeScript client (Swagger)**
+```bash
+# With the API running at http://localhost:3000
+cd backend
+npm run generate:client
 ```
 
 ### Key Environment Variables

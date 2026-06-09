@@ -15,6 +15,17 @@ import {
   VehicleDeletedEvent,
   VehicleUpdatedEvent,
 } from '../../domain/events';
+import {
+  BRAND_EVENT_CREATED,
+  BRAND_EVENT_REMOVED,
+  BRAND_EVENT_UPDATED,
+  MODEL_EVENT_CREATED,
+  MODEL_EVENT_REMOVED,
+  MODEL_EVENT_UPDATED,
+  VEHICLE_EVENT_CREATED,
+  VEHICLE_EVENT_REMOVED,
+  VEHICLE_EVENT_UPDATED,
+} from '../../fleet.constants';
 
 type DomainEvents =
   | VehicleCreatedEvent
@@ -40,15 +51,15 @@ export class FleetDomainEventListener implements OnModuleInit {
 
   onModuleInit() {
     const registrations: Array<[DomainEvents['name'], (event: DomainEvents) => Promise<void>]> = [
-      ['vehicle.created', (event) => this.forwardVehicleEvent(event as VehicleCreatedEvent)],
-      ['vehicle.updated', (event) => this.forwardVehicleEvent(event as VehicleUpdatedEvent)],
-      ['vehicle.removed', (event) => this.forwardVehicleEvent(event as VehicleDeletedEvent)],
-      ['brand.created', (event) => this.forwardBrandEvent(event as BrandCreatedEvent)],
-      ['brand.updated', (event) => this.forwardBrandEvent(event as BrandUpdatedEvent)],
-      ['brand.removed', (event) => this.forwardBrandEvent(event as BrandDeletedEvent)],
-      ['model.created', (event) => this.forwardModelEvent(event as ModelCreatedEvent)],
-      ['model.updated', (event) => this.forwardModelEvent(event as ModelUpdatedEvent)],
-      ['model.removed', (event) => this.forwardModelEvent(event as ModelDeletedEvent)],
+      [VEHICLE_EVENT_CREATED, (event) => this.forwardVehicleEvent(event as VehicleCreatedEvent)],
+      [VEHICLE_EVENT_UPDATED, (event) => this.forwardVehicleEvent(event as VehicleUpdatedEvent)],
+      [VEHICLE_EVENT_REMOVED, (event) => this.forwardVehicleEvent(event as VehicleDeletedEvent)],
+      [BRAND_EVENT_CREATED, (event) => this.forwardBrandEvent(event as BrandCreatedEvent)],
+      [BRAND_EVENT_UPDATED, (event) => this.forwardBrandEvent(event as BrandUpdatedEvent)],
+      [BRAND_EVENT_REMOVED, (event) => this.forwardBrandEvent(event as BrandDeletedEvent)],
+      [MODEL_EVENT_CREATED, (event) => this.forwardModelEvent(event as ModelCreatedEvent)],
+      [MODEL_EVENT_UPDATED, (event) => this.forwardModelEvent(event as ModelUpdatedEvent)],
+      [MODEL_EVENT_REMOVED, (event) => this.forwardModelEvent(event as ModelDeletedEvent)],
     ];
 
     registrations.forEach(([name, handler]) => {

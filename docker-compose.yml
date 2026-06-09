@@ -48,20 +48,21 @@ services:
       context: ./backend
     environment:
       HTTP_PORT: ${HTTP_PORT:-3000}
-      SQLSERVER_HOST: sqlserver
-      SQLSERVER_PORT: 1433
+      SQLSERVER_HOST: ${SQLSERVER_HOST:-sqlserver}
+      SQLSERVER_PORT: ${SQLSERVER_PORT:-1433}
       SQLSERVER_USER: ${SQLSERVER_USER}
       SQLSERVER_PASSWORD: ${SQLSERVER_PASSWORD}
       SQLSERVER_DB: ${SQLSERVER_DB}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
       REDIS_TTL_SECONDS: ${REDIS_TTL_SECONDS:-120}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-3600s}
-      MONGO_URI: mongodb://mongo:27017/fleetcore
-      RABBITMQ_URI: amqp://rabbitmq:5672
+      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017/fleetcore}
+      RABBITMQ_URI: ${RABBITMQ_URI:-amqp://rabbitmq:5672}
       RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-fleetcore.events}
       RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-fleetcore.vehicles}
+      RABBITMQ_AUDIT_QUEUE: ${RABBITMQ_AUDIT_QUEUE:-fleetcore.audit}
       NODE_ENV: production
       ADMIN_NICKNAME: ${ADMIN_NICKNAME:-aivacol}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-aivacol@fleetcore.local}
@@ -82,7 +83,7 @@ services:
       context: ./frontend
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: http://backend:3000/api
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:3000/api}
       NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Fleetcore Web}
       NEXT_PUBLIC_CACHE_TTL_SECONDS: ${REDIS_TTL_SECONDS:-120}
     ports:

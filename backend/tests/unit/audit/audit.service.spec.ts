@@ -1,4 +1,5 @@
 import { AuditService, AuditRecordInput } from '../../../src/modules/audit/audit.service';
+import { VEHICLE_EVENT_CREATED } from '../../../src/modules/fleet/fleet.constants';
 import { MessagingService } from '../../../src/modules/messaging/messaging.service';
 import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
 import { AuditWriterService } from '../../../src/modules/audit/audit-writer.service';
@@ -10,7 +11,7 @@ describe('AuditService', () => {
   let service: AuditService;
 
   const entry: AuditRecordInput = {
-    action: 'vehicle.created',
+    action: VEHICLE_EVENT_CREATED,
     entity: 'vehicle',
     entityId: 'veh-1',
     actor: 'tester',
@@ -38,7 +39,7 @@ describe('AuditService', () => {
 
     expect(messaging.publish).toHaveBeenCalledWith(
       'audit.event',
-      expect.objectContaining({ action: 'vehicle.created', occurredAt: expect.any(String) }),
+      expect.objectContaining({ action: VEHICLE_EVENT_CREATED, occurredAt: expect.any(String) }),
     );
     expect(writer.persist).not.toHaveBeenCalled();
   });
@@ -48,7 +49,7 @@ describe('AuditService', () => {
 
     await service.record(entry);
 
-    expect(writer.persist).toHaveBeenCalledWith(expect.objectContaining({ action: 'vehicle.created' }));
+    expect(writer.persist).toHaveBeenCalledWith(expect.objectContaining({ action: VEHICLE_EVENT_CREATED }));
     expect(messaging.publish).not.toHaveBeenCalled();
   });
 
@@ -57,6 +58,6 @@ describe('AuditService', () => {
 
     await service.record(entry);
 
-    expect(writer.persist).toHaveBeenCalledWith(expect.objectContaining({ action: 'vehicle.created' }));
+    expect(writer.persist).toHaveBeenCalledWith(expect.objectContaining({ action: VEHICLE_EVENT_CREATED }));
   });
 });

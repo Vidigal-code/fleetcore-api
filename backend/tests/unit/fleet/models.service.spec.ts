@@ -14,6 +14,10 @@ import { UnitOfWork } from '../../../src/shared/unit-of-work/unit-of-work';
 import { ModelTypeOrmRepository } from '../../../src/modules/fleet/infrastructure/repositories/model.typeorm.repository';
 import { EventBusService } from '../../../src/shared/domain/events/event-bus.service';
 import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
+import {
+  AUDIT_ENTITY_MODEL,
+  MODEL_EVENT_CREATED,
+} from '../../../src/modules/fleet/fleet.constants';
 
 describe('ModelsService', () => {
   let service: ModelsService;
@@ -115,10 +119,14 @@ describe('ModelsService', () => {
 
     expect(scopedRepository.save).toHaveBeenCalledTimes(1);
     expect(auditService.record).toHaveBeenCalledWith(
-      expect.objectContaining({ action: 'model.created', actor: 'tester' }),
+      expect.objectContaining({
+        action: MODEL_EVENT_CREATED,
+        actor: 'tester',
+        entity: AUDIT_ENTITY_MODEL,
+      }),
     );
     expect(eventBus.publish).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'model.created' }),
+      expect.objectContaining({ name: MODEL_EVENT_CREATED }),
     );
     expect(result.name).toBe('Ranger');
   });
