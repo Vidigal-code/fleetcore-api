@@ -11,5 +11,5 @@ const dbConfig = databaseConfig() as unknown as DataSourceOptions;
 export default new DataSource({
   ...dbConfig,
   entities: ['dist/**/*.entity.js', 'dist/**/*.orm-entity.js'],
-  migrations: ['dist/migrations/*.js'],
+  migrations: ['dist/src/migrations/*.js'],
 });
