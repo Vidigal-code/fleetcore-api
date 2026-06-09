@@ -6,7 +6,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import type { Brand } from '@/entities/brand/model/types';
 import type { Model } from '@/entities/model/model/types';
 import type { VehicleFilters } from '@/entities/vehicle/model/types';
-import { formatLicensePlate } from '@/shared/lib/utils';
+import { cn, formatLicensePlate } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
 import { InputField } from '@/shared/ui/input-field';
 import { SelectField } from '@/shared/ui/select-field';
@@ -23,6 +23,7 @@ export interface VehicleFilterBarProps {
   filters: VehicleFilters;
   loading?: boolean;
   onChange: (filters: VehicleFilters) => void;
+  className?: string;
 }
 
 const emptyFilterValues: VehicleFilterFormValues = {
@@ -37,6 +38,7 @@ export const VehicleFilterBar = ({
   filters,
   loading = false,
   onChange,
+  className,
 }: VehicleFilterBarProps) => {
   const form = useForm<VehicleFilterFormValues>({
     defaultValues: emptyFilterValues,
@@ -97,7 +99,10 @@ export const VehicleFilterBar = ({
 
   return (
     <form
-      className="mx-auto grid w-full max-w-3xl grid-cols-1 gap-4 rounded-3xl border border-border/40 bg-surface/50 px-6 py-5 text-center shadow-sm backdrop-blur-xl lg:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:text-left"
+      className={cn(
+        'grid w-full grid-cols-1 gap-4 text-center lg:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:text-left',
+        className,
+      )}
       onSubmit={handleSubmit}
     >
       <InputField

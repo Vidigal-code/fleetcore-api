@@ -34,9 +34,11 @@ const config: Config = {
         'accent-strong': withAlpha('--color-accent-strong'),
         warning: withAlpha('--color-warning'),
         danger: withAlpha('--color-danger'),
+        positive: withAlpha('--color-positive'),
       },
       boxShadow: {
-        elevated: '0 25px 80px rgba(15, 23, 42, 0.2)',
+        elevated: 'var(--shadow-elevated)',
+        floating: 'var(--shadow-floating)',
       },
       borderRadius: {
         xl: '1.5rem',

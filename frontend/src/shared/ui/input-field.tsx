@@ -5,7 +5,7 @@ import { forwardRef, InputHTMLAttributes } from 'react';
 import { cn } from '@/shared/lib/utils';
 
 const baseInputClasses =
-  'w-full rounded-2xl border border-border/60 bg-surface/70 px-4 py-3 text-sm text-foreground placeholder:text-muted transition duration-base ease-subtle focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/40';
+  'w-full rounded-[1.75rem] border border-border/50 bg-surface/80 px-5 py-3.5 text-sm text-foreground shadow-[0_14px_38px_rgba(15,23,42,0.12)] backdrop-blur focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-background placeholder:text-muted transition-all duration-base ease-subtle hover:border-accent/40 hover:shadow-[0_18px_46px_rgba(15,23,42,0.16)]';
 
 export interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -18,7 +18,7 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
     const inputId = id ?? props.name;
     return (
       <label
-        className={cn('flex flex-col items-center gap-2 text-center sm:items-start sm:text-left', className)}
+        className={cn('flex flex-col items-center gap-3 text-center sm:items-start sm:text-left', className)}
         htmlFor={inputId}
       >
         {label ? (

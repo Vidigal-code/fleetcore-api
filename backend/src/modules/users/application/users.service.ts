@@ -1,4 +1,10 @@
-import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EntityManager } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -20,6 +26,18 @@ export interface CreateUserInput {
   createdBy: string;
 }
 
+export interface UpdateProfileInput {
+  userId: string;
+  name: string;
+  nickname: string;
+  email?: string;
+}
+
+export interface UpdatePasswordInput {
+  userId: string;
+  passwordHash: string;
+}
+
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
@@ -36,6 +54,10 @@ export class UsersService {
 
   async findByNickname(nickname: string): Promise<User | null> {
     return this.repository.findByNickname(nickname.toLowerCase());
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.repository.findById(id);
   }
 
   async ensureAdminSeed(): Promise<User> {
@@ -101,6 +123,52 @@ export class UsersService {
 
     return this.unitOfWork.execute(async (manager) => {
       const scopedRepository = this.getScopedRepository(manager);
+      return scopedRepository.save(user);
+    });
+  }
+
+  async updateProfile(input: UpdateProfileInput): Promise<User> {
+    const nickname = input.nickname.toLowerCase();
+    const email = input.email ? input.email.toLowerCase() : undefined;
+
+    return this.unitOfWork.execute(async (manager) => {
+      const scopedRepository = this.getScopedRepository(manager);
+      const user = await scopedRepository.findById(input.userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const existingByEmail =
+        email && email !== user.email
+          ? await scopedRepository.findByEmail(email)
+          : null;
+      const existingByNickname =
+        nickname !== user.nickname
+          ? await scopedRepository.findByNickname(nickname)
+          : null;
+
+      if (existingByEmail && existingByEmail.id !== user.id) {
+        throw new ConflictException('Email already in use');
+      }
+
+      if (existingByNickname && existingByNickname.id !== user.id) {
+        throw new ConflictException('Nickname already in use');
+      }
+
+      const targetEmail = email ?? user.email;
+      user.updateProfile(input.name, nickname, targetEmail);
+      return scopedRepository.save(user);
+    });
+  }
+
+  async updatePassword(input: UpdatePasswordInput): Promise<User> {
+    return this.unitOfWork.execute(async (manager) => {
+      const scopedRepository = this.getScopedRepository(manager);
+      const user = await scopedRepository.findById(input.userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      user.updatePassword(input.passwordHash);
       return scopedRepository.save(user);
     });
   }

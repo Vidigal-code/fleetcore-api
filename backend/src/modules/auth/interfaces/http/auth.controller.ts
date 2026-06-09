@@ -16,6 +16,8 @@ import type { JwtPayload } from '../../domain/jwt-payload.interface';
 import { AuthService } from '../../application/auth.service';
 import { LoginDto } from '../../dto/login.dto';
 import { RegisterDto } from '../../dto/register.dto';
+import { UpdatePasswordDto } from '../../dto/update-password.dto';
+import { UpdateProfileDto } from '../../dto/update-profile.dto';
 import { Public } from '../../decorators/public.decorator';
 
 @ApiTags('Authentication')
@@ -59,6 +61,36 @@ export class AuthController {
   @ApiOperation({ summary: 'Register a new user account.' })
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('update/password')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update the current user password.' })
+  async updatePassword(
+    @CurrentUser() user: JwtPayload | undefined,
+    @Body() dto: UpdatePasswordDto,
+  ) {
+    if (!user) {
+      throw new UnauthorizedException('User context not found');
+    }
+
+    return this.authService.updatePassword(user.sub, user.sessionId, dto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('update/profile')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update the current user profile.' })
+  async updateProfile(
+    @CurrentUser() user: JwtPayload | undefined,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    if (!user) {
+      throw new UnauthorizedException('User context not found');
+    }
+
+    return this.authService.updateProfile(user.sub, dto);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -8,6 +8,7 @@ import type { Model } from '@/entities/model/model/types';
 import type { Vehicle } from '@/entities/vehicle/model/types';
 import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
+import { cn } from '@/shared/lib/utils';
 import { DataTable, type TableColumn } from '@/shared/ui/table';
 import { Pagination } from '@/shared/ui/pagination';
 
@@ -35,6 +36,7 @@ export interface VehicleTableProps {
   onPageChange: (page: number) => void;
   onEdit: (vehicle: Vehicle) => void;
   onDelete: (vehicle: Vehicle) => void;
+  className?: string;
 }
 
 const formatTimestamp = (value: string) =>
@@ -54,6 +56,7 @@ export const VehicleTable = ({
   onPageChange,
   onEdit,
   onDelete,
+  className,
 }: VehicleTableProps) => {
   const brandMap = useMemo(() => new Map(brands.map((brand) => [brand.id, brand])), [brands]);
   const modelMap = useMemo(() => new Map(models.map((model) => [model.id, model])), [models]);
@@ -144,15 +147,15 @@ export const VehicleTable = ({
   ];
 
   return (
-    <section className="mx-auto w-full max-w-3xl space-y-6 rounded-3xl border border-border/50 bg-surface/70 px-6 py-6 text-center shadow-[var(--shadow-elevated)] backdrop-blur-xl">
-      <div className="flex flex-col gap-4 border-b border-border/40 pb-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
+    <div className={cn('w-full space-y-6 text-center sm:text-left', className)}>
+      <div className="flex flex-col gap-4 border-b border-border/30 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-foreground">Veículos cadastrados</h2>
           <p className="text-sm text-muted">
             Monitoramento em tempo real da frota com cache em Redis.
           </p>
         </div>
-        <div className="mx-auto flex items-center gap-2 rounded-full border border-border/50 bg-background/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted sm:mx-0">
+        <div className="mx-auto flex items-center gap-2 rounded-full border border-border/40 bg-background/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-muted sm:mx-0">
           <CalendarCheck className="h-4 w-4" />
           {total} registro(s)
         </div>
@@ -170,6 +173,6 @@ export const VehicleTable = ({
         limit={limit}
         onPageChange={onPageChange}
       />
-    </section>
+    </div>
   );
 };

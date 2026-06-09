@@ -53,9 +53,10 @@ export class User {
     this.touch();
   }
 
-  updateProfile(name: string, nickname: string) {
+  updateProfile(name: string, nickname: string, email: string) {
     this.props.name = name;
     this.props.nickname = nickname;
+    this.props.email = email;
     this.touch();
   }
 

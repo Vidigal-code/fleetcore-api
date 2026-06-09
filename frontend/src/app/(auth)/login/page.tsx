@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { LoginForm } from '@/features/auth/login/ui/login-form';
@@ -7,12 +8,28 @@ export const metadata: Metadata = {
   title: `${appConfig.appName} · Entrar`,
 };
 
-export default function LoginPage() {
+interface LoginPageProps {
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
+export default function LoginPage({ searchParams }: LoginPageProps) {
+  const resolveParam = (value: string | string[] | undefined) =>
+    Array.isArray(value) ? value[0] : value;
+
+  const registered = resolveParam(searchParams?.registered);
+  const passwordReset = resolveParam(searchParams?.passwordReset);
+
+  const successMessage = passwordReset === '1'
+    ? 'Senha atualizada com sucesso. Entre novamente para continuar.'
+    : registered === '1'
+      ? 'Cadastro realizado com sucesso. Entre com suas credenciais administrativas.'
+      : null;
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6 py-16">
-      <div className="grid w-full max-w-5xl gap-10 rounded-[2.5rem] border border-border/50 bg-surface/80 p-8 shadow-[var(--shadow-elevated)] backdrop-blur-xl lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:p-12">
-        <div className="flex flex-col gap-6">
-          <span className="w-fit rounded-full border border-accent/40 bg-accent/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-accent">
+      <div className="grid w-full max-w-5xl gap-10 rounded-[2.75rem] border border-border/50 bg-surface/80 p-8 shadow-[var(--shadow-elevated)] backdrop-blur-xl lg:grid-cols-[1.1fr_0.9fr] lg:gap-16 lg:p-12">
+        <div className="flex flex-col gap-6 text-center lg:text-left">
+          <span className="mx-auto w-fit rounded-full border border-accent/40 bg-accent/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-accent lg:mx-0">
             Fleetcore
           </span>
           <h1 className="text-3xl font-semibold leading-tight text-foreground lg:text-4xl">
@@ -30,8 +47,14 @@ export default function LoginPage() {
               React Query + Redux Toolkit
             </span>
           </div>
+          <div className="text-xs text-muted">
+            Ainda não possui credenciais?{' '}
+            <Link href="/register" className="text-accent hover:text-accent-strong">
+              Criar conta agora
+            </Link>
+          </div>
         </div>
-        <LoginForm />
+        <LoginForm successMessage={successMessage} />
       </div>
     </div>
   );

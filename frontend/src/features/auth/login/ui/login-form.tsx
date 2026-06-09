@@ -14,7 +14,11 @@ import { InputField } from '@/shared/ui/input-field';
 import { loginSchema, type LoginFormValues } from '../model/login-schema';
 import { useLoginMutation } from '../model/use-login';
 
-export const LoginForm = () => {
+export interface LoginFormProps {
+  successMessage?: string | null;
+}
+
+export const LoginForm = ({ successMessage }: LoginFormProps) => {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -51,6 +55,12 @@ export const LoginForm = () => {
         </div>
       </div>
       <form className="grid grid-cols-1 gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+        {successMessage ? (
+          <InlineMessage className="text-sm" variant="success">
+            {successMessage}
+          </InlineMessage>
+        ) : null}
+
         <InputField
           label="Usuário ou e-mail"
           placeholder="aivacol"
