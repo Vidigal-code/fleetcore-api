@@ -3,10 +3,13 @@ import type { FeatureFlagKey } from '../../../src/shared/config/app-config.types
 import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
 
 describe('FeatureToggleService', () => {
-  const getFeatureFlagMock = jest.fn<boolean, [FeatureFlagKey, boolean | undefined]>();
+  const getFeatureFlagMock = jest.fn<
+    boolean,
+    [FeatureFlagKey, boolean | undefined]
+  >();
   const appConfigMock = {
     getFeatureFlag: getFeatureFlagMock,
-  } as unknown as AppConfigService;
+  } as AppConfigService;
 
   const service = new FeatureToggleService(appConfigMock);
 
@@ -24,7 +27,7 @@ describe('FeatureToggleService', () => {
   it('runs task when flag enabled', async () => {
     getFeatureFlagMock.mockReturnValueOnce(true);
 
-    const result = await service.runIfEnabled('domainEvents', async () => 'ok');
+    const result = await service.runIfEnabled('domainEvents', () => 'ok');
 
     expect(result).toBe('ok');
   });
@@ -34,8 +37,8 @@ describe('FeatureToggleService', () => {
 
     const result = await service.runIfEnabled(
       'domainEvents',
-      async () => 'ok',
-      async () => 'fallback',
+      () => 'ok',
+      () => 'fallback',
     );
 
     expect(result).toBe('fallback');

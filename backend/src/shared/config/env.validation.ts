@@ -89,6 +89,10 @@ class EnvironmentVariables {
   ADMIN_PASSWORD?: string;
 
   @IsOptional()
+  @IsInt()
+  AUTH_SESSION_TTL_SECONDS?: number;
+
+  @IsOptional()
   @IsString()
   DATABASE_TYPE?: string;
 

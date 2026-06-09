@@ -1,4 +1,7 @@
-import { AuditService, AuditRecordInput } from '../../../src/modules/audit/audit.service';
+import {
+  AuditService,
+  AuditRecordInput,
+} from '../../../src/modules/audit/audit.service';
 import { VEHICLE_EVENT_CREATED } from '../../../src/modules/fleet/fleet.constants';
 import { MessagingService } from '../../../src/modules/messaging/messaging.service';
 import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
@@ -19,17 +22,35 @@ describe('AuditService', () => {
 
   beforeEach(() => {
     messaging = {
-      publish: jest.fn().mockResolvedValue(undefined),
-    } as unknown as jest.Mocked<MessagingService>;
+      publish: jest
+        .fn<
+          ReturnType<MessagingService['publish']>,
+          Parameters<MessagingService['publish']>
+        >()
+        .mockResolvedValue(undefined),
+    } as jest.Mocked<MessagingService>;
 
     featureToggles = {
-      isEnabled: jest.fn().mockReturnValue(true),
-      runIfEnabled: jest.fn(),
-    } as unknown as jest.Mocked<FeatureToggleService>;
+      isEnabled: jest
+        .fn<
+          ReturnType<FeatureToggleService['isEnabled']>,
+          Parameters<FeatureToggleService['isEnabled']>
+        >()
+        .mockReturnValue(true),
+      runIfEnabled: jest.fn<
+        ReturnType<FeatureToggleService['runIfEnabled']>,
+        Parameters<FeatureToggleService['runIfEnabled']>
+      >(),
+    } as jest.Mocked<FeatureToggleService>;
 
     writer = {
-      persist: jest.fn().mockResolvedValue(undefined),
-    } as unknown as jest.Mocked<AuditWriterService>;
+      persist: jest
+        .fn<
+          ReturnType<AuditWriterService['persist']>,
+          Parameters<AuditWriterService['persist']>
+        >()
+        .mockResolvedValue(undefined),
+    } as jest.Mocked<AuditWriterService>;
 
     service = new AuditService(messaging, featureToggles, writer);
   });
@@ -37,10 +58,15 @@ describe('AuditService', () => {
   it('publishes to queue when async worker enabled', async () => {
     await service.record(entry);
 
-    expect(messaging.publish).toHaveBeenCalledWith(
-      'audit.event',
-      expect.objectContaining({ action: VEHICLE_EVENT_CREATED, occurredAt: expect.any(String) }),
-    );
+    const publishCalls = messaging.publish.mock.calls as Array<
+      [string, Record<string, unknown>]
+    >;
+    const [routingKey, payload] = publishCalls[0];
+
+    expect(routingKey).toBe('audit.event');
+    expect(payload.action).toBe(VEHICLE_EVENT_CREATED);
+    expect(typeof payload.occurredAt).toBe('string');
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.persist).not.toHaveBeenCalled();
   });
 
@@ -49,7 +75,11 @@ describe('AuditService', () => {
 
     await service.record(entry);
 
-    expect(writer.persist).toHaveBeenCalledWith(expect.objectContaining({ action: VEHICLE_EVENT_CREATED }));
+    const persistCalls = writer.persist.mock.calls as Array<[AuditRecordInput]>;
+    const [payload] = persistCalls[0];
+
+    expect(payload.action).toBe(VEHICLE_EVENT_CREATED);
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(messaging.publish).not.toHaveBeenCalled();
   });
 
@@ -58,6 +88,9 @@ describe('AuditService', () => {
 
     await service.record(entry);
 
-    expect(writer.persist).toHaveBeenCalledWith(expect.objectContaining({ action: VEHICLE_EVENT_CREATED }));
+    const persistCalls = writer.persist.mock.calls as Array<[AuditRecordInput]>;
+    const [payload] = persistCalls[0];
+
+    expect(payload.action).toBe(VEHICLE_EVENT_CREATED);
   });
 });
