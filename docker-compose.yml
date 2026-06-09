@@ -11,6 +11,12 @@ services:
       - '${SQLSERVER_PORT:-1433}:1433'
     volumes:
       - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ['CMD-SHELL', '/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P "$${SA_PASSWORD}" -Q "SELECT 1"']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 40s
     networks:
       - fleetnet
 
@@ -21,6 +27,12 @@ services:
       - '${REDIS_PORT:-6379}:6379'
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - fleetnet
 
@@ -30,6 +42,12 @@ services:
       - '27017:27017'
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ['CMD', 'mongosh', '--quiet', '--eval', 'db.adminCommand("ping")']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
     networks:
       - fleetnet
 
@@ -40,6 +58,12 @@ services:
       - '15672:15672'
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
     networks:
       - fleetnet
 
@@ -72,10 +96,14 @@ services:
     ports:
       - '${HTTP_PORT:-3000}:3000'
     depends_on:
-      - sqlserver
-      - redis
-      - mongo
-      - rabbitmq
+      sqlserver:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - fleetnet
 
@@ -90,7 +118,8 @@ services:
     ports:
       - '${FRONTEND_PORT:-3001}:3000'
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     networks:
       - fleetnet
 
