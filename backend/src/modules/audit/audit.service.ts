@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { MessagingService } from '../messaging/messaging.service';
-import { FeatureToggleService } from '../../shared/features/feature-toggle.service';
+import { FeatureToggleService } from '../../shared/features';
 import { AuditWriterService } from './audit-writer.service';
 
 export interface AuditRecordInput {
