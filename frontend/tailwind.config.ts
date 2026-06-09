@@ -1,15 +1,6 @@
 import type { Config } from 'tailwindcss';
 
-const withOpacity = (variable: string) => ({
-  opacityValue,
-}: {
-  opacityValue?: string;
-}) => {
-  if (opacityValue === undefined) {
-    return `rgb(var(${variable}))`;
-  }
-  return `rgb(var(${variable}) / ${opacityValue})`;
-};
+const withAlpha = (variable: string) => `rgb(var(${variable}) / <alpha-value>)`;
 
 const config: Config = {
   darkMode: 'class',
@@ -33,16 +24,16 @@ const config: Config = {
         mono: ['var(--font-mono)', 'Fira Code', 'monospace'],
       },
       colors: {
-        background: withOpacity('--color-background'),
-        surface: withOpacity('--color-surface'),
-        'surface-strong': withOpacity('--color-surface-strong'),
-        border: withOpacity('--color-border'),
-        foreground: withOpacity('--color-foreground'),
-        muted: withOpacity('--color-foreground-muted'),
-        accent: withOpacity('--color-accent'),
-        'accent-strong': withOpacity('--color-accent-strong'),
-        warning: withOpacity('--color-warning'),
-        danger: withOpacity('--color-danger'),
+        background: withAlpha('--color-background'),
+        surface: withAlpha('--color-surface'),
+        'surface-strong': withAlpha('--color-surface-strong'),
+        border: withAlpha('--color-border'),
+        foreground: withAlpha('--color-foreground'),
+        muted: withAlpha('--color-foreground-muted'),
+        accent: withAlpha('--color-accent'),
+        'accent-strong': withAlpha('--color-accent-strong'),
+        warning: withAlpha('--color-warning'),
+        danger: withAlpha('--color-danger'),
       },
       boxShadow: {
         elevated: '0 25px 80px rgba(15, 23, 42, 0.2)',
