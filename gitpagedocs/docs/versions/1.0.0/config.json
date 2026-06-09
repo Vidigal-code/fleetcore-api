@@ -17,6 +17,265 @@
     {
       "id": 1,
       "title": {
+        "pt": "Início",
+        "en": "Home",
+        "es": "Inicio"
+      },
+      "description": {
+        "pt": "Resumo do desafio e links rápidos",
+        "en": "Challenge summary and quick links",
+        "es": "Resumen del desafío y enlaces rápidos"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/index.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/index.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/index.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 2,
+      "title": {
+        "pt": "Visão geral",
+        "en": "Project overview",
+        "es": "Visión general"
+      },
+      "description": {
+        "pt": "Contexto, objetivos e pilares entregues",
+        "en": "Context, goals, and delivered pillars",
+        "es": "Contexto, objetivos y pilares entregados"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/visao-geral.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/project-overview.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/vision-general.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 3,
+      "title": {
+        "pt": "Arquitetura",
+        "en": "Architecture",
+        "es": "Arquitectura"
+      },
+      "description": {
+        "pt": "Componentes backend, domínio e integrações",
+        "en": "Backend components, domain modeling, integrations",
+        "es": "Componentes backend, modelado de dominio e integraciones"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/arquitetura.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/architecture.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/arquitectura.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 4,
+      "title": {
+        "pt": "Back-end",
+        "en": "Back-end",
+        "es": "Back-end"
+      },
+      "description": {
+        "pt": "APIs, regras de negócio e automações",
+        "en": "APIs, business rules, automations",
+        "es": "APIs, reglas de negocio y automatizaciones"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/backend.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/backend.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/backend.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 5,
+      "title": {
+        "pt": "Front-end",
+        "en": "Front-end",
+        "es": "Front-end"
+      },
+      "description": {
+        "pt": "Experiência Next.js, FSD e dados",
+        "en": "Next.js experience, FSD layers, data flows",
+        "es": "Experiencia Next.js, capas FSD y flujos de datos"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/frontend.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/frontend.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/frontend.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 6,
+      "title": {
+        "pt": "Qualidade",
+        "en": "Quality & ops",
+        "es": "Calidad"
+      },
+      "description": {
+        "pt": "Testes, observabilidade e operação diária",
+        "en": "Testing, observability, daily operations",
+        "es": "Pruebas, observabilidad y operación diaria"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/qualidade-operacoes.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/quality-ops.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/calidad-operaciones.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 7,
+      "title": {
+        "pt": "Perguntas",
+        "en": "Conceptual answers",
+        "es": "Preguntas"
+      },
+      "description": {
+        "pt": "Respostas para a etapa conceitual",
+        "en": "Answers for the conceptual stage",
+        "es": "Respuestas para la etapa conceptual"
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/perguntas-conceituais.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/conceptual-answers.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/preguntas-conceptuales.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 8,
+      "title": {
         "pt": "Introdução ao Desafio",
         "en": "Challenge Overview",
         "es": "Introducción al Desafío"
@@ -52,7 +311,7 @@
       "RouteguideBrandContainerTop": false
     },
     {
-      "id": 2,
+      "id": 9,
       "title": {
         "pt": "Requisitos e Critérios",
         "en": "Requirements and Criteria",
@@ -89,7 +348,7 @@
       "RouteguideBrandContainerTop": false
     },
     {
-      "id": 3,
+      "id": 10,
       "title": {
         "pt": "Arquitetura Backend",
         "en": "Backend Architecture",
@@ -126,7 +385,7 @@
       "RouteguideBrandContainerTop": false
     },
     {
-      "id": 4,
+      "id": 11,
       "title": {
         "pt": "Modelagem de Dados e Domínio",
         "en": "Data and Domain Modeling",
@@ -163,7 +422,7 @@
       "RouteguideBrandContainerTop": false
     },
     {
-      "id": 5,
+      "id": 12,
       "title": {
         "pt": "Segurança, Auditoria e Mensageria",
         "en": "Security, Audit and Messaging",
@@ -200,7 +459,7 @@
       "RouteguideBrandContainerTop": false
     },
     {
-      "id": 6,
+      "id": 13,
       "title": {
         "pt": "Frontend e Experiência",
         "en": "Frontend and Experience",
@@ -237,7 +496,7 @@
       "RouteguideBrandContainerTop": false
     },
     {
-      "id": 7,
+      "id": 14,
       "title": {
         "pt": "Infraestrutura e Deployment",
         "en": "Infrastructure and Deployment",
@@ -274,7 +533,7 @@
       "RouteguideBrandContainerTop": false
     },
     {
-      "id": 8,
+      "id": 15,
       "title": {
         "pt": "Qualidade e Testes",
         "en": "Quality and Testing",
@@ -311,7 +570,7 @@
       "RouteguideBrandContainerTop": false
     },
     {
-      "id": 9,
+      "id": 16,
       "title": {
         "pt": "Guia de Execução e Troubleshooting",
         "en": "Runbook and Troubleshooting",
