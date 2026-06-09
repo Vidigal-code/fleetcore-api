@@ -11,7 +11,7 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main.js",
     "start:audit-worker": "nest start --entry-file apps/audit-worker/main",
     "lint": "eslint \"{src,apps,libs,tests}/**/*.ts\" --fix",
     "generate:openapi": "ts-node -r tsconfig-paths/register --transpile-only scripts/generate-openapi.ts",
