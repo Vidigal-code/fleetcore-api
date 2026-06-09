@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { startTransition, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
+import { PageContainer } from '@/shared/ui/layout-primitives';
 import { MainFooter } from '@/widgets/layout/main-footer';
 import { MainHeader } from '@/widgets/layout/main-header';
 import { MobileMenu } from '@/widgets/layout/mobile-menu';
@@ -29,10 +30,8 @@ export const AppShell = ({ children }: AppShellProps) => {
         onMobileMenuToggle={() => setMobileMenuOpen((prev) => !prev)}
       />
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
-      <main className="flex-1 bg-transparent pb-16 pt-10">
-        <div className="container mx-auto flex flex-col items-center gap-10 px-4 sm:px-6 lg:gap-12 lg:px-8">
-          {children}
-        </div>
+      <main className="flex-1 bg-transparent pb-20 pt-12 lg:pb-24 lg:pt-16">
+        <PageContainer>{children}</PageContainer>
       </main>
       <MainFooter />
     </div>

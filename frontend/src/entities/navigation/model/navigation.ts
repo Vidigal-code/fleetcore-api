@@ -13,9 +13,10 @@ export interface NavigationGroup {
 
 export const primaryNavigation: NavigationLink[] = [
   { id: 'dashboard', label: 'Painel', href: '/dashboard' },
-  { id: 'vehicles', label: 'Veículos', href: '/dashboard#veiculos' },
-  { id: 'models', label: 'Modelos', href: '/dashboard#modelos' },
-  { id: 'brands', label: 'Marcas', href: '/dashboard#marcas' },
+  { id: 'vehicles', label: 'Veículos', href: '/vehicles' },
+  { id: 'models', label: 'Modelos', href: '/models' },
+  { id: 'brands', label: 'Marcas', href: '/brands' },
+  { id: 'profile', label: 'Perfil', href: '/profile' },
 ];
 
 export const supportNavigation: NavigationLink[] = [

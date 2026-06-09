@@ -3,6 +3,7 @@
 import type { HTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@/shared/lib/utils';
+import { Stack, Surface } from '@/shared/ui/layout-primitives';
 
 export interface SectionHeaderProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -17,21 +18,27 @@ export const SectionHeader = ({
   className,
   ...props
 }: SectionHeaderProps) => (
-  <div
+  <Surface
+    align="center"
+    elevation="low"
+    padding="md"
+    glass="base"
+    radius="lg"
+    width="full"
     className={cn(
-      'flex w-full max-w-5xl flex-col items-center gap-4 rounded-3xl bg-surface/60 px-6 py-5 text-center shadow-sm ring-1 ring-border/50 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between sm:text-left',
+      'flex flex-col items-center gap-4 md:flex-row md:items-center md:justify-between',
       className,
     )}
     {...props}
   >
-    <div className="max-w-3xl">
+    <Stack gap="sm" className="max-w-3xl">
       <h2 className="text-2xl font-semibold text-foreground">{title}</h2>
-      {subtitle ? <p className="mt-2 text-sm text-muted">{subtitle}</p> : null}
-    </div>
+      {subtitle ? <p className="text-sm text-muted">{subtitle}</p> : null}
+    </Stack>
     {actions ? (
-      <div className="flex flex-wrap items-center justify-center gap-3 sm:justify-end">
+      <div className="flex flex-wrap items-center justify-center gap-3 md:justify-end">
         {actions}
       </div>
     ) : null}
-  </div>
+  </Surface>
 );

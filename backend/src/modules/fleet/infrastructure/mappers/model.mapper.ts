@@ -1,5 +1,6 @@
 import { Model } from '../../domain/model.aggregate';
 import { ModelOrmEntity } from '../entities/model.orm-entity';
+import { BrandOrmEntity } from '../entities/brand.orm-entity';
 
 export const ModelMapper = {
   toDomain(entity: ModelOrmEntity): Model {
@@ -16,7 +17,10 @@ export const ModelMapper = {
     const entity = new ModelOrmEntity();
     entity.id = model.id;
     entity.name = model.name;
-    entity.brandId = model.brandId;
+    entity.brand = model.brandId
+      ? ({ id: model.brandId } as BrandOrmEntity)
+      : null;
+    entity.brandId = model.brandId ?? null;
     entity.createdAt = model.createdAt;
     entity.updatedAt = model.updatedAt;
     entity.createdBy = model.createdBy;

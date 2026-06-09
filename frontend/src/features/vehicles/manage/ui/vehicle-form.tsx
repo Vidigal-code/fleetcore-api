@@ -13,6 +13,7 @@ import { Button } from '@/shared/ui/button';
 import { InlineMessage } from '@/shared/ui/inline-message';
 import { InputField } from '@/shared/ui/input-field';
 import { SelectField } from '@/shared/ui/select-field';
+import { Stack, Surface } from '@/shared/ui/layout-primitives';
 
 import {
   vehicleSchema,
@@ -128,8 +129,16 @@ export const VehicleForm = ({
   );
 
   return (
-    <div className={cn('flex w-full flex-col gap-6', className)}>
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-border/40 bg-surface/80 px-5 py-4 text-center shadow-sm md:flex-row md:items-start md:text-left">
+    <Stack gap="lg" className={cn('w-full', className)}>
+      <Surface
+        tone="strong"
+        elevation="low"
+        padding="sm"
+        radius="lg"
+        align="center"
+        glass="base"
+        className="mx-0 flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:text-left"
+      >
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
           <Wrench className="h-5 w-5" />
         </div>
@@ -141,7 +150,7 @@ export const VehicleForm = ({
             Defina placa, identificadores e relacione o veículo ao modelo correspondente.
           </p>
         </div>
-      </div>
+      </Surface>
       <form className="grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
         <InputField
           label="Placa Mercosul"
@@ -212,6 +221,6 @@ export const VehicleForm = ({
           </Button>
         </div>
       </form>
-    </div>
+    </Stack>
   );
 };
