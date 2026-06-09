@@ -1,7 +1,5 @@
 import type { DataSourceOptions } from 'typeorm';
 
-import type { Environment } from './env.validation';
-
 export interface AppConfig {
   readonly name: string;
   readonly port: number;
@@ -12,6 +10,14 @@ export interface RedisConfig {
   readonly host: string;
   readonly port: number;
   readonly ttlSeconds: number;
+}
+
+export interface AuthConfig {
+  readonly adminNickname: string;
+  readonly adminEmail: string;
+  readonly adminName: string;
+  readonly adminPassword: string;
+  readonly sessionTtlSeconds: number;
 }
 
 export type DatabaseConfig = DataSourceOptions;

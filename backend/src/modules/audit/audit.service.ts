@@ -36,15 +36,24 @@ export class AuditService {
     };
 
     if (!this.featureToggles.isEnabled('auditAsyncWorker', true)) {
-      await this.writer.persist({ ...entry, occurredAt: new Date(payload.occurredAt) });
+      await this.writer.persist({
+        ...entry,
+        occurredAt: new Date(payload.occurredAt),
+      });
       return;
     }
 
     try {
       await this.messaging.publish('audit.event', payload);
     } catch (error) {
-      this.logger.error('Failed to enqueue audit entry, persisting synchronously', error as Error);
-      await this.writer.persist({ ...entry, occurredAt: new Date(payload.occurredAt) });
+      this.logger.error(
+        'Failed to enqueue audit entry, persisting synchronously',
+        error as Error,
+      );
+      await this.writer.persist({
+        ...entry,
+        occurredAt: new Date(payload.occurredAt),
+      });
     }
   }
 }

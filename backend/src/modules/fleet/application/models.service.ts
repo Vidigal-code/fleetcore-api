@@ -18,7 +18,11 @@ import { ModelOrmEntity } from '../infrastructure/entities/model.orm-entity';
 import { ModelTypeOrmRepository } from '../infrastructure/repositories/model.typeorm.repository';
 import { EventBusService } from '../../../shared/domain/events';
 import { FeatureToggleService } from '../../../shared/features';
-import { ModelCreatedEvent, ModelDeletedEvent, ModelUpdatedEvent } from '../domain/events';
+import {
+  ModelCreatedEvent,
+  ModelDeletedEvent,
+  ModelUpdatedEvent,
+} from '../domain/events';
 import {
   AUDIT_ENTITY_MODEL,
   MODEL_EVENT_CREATED,

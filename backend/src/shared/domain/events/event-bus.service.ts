@@ -16,7 +16,7 @@ export class EventBusService {
     handler: DomainEventHandler<T>,
   ) {
     const existing = this.handlers.get(eventName) ?? [];
-    this.handlers.set(eventName, [...existing, handler as DomainEventHandler]);
+    this.handlers.set(eventName, [...existing, handler]);
   }
 
   async publish(event: DomainEvent) {

@@ -50,16 +50,45 @@ export class FleetDomainEventListener implements OnModuleInit {
   ) {}
 
   onModuleInit() {
-    const registrations: Array<[DomainEvents['name'], (event: DomainEvents) => Promise<void>]> = [
-      [VEHICLE_EVENT_CREATED, (event) => this.forwardVehicleEvent(event as VehicleCreatedEvent)],
-      [VEHICLE_EVENT_UPDATED, (event) => this.forwardVehicleEvent(event as VehicleUpdatedEvent)],
-      [VEHICLE_EVENT_REMOVED, (event) => this.forwardVehicleEvent(event as VehicleDeletedEvent)],
-      [BRAND_EVENT_CREATED, (event) => this.forwardBrandEvent(event as BrandCreatedEvent)],
-      [BRAND_EVENT_UPDATED, (event) => this.forwardBrandEvent(event as BrandUpdatedEvent)],
-      [BRAND_EVENT_REMOVED, (event) => this.forwardBrandEvent(event as BrandDeletedEvent)],
-      [MODEL_EVENT_CREATED, (event) => this.forwardModelEvent(event as ModelCreatedEvent)],
-      [MODEL_EVENT_UPDATED, (event) => this.forwardModelEvent(event as ModelUpdatedEvent)],
-      [MODEL_EVENT_REMOVED, (event) => this.forwardModelEvent(event as ModelDeletedEvent)],
+    const registrations: Array<
+      [DomainEvents['name'], (event: DomainEvents) => Promise<void>]
+    > = [
+      [
+        VEHICLE_EVENT_CREATED,
+        (event) => this.forwardVehicleEvent(event as VehicleCreatedEvent),
+      ],
+      [
+        VEHICLE_EVENT_UPDATED,
+        (event) => this.forwardVehicleEvent(event as VehicleUpdatedEvent),
+      ],
+      [
+        VEHICLE_EVENT_REMOVED,
+        (event) => this.forwardVehicleEvent(event as VehicleDeletedEvent),
+      ],
+      [
+        BRAND_EVENT_CREATED,
+        (event) => this.forwardBrandEvent(event as BrandCreatedEvent),
+      ],
+      [
+        BRAND_EVENT_UPDATED,
+        (event) => this.forwardBrandEvent(event as BrandUpdatedEvent),
+      ],
+      [
+        BRAND_EVENT_REMOVED,
+        (event) => this.forwardBrandEvent(event as BrandDeletedEvent),
+      ],
+      [
+        MODEL_EVENT_CREATED,
+        (event) => this.forwardModelEvent(event as ModelCreatedEvent),
+      ],
+      [
+        MODEL_EVENT_UPDATED,
+        (event) => this.forwardModelEvent(event as ModelUpdatedEvent),
+      ],
+      [
+        MODEL_EVENT_REMOVED,
+        (event) => this.forwardModelEvent(event as ModelDeletedEvent),
+      ],
     ];
 
     registrations.forEach(([name, handler]) => {
@@ -116,7 +145,9 @@ export class FleetDomainEventListener implements OnModuleInit {
     payloadFactory: () => Record<string, unknown>,
   ) {
     if (!this.featureToggles.isEnabled('domainEvents', true)) {
-      this.logger.debug(`Domain event forwarding disabled, skipping ${event.name}`);
+      this.logger.debug(
+        `Domain event forwarding disabled, skipping ${event.name}`,
+      );
       return;
     }
 

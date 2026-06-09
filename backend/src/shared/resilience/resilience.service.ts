@@ -31,7 +31,10 @@ interface ExecuteOptions {
 export class ResilienceService {
   private readonly logger = new Logger(ResilienceService.name);
   private readonly retryPolicies = new Map<string, RetryPolicy>();
-  private readonly circuitBreakerPolicies = new Map<string, CircuitBreakerPolicy>();
+  private readonly circuitBreakerPolicies = new Map<
+    string,
+    CircuitBreakerPolicy
+  >();
   private readonly timeoutPolicies = new Map<string, TimeoutPolicy>();
 
   constructor(private readonly config: AppConfigService) {}
@@ -78,7 +81,9 @@ export class ResilienceService {
     timeoutMs,
   }: ExecuteOptions) {
     const timeoutPolicy =
-      timeoutMs && timeoutMs > 0 ? this.getTimeoutPolicy(name, timeoutMs) : undefined;
+      timeoutMs && timeoutMs > 0
+        ? this.getTimeoutPolicy(name, timeoutMs)
+        : undefined;
 
     const defaults = this.resolveDefaults(name);
     const retryConfig: RetryPolicyConfig = {
@@ -86,7 +91,9 @@ export class ResilienceService {
       ...(retryOverrides ?? {}),
     };
     const retryPolicy =
-      retryConfig.attempts > 1 ? this.getRetryPolicy(name, retryConfig) : undefined;
+      retryConfig.attempts > 1
+        ? this.getRetryPolicy(name, retryConfig)
+        : undefined;
 
     const circuitConfig: CircuitBreakerConfig = {
       ...defaults.circuitBreaker,
@@ -115,7 +122,10 @@ export class ResilienceService {
     return created;
   }
 
-  private getRetryPolicy(name: string, options: RetryPolicyConfig): RetryPolicy {
+  private getRetryPolicy(
+    name: string,
+    options: RetryPolicyConfig,
+  ): RetryPolicy {
     const key = `${name}:retry:${options.attempts}:${options.initialDelayMs}:${options.maxDelayMs}:${options.jitter}`;
     const cached = this.retryPolicies.get(key);
     if (cached) {
@@ -135,9 +145,10 @@ export class ResilienceService {
     });
 
     created.onRetry((reason) => {
-      const message = 'error' in reason && reason.error instanceof Error
-        ? reason.error.message
-        : 'Retrying after failure';
+      const message =
+        'error' in reason && reason.error instanceof Error
+          ? reason.error.message
+          : 'Retrying after failure';
       this.logger.warn(`Retrying operation ${name}: ${message}`);
     });
 

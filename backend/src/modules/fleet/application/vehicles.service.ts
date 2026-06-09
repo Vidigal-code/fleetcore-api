@@ -32,7 +32,11 @@ import { UpdateVehicleDto } from '../dto/update-vehicle.dto';
 import { VehicleOrmEntity } from '../infrastructure/entities/vehicle.orm-entity';
 import { VehicleTypeOrmRepository } from '../infrastructure/repositories/vehicle.typeorm.repository';
 import { EventBusService } from '../../../shared/domain/events';
-import { VehicleCreatedEvent, VehicleDeletedEvent, VehicleUpdatedEvent } from '../domain/events';
+import {
+  VehicleCreatedEvent,
+  VehicleDeletedEvent,
+  VehicleUpdatedEvent,
+} from '../domain/events';
 import { FeatureToggleService } from '../../../shared/features';
 
 interface SerializedVehicle {

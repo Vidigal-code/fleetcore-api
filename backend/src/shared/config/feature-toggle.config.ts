@@ -9,6 +9,9 @@ export const defaultFeatureToggles: FeatureToggleMap = {
   swaggerDocs: true,
 };
 
-export default registerAs('features', (): FeatureToggleConfig => ({
-  flags: { ...defaultFeatureToggles },
-}));
+export default registerAs(
+  'features',
+  (): FeatureToggleConfig => ({
+    flags: { ...defaultFeatureToggles },
+  }),
+);
