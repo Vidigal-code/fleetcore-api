@@ -150,8 +150,8 @@ export const VehicleTable = ({
     <div className={cn('w-full space-y-6 text-center sm:text-left', className)}>
       <div className="flex flex-col gap-4 border-b border-border/30 pb-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-foreground">Veículos cadastrados</h2>
-          <p className="text-sm text-muted">
+          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">Veículos cadastrados</h2>
+          <p className="text-sm text-muted sm:text-base">
             Monitoramento em tempo real da frota com cache em Redis.
           </p>
         </div>
@@ -160,12 +160,16 @@ export const VehicleTable = ({
           {total} registro(s)
         </div>
       </div>
-      <DataTable
-        data={tableData}
-        columns={columns}
-        loading={loading}
-        emptyState="Nenhum veículo encontrado com estes filtros."
-      />
+      <div className="overflow-x-auto">
+        <div className="min-w-[720px]">
+          <DataTable
+            data={tableData}
+            columns={columns}
+            loading={loading}
+            emptyState="Nenhum veículo encontrado com estes filtros."
+          />
+        </div>
+      </div>
       <Pagination
         className="mx-auto max-w-md"
         page={page}

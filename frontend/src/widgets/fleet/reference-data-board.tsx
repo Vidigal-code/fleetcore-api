@@ -8,7 +8,7 @@ import type { Model } from '@/entities/model/model/types';
 import { BrandForm } from '@/features/brands/manage/ui/brand-form';
 import { ModelForm } from '@/features/models/manage/ui/model-form';
 import { Button } from '@/shared/ui/button';
-import { PageSection, Stack, Surface } from '@/shared/ui/layout-primitives';
+import { PageSection, ResponsiveGrid, Stack, Surface } from '@/shared/ui/layout-primitives';
 import { Pagination } from '@/shared/ui/pagination';
 
 import {
@@ -36,21 +36,18 @@ const ReferencePanel = ({
   form,
   children,
 }: ReferencePanelProps) => (
-  <Surface
-    tone="base"
-    radius="xl"
-    align="center"
-    className="space-y-6"
-  >
-    <Stack gap="sm">
-      <h3 className="text-lg font-semibold text-foreground" id={id}>
+  <Surface tone="base" radius="xl" align="center" className="w-full space-y-6">
+    <Stack gap="sm" className="items-center text-center sm:items-start sm:text-left">
+      <h3 className="text-lg font-semibold text-foreground sm:text-xl" id={id}>
         {title}
       </h3>
-      <p className="text-xs text-muted">{description}</p>
+      <p className="text-xs text-muted sm:text-sm">{description}</p>
     </Stack>
     {form}
     <div className="flex w-full flex-col gap-3">{children}</div>
-    <p className="text-xs text-muted">{loading ? 'Carregando...' : countLabel}</p>
+    <p className="text-xs text-muted sm:text-[0.75rem]">
+      {loading ? 'Carregando...' : countLabel}
+    </p>
   </Surface>
 );
 
@@ -71,9 +68,9 @@ const ReferenceListItem = ({ title, subtitle, onEdit, onDelete }: ReferenceListI
     className="w-full text-center sm:text-left"
   >
     <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="space-y-1 text-center sm:text-left">
+      <div className="max-w-full space-y-1 text-center sm:text-left">
         <p className="text-sm font-semibold text-foreground">{title}</p>
-        <p className="text-xs text-muted">{subtitle}</p>
+        <p className="text-xs text-muted sm:text-[0.75rem]">{subtitle}</p>
       </div>
       <div className="flex items-center justify-center gap-2">
         <Button type="button" variant="ghost" size="sm" onClick={onEdit}>
@@ -299,9 +296,11 @@ export const ReferenceDataBoard = () => {
   const [state, actions] = useReferenceDataBoard();
 
   return (
-    <PageSection id="referencias" width="xl" layout="grid" split="even">
-      <BrandSection state={state} actions={actions} />
-      <ModelSection state={state} actions={actions} />
+    <PageSection id="referencias" width="xl" layout="stack" className="gap-10">
+      <ResponsiveGrid columns="even" className="w-full">
+        <BrandSection state={state} actions={actions} />
+        <ModelSection state={state} actions={actions} />
+      </ResponsiveGrid>
     </PageSection>
   );
 };

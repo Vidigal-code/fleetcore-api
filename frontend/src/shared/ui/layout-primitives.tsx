@@ -23,8 +23,8 @@ const sectionWidthMap: Record<SectionWidth, string> = {
 };
 
 const layoutBaseMap: Record<SectionLayout, string> = {
-  stack: 'flex flex-col gap-6 lg:gap-8',
-  grid: 'grid gap-6 lg:gap-10',
+  stack: 'flex flex-col gap-6 sm:gap-8',
+  grid: 'grid gap-6 sm:gap-8',
 };
 
 const layoutSplitMap: Record<SectionSplit, string> = {
@@ -35,21 +35,18 @@ const layoutSplitMap: Record<SectionSplit, string> = {
 
 const alignMap: Record<SectionAlign, string> = {
   start: '',
-  center: 'items-center text-center lg:items-start lg:text-left',
+  center: 'items-center text-center sm:items-start sm:text-left',
 };
+
+const baseContainerClasses =
+  'mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 sm:px-6 lg:gap-12 lg:px-8 xl:px-12';
 
 export const PageContainer = ({
   as: Component = 'div',
   className,
   ...props
 }: PageContainerProps) => (
-  <Component
-    className={cn(
-      'container mx-auto flex w-full flex-col gap-10 px-4 sm:px-6 lg:gap-12 lg:px-8',
-      className,
-    )}
-    {...props}
-  />
+  <Component className={cn(baseContainerClasses, className)} {...props} />
 );
 
 export interface PageSectionProps extends HTMLAttributes<HTMLElement> {

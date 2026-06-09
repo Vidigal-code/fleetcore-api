@@ -100,7 +100,7 @@ export const VehicleFilterBar = ({
   return (
     <form
       className={cn(
-        'grid w-full grid-cols-1 gap-4 text-center lg:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:text-left',
+        'grid w-full grid-cols-1 gap-4 text-center sm:grid-cols-2 lg:grid-cols-[repeat(3,minmax(0,1fr))_auto] lg:text-left',
         className,
       )}
       onSubmit={handleSubmit}
@@ -122,7 +122,7 @@ export const VehicleFilterBar = ({
         options={modelOptions}
         {...form.register('modelId')}
       />
-      <div className="flex flex-col items-center justify-center gap-3 lg:flex-row lg:justify-end">
+      <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:justify-center lg:justify-end">
         <Button type="button" variant="ghost" size="sm" onClick={handleReset} disabled={loading}>
           Limpar
         </Button>

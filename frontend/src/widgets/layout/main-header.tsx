@@ -42,7 +42,7 @@ export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderPro
 
   return (
     <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6 lg:px-8 xl:px-12">
         <Surface
           tone="base"
           elevation="floating"
@@ -65,11 +65,11 @@ export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderPro
               <span className="text-sm font-black tracking-[0.24em]">{brandMark}</span>
             </div>
 
-            <div className="flex flex-1 flex-col text-left">
-              <span className="text-[0.62rem] font-semibold uppercase tracking-[0.32em] text-muted">
+            <div className="flex min-w-0 flex-1 flex-col text-left">
+              <span className="truncate text-[0.62rem] font-semibold uppercase tracking-[0.32em] text-muted">
                 {appConfig.appName}
               </span>
-              <span className="text-base font-semibold text-foreground sm:text-lg">
+              <span className="truncate text-base font-semibold text-foreground sm:text-lg">
                 Plataforma Inteligente de Frotas
               </span>
             </div>

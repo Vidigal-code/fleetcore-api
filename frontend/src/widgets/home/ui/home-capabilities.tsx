@@ -31,8 +31,10 @@ const capabilities = [
 export const HomeCapabilities = () => (
   <PageSection width="xl" layout="stack" className="gap-8">
     <Stack gap="sm" className="items-center text-center lg:items-start lg:text-left">
-      <h2 className="text-2xl font-semibold text-foreground">Uma plataforma orquestrada para frota</h2>
-      <p className="max-w-3xl text-sm text-muted">
+      <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
+        Uma plataforma orquestrada para frota
+      </h2>
+      <p className="max-w-3xl text-sm text-muted sm:text-base">
         Combine compliance, produtividade e inteligência operacional com componentes reutilizáveis em FSD
         e integrações simplificadas via API.
       </p>
@@ -55,8 +57,10 @@ export const HomeCapabilities = () => (
               {capability.id}
             </span>
           </div>
-          <h3 className="text-lg font-semibold text-foreground">{capability.title}</h3>
-          <p className="text-sm text-muted">{capability.description}</p>
+          <h3 className="text-lg font-semibold text-foreground sm:text-xl">
+            {capability.title}
+          </h3>
+          <p className="text-sm text-muted sm:text-[0.95rem]">{capability.description}</p>
         </Surface>
       ))}
     </div>

@@ -31,7 +31,9 @@ export const AppShell = ({ children }: AppShellProps) => {
       />
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
       <main className="flex-1 bg-transparent pb-20 pt-12 lg:pb-24 lg:pt-16">
-        <PageContainer>{children}</PageContainer>
+        <PageContainer as="section" className="w-full">
+          {children}
+        </PageContainer>
       </main>
       <MainFooter />
     </div>
