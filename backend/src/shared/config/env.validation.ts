@@ -42,18 +42,80 @@ class EnvironmentVariables {
   @IsOptional()
   FRONTEND_PORT?: number;
 
+  @Transform(({ value, obj }) => {
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+    const source = obj as Record<string, unknown>;
+    const candidates = [source.SQLSERVER_SERVER, source.DB_HOST];
+    for (const candidate of candidates) {
+      if (typeof candidate === 'string' && candidate.length > 0) {
+        return candidate;
+      }
+    }
+    return 'sqlserver';
+  })
   @IsString()
   SQLSERVER_HOST!: string;
 
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      return 1433;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    const match = `${value}`.match(/\d+/);
+    if (!match) {
+      return 1433;
+    }
+    const parsed = Number.parseInt(match[0], 10);
+    return Number.isNaN(parsed) ? 1433 : parsed;
+  })
   @IsInt()
   SQLSERVER_PORT!: number;
 
+  @Transform(({ value, obj }) => {
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+    const source = obj as Record<string, unknown>;
+    const saUser = source.SA_USER;
+    if (typeof saUser === 'string' && saUser.length > 0) {
+      return saUser;
+    }
+    return 'sa';
+  })
   @IsString()
   SQLSERVER_USER!: string;
 
+  @Transform(({ value, obj }) => {
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+    const source = obj as Record<string, unknown>;
+    const saPassword = source.SA_PASSWORD;
+    if (typeof saPassword === 'string' && saPassword.length > 0) {
+      return saPassword;
+    }
+    return 'YourStrong!Passw0rd';
+  })
   @IsString()
   SQLSERVER_PASSWORD!: string;
 
+  @Transform(({ value, obj }) => {
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+    const source = obj as Record<string, unknown>;
+    const candidates = [source.SQLSERVER_DATABASE, source.DB_NAME];
+    for (const candidate of candidates) {
+      if (typeof candidate === 'string' && candidate.length > 0) {
+        return candidate;
+      }
+    }
+    return 'fleetcore';
+  })
   @IsString()
   SQLSERVER_DB!: string;
 
