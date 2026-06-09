@@ -102,7 +102,7 @@ export const RegisterForm = () => {
           </InlineMessage>
         ) : null}
 
-        <Button type="submit" loading={registerMutation.isPending}>
+        <Button type="submit" loading={registerMutation.isPending} className="w-full">
           Concluir cadastro
         </Button>
       </form>

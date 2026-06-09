@@ -89,6 +89,7 @@ export const LoginForm = ({ successMessage }: LoginFormProps) => {
           size="md"
           loading={loginMutation.isPending}
           trailingIcon={<ArrowRight className="h-4 w-4" />}
+          className="w-full"
         >
           Entrar
         </Button>
