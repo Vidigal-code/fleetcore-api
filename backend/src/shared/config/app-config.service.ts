@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import type { Environment } from './env.validation';
+import { Environment } from './env.validation';
 import type { SecurityConfig } from './security.config';
 import type { SwaggerConfig } from './swagger.config';
 import {
@@ -23,7 +23,7 @@ export class AppConfigService {
   constructor(private readonly configService: ConfigService) {}
 
   get environment(): Environment {
-    return this.configService.get<Environment>('NODE_ENV', 'development');
+    return this.configService.get<Environment>('NODE_ENV') ?? Environment.Development;
   }
 
   get app(): AppConfig {

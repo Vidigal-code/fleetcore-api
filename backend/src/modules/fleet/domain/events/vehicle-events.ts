@@ -1,4 +1,4 @@
-import { BaseDomainEvent } from '../../../../shared/domain/events/domain-event';
+import { BaseDomainEvent } from '../../../../shared/domain/events';
 import type { Vehicle } from '../vehicle.aggregate';
 
 interface VehicleEventPayload {

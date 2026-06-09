@@ -11,11 +11,12 @@ describe('SanitizeInputPipe', () => {
       },
     };
 
-    const sanitized = pipe.transform(payload) as Record<string, string>;
+    const sanitized = pipe.transform(payload) as {
+      name: string;
+      nested: { value: string };
+    };
 
     expect(sanitized.name).toBe('&lt;script&gt;alert(1)&lt;/script&gt;');
-    expect((sanitized.nested as Record<string, string>).value).toBe(
-      "O'Reilly &amp; Associates",
-    );
+    expect(sanitized.nested.value).toBe("O'Reilly &amp; Associates");
   });
 });

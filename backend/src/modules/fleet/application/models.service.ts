@@ -16,9 +16,9 @@ import { CreateModelDto } from '../dto/create-model.dto';
 import { UpdateModelDto } from '../dto/update-model.dto';
 import { ModelOrmEntity } from '../infrastructure/entities/model.orm-entity';
 import { ModelTypeOrmRepository } from '../infrastructure/repositories/model.typeorm.repository';
-import { EventBusService } from '../../../shared/domain/events/event-bus.service';
-import { FeatureToggleService } from '../../../shared/features/feature-toggle.service';
-import { ModelCreatedEvent, ModelDeletedEvent, ModelUpdatedEvent } from '../domain/events/model-events';
+import { EventBusService } from '../../../shared/domain/events';
+import { FeatureToggleService } from '../../../shared/features';
+import { ModelCreatedEvent, ModelDeletedEvent, ModelUpdatedEvent } from '../domain/events';
 
 @Injectable()
 export class ModelsService {
