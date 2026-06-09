@@ -1,0 +1,5 @@
+# Frontend public vars
+NEXT_PUBLIC_API_URL=http://backend:3000/api
+NEXT_PUBLIC_APP_NAME=Fleetcore Web
+NEXT_PUBLIC_CACHE_TTL_SECONDS=60
+NEXT_PUBLIC_START_THEME=light
