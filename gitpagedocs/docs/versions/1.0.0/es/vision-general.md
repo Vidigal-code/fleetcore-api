@@ -8,10 +8,10 @@ Entregar un stack integral (backend, frontend, infraestructura y documentación)
 
 ## Pilares
 
-- **Arquitectura** — revisa [Arquitectura Backend](./03-arquitectura-backend.md) y [Modelado de Datos y Dominio](./04-modelado-dominio.md) para conocer módulos, capas y entidades.
-- **Seguridad y observabilidad** — [Seguridad, Auditoría y Mensajería](./05-seguridad-auditoria-mensajeria.md) detalla RBAC, auditoría y eventos RabbitMQ.
-- **Experiencia digital** — [Frontend y Experiencia](./06-frontend.md) cubre el patrón FSD, los temas naranjas y el flujo de datos.
-- **Calidad y operaciones** — [Calidad y Pruebas](./08-calidad-pruebas.md) y [Runbook y Resolución de Problemas](./09-runbook-resolucion.md) muestran las rutinas de QA y soporte.
+- **Arquitectura** — módulos, capas y entidades descritos en las secciones Arquitectura Backend y Modelado de Datos y Dominio del menú.
+- **Seguridad y observabilidad** — RBAC, auditoría y eventos RabbitMQ explicados en Seguridad, Auditoría y Mensajería.
+- **Experiencia digital** — patrón FSD, temas naranjas y flujo de datos abordados en Frontend y Experiencia.
+- **Calidad y operaciones** — rutinas de QA y soporte documentadas en Calidad y Pruebas y Runbook y Resolución de Problemas.
 
 ## Resultados
 

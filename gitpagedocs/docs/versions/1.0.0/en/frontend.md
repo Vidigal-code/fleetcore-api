@@ -16,5 +16,5 @@ High-level summary of the Next.js client and how it integrates with the platform
 
 ## Explore further
 
-- [Frontend and Experience](./06-frontend.md)
-- [Quality and Testing](./08-quality-testing.md)
+- **Frontend and Experience**
+- **Quality and Testing**

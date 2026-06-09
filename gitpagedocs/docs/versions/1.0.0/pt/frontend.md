@@ -16,5 +16,5 @@ Resumo do cliente Next.js e como ele consome as APIs da plataforma.
 
 ## Próximos passos
 
-- Consulte [Frontend e Experiência](./06-frontend.md) para detalhes aprofundados.
-- Verifique [Qualidade e Testes](./08-testes-observabilidade.md) para conhecer as suítes RTL/Playwright.
+- Consulte a seção Frontend e Experiência para detalhes aprofundados.
+- Verifique a seção Qualidade e Testes para conhecer as suítes RTL/Playwright.

@@ -8,10 +8,10 @@ Deliver a production-ready stack that satisfies every requirement from the Aivac
 
 ## Pillars
 
-- **Architecture** — read [Backend Architecture](./03-backend-architecture.md) and [Data and Domain Modeling](./04-data-domain-modeling.md) for modules, layers and entities.
-- **Security & observability** — [Security, Audit and Messaging](./05-security-audit-messaging.md) explains RBAC, audit logs and RabbitMQ.
-- **User experience** — [Frontend and Experience](./06-frontend.md) details the FSD structure, theming and data flow.
-- **Quality & operations** — [Quality and Testing](./08-quality-testing.md) and [Runbook and Troubleshooting](./09-runbook.md) cover QA and support routines.
+- **Architecture** — modules, layers and entities covered in the Backend Architecture and Data and Domain Modeling sections.
+- **Security & observability** — RBAC, audit logs and RabbitMQ flows summarized in the Security, Audit and Messaging chapter.
+- **User experience** — FSD structure, theming and data flow documented under Frontend and Experience.
+- **Quality & operations** — QA and support routines detailed in the Quality and Testing and Runbook sections.
 
 ## Outcomes
 

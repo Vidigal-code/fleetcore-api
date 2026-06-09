@@ -16,6 +16,6 @@ Quick reference to the NestJS API surface, business rules and supporting mechani
 
 ## Deep dives
 
-- [Backend Architecture](./03-backend-architecture.md) — modules and layering.
-- [Data and Domain Modeling](./04-data-domain-modeling.md) — entities, aggregates, migrations.
-- [Security, Audit and Messaging](./05-security-audit-messaging.md) — guards, audit trail, messaging.
+- **Backend Architecture** — modules and layering documented in the dedicated section.
+- **Data and Domain Modeling** — entities, aggregates, migrations.
+- **Security, Audit and Messaging** — guards, audit trail, messaging.

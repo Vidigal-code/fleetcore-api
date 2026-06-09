@@ -8,7 +8,7 @@ Este panorama reforça como o backend, o domínio e os serviços de suporte se c
 - Guardas globais (`JwtAuthGuard`, `RolesGuard`) e `AuthSessionService` com Redis.
 - Eventos de domínio propagados por `FleetDomainEventListener` para RabbitMQ.
 
-Saiba mais em [Arquitetura Backend](./03-arquitetura-backend.md).
+Saiba mais na seção Arquitetura Backend do menu.
 
 ## Modelagem e persistência
 
@@ -16,7 +16,7 @@ Saiba mais em [Arquitetura Backend](./03-arquitetura-backend.md).
 - Agregados que preservam invariantes e utilizam `UnitOfWork` para transações.
 - Seeds (`UsersService.ensureAdminSeed`) e dataset inicial de veículos.
 
-Veja detalhes em [Modelagem de Dados e Domínio](./04-modelagem-dominio.md).
+Veja detalhes na seção Modelagem de Dados e Domínio.
 
 ## Observabilidade
 
@@ -24,4 +24,4 @@ Veja detalhes em [Modelagem de Dados e Domínio](./04-modelagem-dominio.md).
 - Métricas de domínio para monitoramento.
 - Resiliência configurável via `ResilienceService` e feature toggles.
 
-Consulte [Segurança, Auditoria e Mensageria](./05-seguranca-mensageria.md) para o fluxo completo.
+Consulte a seção Segurança, Auditoria e Mensageria para o fluxo completo.
