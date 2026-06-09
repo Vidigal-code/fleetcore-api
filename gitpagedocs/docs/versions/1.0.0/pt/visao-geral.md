@@ -8,10 +8,10 @@ Entregar uma solução completa (backend, frontend, infraestrutura e documentaç
 
 ## Componentes principais
 
-- **Arquitetura** — veja [Arquitetura Backend](./03-arquitetura-backend.md) e [Modelagem de Dados](./04-modelagem-dominio.md) para entender módulos, camadas e entidades.
-- **Segurança e observabilidade** — consulte [Segurança, Auditoria e Mensageria](./05-seguranca-mensageria.md) para conhecer estratégias de RBAC, auditoria e RabbitMQ.
-- **Experiência digital** — em [Frontend e Experiência](./06-frontend.md) estão o padrão FSD, os temas laranja e o fluxo de dados.
-- **Qualidade operacional** — [Qualidade e Testes](./08-testes-observabilidade.md) e [Guia de Execução](./09-guia-execucao.md) cobrem as rotinas de QA e troubleshooting.
+- **Arquitetura** — módulos, camadas e entidades disponíveis nas seções Arquitetura Backend e Modelagem de Dados do menu principal.
+- **Segurança e observabilidade** — estratégias de RBAC, auditoria e RabbitMQ centralizadas na seção Segurança, Auditoria e Mensageria.
+- **Experiência digital** — padrão FSD, temas laranja e fluxo de dados descritos na área Frontend e Experiência.
+- **Qualidade operacional** — rotinas de QA e troubleshooting detalhadas nas seções Qualidade e Testes e Guia de Execução.
 
 ## Resultado alcançado
 

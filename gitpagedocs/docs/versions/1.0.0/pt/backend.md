@@ -16,6 +16,6 @@ Guia rápido dos endpoints, camadas e mecanismos de negócio da API NestJS.
 
 ## Como aprofundar
 
-- [Arquitetura Backend](./03-arquitetura-backend.md) descreve módulos e camadas.
-- [Modelagem de Dados e Domínio](./04-modelagem-dominio.md) detalha entidades, agregados e migrations.
-- [Segurança, Auditoria e Mensageria](./05-seguranca-mensageria.md) cobre guardas, auditoria e mensageria.
+- **Arquitetura Backend** descreve módulos e camadas no capítulo correspondente.
+- **Modelagem de Dados e Domínio** detalha entidades, agregados e migrations.
+- **Segurança, Auditoria e Mensageria** cobre guardas, auditoria e mensageria.

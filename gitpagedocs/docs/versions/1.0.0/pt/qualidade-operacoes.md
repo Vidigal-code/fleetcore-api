@@ -16,5 +16,5 @@ Visão condensada dos rituais de qualidade e das rotinas operacionais que susten
 
 ## Referências
 
-- [Qualidade e Testes](./08-testes-observabilidade.md)
-- [Guia de Execução e Troubleshooting](./09-guia-execucao.md)
+- **Qualidade e Testes**
+- **Guia de Execução e Troubleshooting**

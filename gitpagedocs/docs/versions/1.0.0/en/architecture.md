@@ -8,7 +8,7 @@ Snapshot of how the backend, domain and support services fit together.
 - Global guards (`JwtAuthGuard`, `RolesGuard`) and Redis-backed `AuthSessionService`.
 - Domain events flowing through `FleetDomainEventListener` into RabbitMQ.
 
-Read [Backend Architecture](./03-backend-architecture.md) for the full breakdown.
+Refer to the Backend Architecture section in the menu for the full breakdown.
 
 ## Modeling & persistence
 
@@ -16,7 +16,7 @@ Read [Backend Architecture](./03-backend-architecture.md) for the full breakdown
 - Aggregates enforce invariants with transactional `UnitOfWork` support.
 - Seeds (`UsersService.ensureAdminSeed`) and vehicle dataset prime the environment.
 
-See [Data and Domain Modeling](./04-data-domain-modeling.md) for details.
+See the Data and Domain Modeling section for details.
 
 ## Observability
 
@@ -24,4 +24,4 @@ See [Data and Domain Modeling](./04-data-domain-modeling.md) for details.
 - Domain metrics expose counters for monitoring.
 - `ResilienceService` and feature toggles manage retries, timeouts and optional behaviours.
 
-The full narrative lives in [Security, Audit and Messaging](./05-security-audit-messaging.md).
+The full narrative lives in the Security, Audit and Messaging section.
