@@ -98,10 +98,23 @@ class EnvironmentVariables {
     if (typeof saPassword === 'string' && saPassword.length > 0) {
       return saPassword;
     }
-    return 'YourStrong!Passw0rd';
+    return 'YourStrong@Passw0rd';
   })
   @IsString()
   SQLSERVER_PASSWORD!: string;
+
+  @Transform(({ value }) => {
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+    return 'YourStrong@Passw0rd';
+  })
+  @IsString()
+  SQLSERVER_PASSWORD_FALLBACK!: string;
+
+  @IsOptional()
+  @IsString()
+  SQLSERVER_LEGACY_PASSWORD?: string;
 
   @Transform(({ value, obj }) => {
     if (typeof value === 'string' && value.length > 0) {
@@ -165,6 +178,63 @@ class EnvironmentVariables {
   @IsOptional()
   @IsString()
   ADMIN_NICKNAME?: string;
+
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    const match = `${value}`.match(/\d+/);
+    if (!match) {
+      return undefined;
+    }
+    const parsed = Number.parseInt(match[0], 10);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RABBITMQ_CONNECT_TIMEOUT_MS?: number;
+
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    const match = `${value}`.match(/\d+/);
+    if (!match) {
+      return undefined;
+    }
+    const parsed = Number.parseInt(match[0], 10);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RABBITMQ_RECONNECT_SECONDS?: number;
+
+  @Transform(({ value }) => {
+    if (value === undefined || value === null || value === '') {
+      return undefined;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+    const match = `${value}`.match(/\d+/);
+    if (!match) {
+      return undefined;
+    }
+    const parsed = Number.parseInt(match[0], 10);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  })
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RABBITMQ_HEARTBEAT_SECONDS?: number;
 
   @IsOptional()
   @IsString()
