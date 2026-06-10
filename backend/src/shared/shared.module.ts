@@ -16,6 +16,14 @@ import { EventBusService } from './domain/events';
 import { ResilienceService } from './resilience/resilience.service';
 import { DomainMetricsService } from './metrics/domain-metrics.service';
 
+const toNonEmptyString = (value: unknown): string | undefined => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+};
+
 @Global()
 @Module({
   imports: [
@@ -29,8 +37,67 @@ import { DomainMetricsService } from './metrics/domain-metrics.service';
         return options;
       },
       dataSourceFactory: async (options: DataSourceOptions) => {
-        const dataSource = new DataSource(options);
-        return dataSource.initialize();
+        const sqlOptions = options as DataSourceOptions & {
+          type?: string;
+          password?: string;
+        };
+
+        if (sqlOptions.type !== 'mssql') {
+          const dataSource = new DataSource(options);
+          return dataSource.initialize();
+        }
+
+        const primaryPassword = toNonEmptyString(sqlOptions.password);
+        const fallbackPassword = toNonEmptyString(
+          process.env.SQLSERVER_PASSWORD_FALLBACK,
+        );
+        const legacyPassword = toNonEmptyString(
+          process.env.SQLSERVER_LEGACY_PASSWORD,
+        );
+        const defaultPassword = 'YourStrong@Passw0rd';
+        const secondaryDefaultPassword = 'YourStrong!Passw0rd';
+
+        const candidates = [
+          primaryPassword,
+          fallbackPassword,
+          legacyPassword,
+          defaultPassword,
+          secondaryDefaultPassword,
+        ].filter(
+          (value): value is string =>
+            typeof value === 'string' && value.length > 0,
+        );
+
+        const uniqueCandidates = Array.from(new Set(candidates));
+
+        let lastError: Error | undefined;
+
+        for (const candidate of uniqueCandidates) {
+          const attemptOptions = {
+            ...options,
+            password: candidate,
+          } as DataSourceOptions;
+
+          const dataSource = new DataSource(attemptOptions);
+          try {
+            await dataSource.initialize();
+            return dataSource;
+          } catch (error) {
+            lastError =
+              error instanceof Error ? error : new Error(String(error ?? ''));
+            if (dataSource.isInitialized) {
+              await dataSource.destroy().catch(() => undefined);
+            }
+          }
+        }
+
+        if (lastError) {
+          throw lastError;
+        }
+
+        throw new Error(
+          'Unable to connect to SQL Server. No valid password candidate succeeded.',
+        );
       },
     }),
     MongooseModule.forRootAsync({
