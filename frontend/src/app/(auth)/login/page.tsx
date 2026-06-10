@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 
 import { LoginForm } from '@/features/auth/login/ui/login-form';
 import { appConfig } from '@/shared/config/env';
+import { ROUTES } from '@/shared/constants/routes';
 import { RequireGuest } from '@/processes/auth/ui/require-guest';
 import { AppShell } from '@/widgets/layout/app-shell';
 
@@ -53,7 +54,7 @@ export default function LoginPage({ searchParams }: LoginPageProps) {
               </div>
               <div className="text-xs text-muted">
                 Ainda não possui credenciais?{' '}
-                <Link href="/register" className="text-accent hover:text-accent-strong">
+                <Link href={ROUTES.register} className="text-accent hover:text-accent-strong">
                   Criar conta agora
                 </Link>
               </div>

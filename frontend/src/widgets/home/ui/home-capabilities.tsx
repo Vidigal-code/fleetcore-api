@@ -29,7 +29,7 @@ const capabilities = [
 ];
 
 export const HomeCapabilities = () => (
-  <PageSection width="xl" layout="stack" className="gap-8">
+  <PageSection id="recursos" width="xl" layout="stack" className="gap-8">
     <Stack gap="sm" className="items-center text-center lg:items-start lg:text-left">
       <h2 className="text-2xl font-semibold text-foreground sm:text-3xl">
         Uma plataforma orquestrada para frota
