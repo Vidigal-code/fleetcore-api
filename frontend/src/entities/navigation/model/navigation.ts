@@ -1,3 +1,5 @@
+import { ROUTES } from '@/shared/constants/routes';
+
 export interface NavigationLink {
   id: string;
   label: string;
@@ -11,44 +13,81 @@ export interface NavigationGroup {
   links: NavigationLink[];
 }
 
-export const primaryNavigation: NavigationLink[] = [
-  { id: 'dashboard', label: 'Painel', href: '/dashboard' },
-  { id: 'vehicles', label: 'Veículos', href: '/vehicles' },
-  { id: 'models', label: 'Modelos', href: '/models' },
-  { id: 'brands', label: 'Marcas', href: '/brands' },
-  { id: 'profile', label: 'Perfil', href: '/profile' },
-];
+export interface NavigationConfig {
+  scope: 'public' | 'private';
+  primary: NavigationLink[];
+  support: NavigationLink[];
+  spotlight: NavigationLink[];
+  cta?: NavigationLink;
+}
 
-export const supportNavigation: NavigationLink[] = [
-  {
-    id: 'docs',
-    label: 'Documentação',
-    href: 'https://vidigal-code.github.io/fleetcore-api/docs/',
-    external: true,
-  },
-  { id: 'status', label: 'Status', href: 'https://github.com/Vidigal-code/fleetcore-api', external: true },
-];
+const publicNavigation: NavigationConfig = {
+  scope: 'public',
+  primary: [
+    { id: 'overview', label: 'Visão geral', href: '#inicio' },
+    { id: 'features', label: 'Recursos', href: '#recursos' },
+    { id: 'pricing', label: 'Planos', href: '#planos' },
+  ],
+  support: [
+    { id: 'docs', label: 'Documentação', href: ROUTES.documentation, external: true },
+    { id: 'status', label: 'Status', href: ROUTES.status, external: true },
+  ],
+  spotlight: [
+    { id: 'login', label: 'Entrar', href: ROUTES.login },
+    { id: 'register', label: 'Criar conta', href: ROUTES.register },
+    { id: 'recover', label: 'Recuperar acesso', href: ROUTES.recoverPassword },
+  ],
+  cta: { id: 'primary-cta', label: 'Começar agora', href: ROUTES.register },
+};
 
-export const footerGroups: NavigationGroup[] = [
-  {
-    id: 'product',
-    label: 'Produto',
-    links: primaryNavigation,
-  },
+const privateNavigation: NavigationConfig = {
+  scope: 'private',
+  primary: [
+    { id: 'dashboard', label: 'Painel', href: ROUTES.dashboard },
+    { id: 'vehicles', label: 'Veículos', href: ROUTES.vehicles },
+    { id: 'models', label: 'Modelos', href: ROUTES.models },
+    { id: 'brands', label: 'Marcas', href: ROUTES.brands },
+    { id: 'settings', label: 'Configurações', href: ROUTES.settings },
+    { id: 'profile', label: 'Perfil', href: ROUTES.profile },
+  ],
+  support: [
+    { id: 'docs', label: 'Documentação', href: ROUTES.documentation, external: true },
+    { id: 'status', label: 'Status', href: ROUTES.status, external: true },
+  ],
+  spotlight: [],
+  cta: undefined,
+};
+
+const footerBaseGroups: NavigationGroup[] = [
   {
     id: 'company',
     label: 'Companhia',
     links: [
-      { id: 'about', label: 'Fleetcore', href: 'https://github.com/Vidigal-code/fleetcore-api', external: true },
-      { id: 'careers', label: 'Fleetcore Docs', href: 'https://vidigal-code.github.io/fleetcore-api/docs/', external: true },
+      { id: 'about', label: 'Fleetcore', href: ROUTES.status, external: true },
+      { id: 'careers', label: 'Fleetcore Docs', href: ROUTES.documentation, external: true },
     ],
   },
   {
     id: 'legal',
     label: 'Legal',
     links: [
-      { id: 'privacy', label: 'Privacidade', href: '/politica-de-privacidade' },
-      { id: 'terms', label: 'Termos de Uso', href: '/termos' },
+      { id: 'privacy', label: 'Privacidade', href: ROUTES.privacy },
+      { id: 'terms', label: 'Termos de Uso', href: ROUTES.terms },
     ],
   },
 ];
+
+export const getNavigationConfig = (isAuthenticated: boolean): NavigationConfig =>
+  isAuthenticated ? privateNavigation : publicNavigation;
+
+export const getFooterGroups = (isAuthenticated: boolean): NavigationGroup[] => {
+  const navigation = getNavigationConfig(isAuthenticated);
+  return [
+    {
+      id: 'product',
+      label: 'Produto',
+      links: navigation.primary,
+    },
+    ...footerBaseGroups,
+  ];
+};

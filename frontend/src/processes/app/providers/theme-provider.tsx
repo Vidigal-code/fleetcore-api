@@ -8,6 +8,7 @@ import {
   THEME_STORAGE_KEY,
   type ThemeMode,
 } from '@/shared/config/theme';
+import { designTokens } from '@/shared/constants/theme-tokens';
 
 interface ThemeContextValue {
   theme: ThemeMode;
@@ -30,6 +31,9 @@ const readStoredTheme = (): ThemeMode | null => {
   return null;
 };
 
+const toCssVarName = (token: string) =>
+  token.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
+
 const applyThemeClass = (mode: ThemeMode) => {
   if (typeof document === 'undefined') {
     return;
@@ -39,6 +43,15 @@ const applyThemeClass = (mode: ThemeMode) => {
   root.classList.remove('light', 'dark');
   root.classList.add(mode);
   root.dataset.theme = mode;
+
+  const palette = designTokens.palette[mode];
+  Object.entries(palette).forEach(([token, value]) => {
+    root.style.setProperty(`--color-${toCssVarName(token)}`, value);
+  });
+
+  root.style.setProperty('--shadow-elevated', designTokens.shadow.elevated);
+  root.style.setProperty('--shadow-floating', designTokens.shadow.floating);
+  root.style.setProperty('--color-warning-foreground', palette.foreground);
 };
 
 interface ThemeProviderProps {

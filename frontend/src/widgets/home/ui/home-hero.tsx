@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
+import { ROUTES } from '@/shared/constants/routes';
 import { PageSection, Surface, Stack } from '@/shared/ui/layout-primitives';
 
 const primaryActionClasses =
@@ -12,7 +13,7 @@ const secondaryActionClasses =
   'inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-border/60 bg-surface/90 px-6 text-[0.8rem] font-semibold uppercase tracking-[0.18em] text-foreground transition-all duration-base ease-subtle hover:border-accent/50 hover:bg-accent/15 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 sm:w-auto';
 
 export const HomeHero = () => (
-  <PageSection width="xl" layout="stack" align="center" className="gap-10">
+  <PageSection id="inicio" width="xl" layout="stack" align="center" className="gap-10">
     <Surface
       tone="base"
       elevation="floating"
@@ -37,11 +38,11 @@ export const HomeHero = () => (
           </p>
         </Stack>
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-start">
-          <Link href="/login" className={primaryActionClasses}>
+          <Link href={ROUTES.login} className={primaryActionClasses}>
             Acessar painel
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <Link href="/register" className={secondaryActionClasses}>
+          <Link href={ROUTES.register} className={secondaryActionClasses}>
             Criar conta admin
           </Link>
         </div>

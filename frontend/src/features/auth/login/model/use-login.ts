@@ -8,6 +8,7 @@ import { useAppDispatch } from '@/processes/app/store/hooks';
 import { authActions } from '@/processes/auth/model/auth-slice';
 import { httpClient } from '@/shared/api/http-client';
 import { extractErrorMessage } from '@/shared/api/http-error';
+import { ROUTES } from '@/shared/constants/routes';
 import { sessionStorage } from '@/shared/lib/token-storage';
 
 import type { LoginFormValues } from './login-schema';
@@ -45,7 +46,7 @@ export const useLoginMutation = () => {
           user: response.user,
         }),
       );
-      router.push('/dashboard');
+      router.push(ROUTES.dashboard);
     },
     onError: (error: unknown) => {
       const message = error instanceof Error ? error.message : extractErrorMessage(error);
