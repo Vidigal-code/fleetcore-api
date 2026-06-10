@@ -5,9 +5,18 @@ import { Compass, Home as HomeIcon } from 'lucide-react';
 
 import { PageSection, Surface, Stack } from '@/shared/ui/layout-primitives';
 import { Button } from '@/shared/ui/button';
+import { useAppSelector } from '@/processes/app/store/hooks';
+import { selectIsAuthenticated } from '@/processes/auth/model/auth-selectors';
+import { ROUTES } from '@/shared/constants/routes';
 
 export const NotFoundScreen = () => {
   const router = useRouter();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+
+  const primaryRedirect = isAuthenticated ? ROUTES.dashboard : ROUTES.landing;
+  const secondaryRedirect = isAuthenticated ? ROUTES.profile : ROUTES.login;
+  const primaryLabel = isAuthenticated ? 'Voltar ao painel' : 'Ir para a landing';
+  const secondaryLabel = isAuthenticated ? 'Ir para o perfil' : 'Ir para o login';
 
   return (
     <PageSection width="md" layout="stack" align="center" className="gap-8 py-16">
@@ -30,17 +39,17 @@ export const NotFoundScreen = () => {
           </p>
         </Stack>
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Button type="button" onClick={() => router.push('/dashboard')} className="w-full sm:w-auto">
-            Ir para o painel
+          <Button type="button" onClick={() => router.push(primaryRedirect)} className="w-full sm:w-auto">
+            {primaryLabel}
           </Button>
           <Button
             type="button"
             variant="secondary"
-            onClick={() => router.push('/')}
+            onClick={() => router.push(secondaryRedirect)}
             icon={<HomeIcon className="h-4 w-4" />}
             className="w-full sm:w-auto"
           >
-            Voltar ao início
+            {secondaryLabel}
           </Button>
         </div>
       </Surface>

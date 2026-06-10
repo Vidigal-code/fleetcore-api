@@ -3,155 +3,233 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
-import { ChevronRight, LogOut, Menu, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 
 import { ThemeToggle } from '@/features/theme/toggle';
-import {
-  primaryNavigation,
-  supportNavigation,
-} from '@/entities/navigation/model/navigation';
+import { getNavigationConfig } from '@/entities/navigation/model/navigation';
 import { useAppSelector } from '@/processes/app/store/hooks';
-import { selectCurrentUser } from '@/processes/auth/model/auth-selectors';
+import {
+  selectCurrentUser,
+  selectIsAuthenticated,
+} from '@/processes/auth/model/auth-selectors';
 import { useLogout } from '@/processes/auth/model/use-logout';
 import { appConfig } from '@/shared/config/env';
+import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/lib/utils';
-import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
-import { Surface } from '@/shared/ui/layout-primitives';
+
+import {
+  createPathMatcher,
+  getAriaCurrent,
+  getBrandHref,
+  getBrandMonogram,
+  getLinkAttributes,
+  getNavLinkClassName,
+} from '@/widgets/layout/navigation-helpers';
+import { RoleBadges } from '@/widgets/layout/role-badges';
 
 export interface MainHeaderProps {
   mobileMenuOpen: boolean;
   onMobileMenuToggle: () => void;
 }
 
+const BRAND_MARK_LENGTH = 2;
+const HEADER_HEIGHT = 'h-16';
+const HEADER_TAGLINE = 'Operação inteligente de frotas';
+
+const MenuToggleButton = ({
+  isOpen,
+  onToggle,
+}: {
+  isOpen: boolean;
+  onToggle: () => void;
+}) => (
+  <button
+    type="button"
+    aria-label={isOpen ? 'Fechar navegação' : 'Abrir navegação'}
+    onClick={onToggle}
+    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-surface/80 text-foreground shadow-sm transition hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 lg:hidden"
+  >
+    {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+  </button>
+);
+
+const HeaderBrand = ({
+  href,
+  monogram,
+  appName,
+}: {
+  href: string;
+  monogram: string;
+  appName: string;
+}) => (
+  <Link
+    href={href}
+    aria-label={`Ir para ${appName}`}
+    className="group inline-flex items-center gap-3 rounded-full border border-transparent px-2 py-1 transition hover:border-accent/40"
+  >
+    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/15 text-accent shadow-inner shadow-accent/15">
+      <span className="text-sm font-black tracking-[0.28em]">{monogram}</span>
+    </span>
+    <span className="hidden flex-col leading-tight text-left sm:flex">
+      <span className="text-sm font-semibold text-foreground">{appName}</span>
+      <span className="text-[0.62rem] font-medium uppercase tracking-[0.28em] text-muted opacity-80">
+        {HEADER_TAGLINE}
+      </span>
+    </span>
+  </Link>
+);
+
+const PrimaryNavigation = ({
+  isActive,
+  links,
+}: {
+  isActive: (href: string) => boolean;
+  links: ReturnType<typeof getNavigationConfig>['primary'];
+}) => (
+  <nav className="hidden flex-1 items-center justify-center lg:flex">
+    <div className="flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2 py-1 backdrop-blur">
+      {links.map((link) => {
+        const active = isActive(link.href);
+        const { href, target, rel } = getLinkAttributes(link);
+        return (
+          <Link
+            key={link.id}
+            href={href}
+            target={target}
+            rel={rel}
+            aria-current={getAriaCurrent(active)}
+            className={getNavLinkClassName({ active, variant: 'primary', size: 'compact' })}
+          >
+            {link.label}
+          </Link>
+        );
+      })}
+    </div>
+  </nav>
+);
+
+const SupportLinks = ({
+  isActive,
+  links,
+}: {
+  isActive: (href: string) => boolean;
+  links: ReturnType<typeof getNavigationConfig>['support'];
+}) => (
+  <nav className="hidden items-center gap-2 xl:flex">
+    {links.map((link) => {
+      const active = isActive(link.href);
+      const { href, target, rel } = getLinkAttributes(link);
+      return (
+        <Link
+          key={link.id}
+          href={href}
+          target={target}
+          rel={rel}
+          aria-current={getAriaCurrent(active)}
+          className={getNavLinkClassName({ active, variant: 'support' })}
+        >
+          {link.label}
+        </Link>
+      );
+    })}
+  </nav>
+);
+
+const UserSummary = ({
+  name,
+  email,
+}: {
+  name: string;
+  email: string;
+}) => (
+  <div className="hidden min-w-[160px] flex-col items-end leading-tight text-right lg:flex">
+    <span className="text-sm font-semibold text-foreground">{name}</span>
+    <span className="text-[0.64rem] uppercase tracking-[0.26em] text-muted">{email}</span>
+  </div>
+);
+
+const LogoutButton = ({ onLogout }: { onLogout: () => Promise<void> | void }) => (
+  <Button
+    type="button"
+    variant="ghost"
+    size="sm"
+    onClick={() => {
+      void onLogout();
+    }}
+    icon={<LogOut className="h-4 w-4" />}
+    className="hidden border border-border/60 bg-surface/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-muted transition hover:border-accent/50 hover:text-accent lg:inline-flex"
+  >
+    Sair
+  </Button>
+);
+
 export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderProps) => {
   const pathname = usePathname();
   const user = useAppSelector(selectCurrentUser);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const logout = useLogout();
 
   const currentRoles = user?.roles ?? [];
-  const brandMark = appConfig.appName.slice(0, 2).toUpperCase();
 
-  const isActive = useMemo(() => {
-    return (href: string) => {
-      const [path] = href.split('#');
-      if (!path) return false;
-      return path === pathname;
-    };
-  }, [pathname]);
+  const isActive = useMemo(() => createPathMatcher(pathname), [pathname]);
+  const navigation = useMemo(() => getNavigationConfig(!!isAuthenticated), [isAuthenticated]);
+  const brandHref = isAuthenticated
+    ? getBrandHref(navigation.primary, ROUTES.dashboard)
+    : ROUTES.landing;
+  const brandMark = getBrandMonogram(appConfig.appName, BRAND_MARK_LENGTH);
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6 lg:px-8 xl:px-12">
-        <Surface
-          tone="base"
-          elevation="floating"
-          padding="sm"
-          radius="xl"
-          glass="base"
-          className="mx-0 flex flex-wrap items-center justify-between gap-4"
-        >
-          <div className="flex flex-1 items-center gap-3 lg:gap-4">
-            <button
-              type="button"
-              aria-label={mobileMenuOpen ? 'Fechar navegação' : 'Abrir navegação'}
-              onClick={onMobileMenuToggle}
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-surface/80 text-foreground shadow-sm transition hover:border-accent/50 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 lg:hidden"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
+    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
+      <div className={cn('mx-auto flex w-full max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8 xl:px-12', HEADER_HEIGHT)}>
+        <div className="flex flex-1 items-center gap-3">
+          <MenuToggleButton isOpen={mobileMenuOpen} onToggle={onMobileMenuToggle} />
+          <HeaderBrand href={brandHref} monogram={brandMark} appName={appConfig.appName} />
+        </div>
 
-            <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent shadow-inner shadow-accent/15 sm:flex">
-              <span className="text-sm font-black tracking-[0.24em]">{brandMark}</span>
-            </div>
+        <PrimaryNavigation isActive={isActive} links={navigation.primary} />
 
-            <div className="flex min-w-0 flex-1 flex-col text-left">
-              <span className="truncate text-[0.62rem] font-semibold uppercase tracking-[0.32em] text-muted">
-                {appConfig.appName}
-              </span>
-              <span className="truncate text-base font-semibold text-foreground sm:text-lg">
-                Plataforma Inteligente de Frotas
-              </span>
-            </div>
-          </div>
-
-          <nav className="hidden min-w-0 flex-1 flex-wrap items-center justify-center gap-2 lg:flex">
-            {primaryNavigation.map((link) => (
-              <Link
-                key={link.id}
-                href={link.href}
-                className={cn(
-                  'group relative overflow-hidden rounded-full px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] transition-all duration-base ease-subtle',
-                  isActive(link.href)
-                    ? 'bg-accent text-background shadow-[0_16px_42px_rgba(240,174,0,0.32)]'
-                    : 'nav-pill text-muted hover:text-foreground hover:shadow-[0_16px_42px_rgba(240,174,0,0.18)]',
-                )}
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  {link.label}
-                  {isActive(link.href) ? (
-                    <ChevronRight className="h-3 w-3" />
-                  ) : (
-                    <span className="h-1 w-1 rounded-full bg-accent/40 transition-all group-hover:w-2" />
-                  )}
-                </span>
-                {!isActive(link.href) ? (
-                  <span className="pointer-events-none absolute inset-0 rounded-full border border-transparent transition group-hover:border-accent/60" />
-                ) : null}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex flex-1 items-center justify-end gap-3 lg:gap-4">
-            <div className="hidden items-center gap-3 xl:gap-5 lg:flex">
-              {supportNavigation.map((link) => (
+        <div className="flex flex-1 items-center justify-end gap-3">
+          <SupportLinks isActive={isActive} links={navigation.support} />
+          <ThemeToggle />
+          {isAuthenticated && user ? (
+            <>
+              <UserSummary name={user.name} email={user.email} />
+              <RoleBadges roles={currentRoles} className="hidden lg:flex" />
+              <LogoutButton
+                onLogout={async () => {
+                  await logout();
+                }}
+              />
+            </>
+          ) : (
+            <div className="hidden items-center gap-2 lg:flex">
+              {navigation.spotlight.map((action) => {
+                const { href, target, rel } = getLinkAttributes(action);
+                return (
+                  <Link
+                    key={action.id}
+                    href={href}
+                    target={target}
+                    rel={rel}
+                    className={getNavLinkClassName({ active: isActive(action.href), variant: 'support', size: 'compact' })}
+                  >
+                    {action.label}
+                  </Link>
+                );
+              })}
+              {navigation.cta ? (
                 <Link
-                  key={link.id}
-                  href={link.href}
-                  target={link.external ? '_blank' : undefined}
-                  rel={link.external ? 'noreferrer' : undefined}
-                  className="rounded-full border border-transparent px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.26em] text-muted transition hover:border-accent/40 hover:text-foreground"
+                  key={navigation.cta.id}
+                  href={navigation.cta.href}
+                  className="inline-flex items-center justify-center rounded-full border border-accent/40 bg-accent px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-background shadow-[0_10px_30px_rgba(229,166,19,0.35)] transition hover:-translate-y-0.5 hover:bg-accent-strong"
                 >
-                  {link.label}
+                  {navigation.cta.label}
                 </Link>
-              ))}
+              ) : null}
             </div>
-
-            <ThemeToggle />
-
-            <div className="hidden min-w-[160px] flex-col items-end text-right lg:flex">
-              <span className="text-sm font-semibold text-foreground">
-                {user?.name ?? 'Usuário'}
-              </span>
-              <span className="text-[0.65rem] uppercase tracking-[0.24em] text-muted">
-                {user?.email ?? '---'}
-              </span>
-            </div>
-
-            {currentRoles.length > 0 ? (
-              <div className="hidden items-center gap-2 lg:flex">
-                {currentRoles.map((role) => (
-                  <Badge key={role} variant="accent" size="xs">
-                    {role}
-                  </Badge>
-                ))}
-              </div>
-            ) : null}
-
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                void logout();
-              }}
-              icon={<LogOut className="h-4 w-4" />}
-              className="hidden border border-border/60 bg-surface/80 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-muted hover:border-accent/50 hover:text-accent lg:inline-flex"
-            >
-              Sair
-            </Button>
-          </div>
-        </Surface>
+          )}
+        </div>
       </div>
     </header>
   );

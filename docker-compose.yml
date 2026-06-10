@@ -1,69 +1,70 @@
-version: '3.9'
-
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fleetcore-sqlserver
     environment:
-      ACCEPT_EULA: 'Y'
-      MSSQL_PID: Developer
-      SA_PASSWORD: ${SQLSERVER_PASSWORD}
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: "${SQLSERVER_PASSWORD:-YourStrong@Passw0rd}"
     ports:
-      - '${SQLSERVER_PORT:-1433}:1433'
+      - "${SQLSERVER_PORT:-1433}:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
       - ./docker/sqlserver:/docker-entrypoint-initdb.d
     healthcheck:
-      test: ['CMD-SHELL', '/bin/bash -c "</dev/tcp/127.0.0.1/1433"']
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q \"SELECT 1\" || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 40s
+      retries: 20
+      start_period: 60s
     networks:
       - fleetnet
 
   redis:
     image: redis:7-alpine
+    container_name: fleetcore-redis
     command: redis-server --appendonly yes
     ports:
-      - '${REDIS_PORT:-6379}:6379'
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
     networks:
       - fleetnet
 
   mongo:
     image: mongo:7
+    container_name: fleetcore-mongo
     ports:
-      - '27017:27017'
+      - "${MONGO_PORT:-27017}:27017"
     volumes:
       - mongo_data:/data/db
     healthcheck:
-      test: ['CMD', 'mongosh', '--quiet', '--eval', 'db.adminCommand("ping")']
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
       timeout: 5s
-      retries: 6
+      retries: 10
       start_period: 20s
     networks:
       - fleetnet
 
   rabbitmq:
     image: rabbitmq:3-management
+    container_name: fleetcore-rabbitmq
     ports:
-      - '5672:5672'
-      - '15672:15672'
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
       timeout: 5s
-      retries: 6
+      retries: 10
       start_period: 20s
     networks:
       - fleetnet
@@ -71,31 +72,42 @@ services:
   backend:
     build:
       context: ./backend
+    container_name: fleetcore-backend
     environment:
-      HTTP_PORT: ${HTTP_PORT:-3000}
-      SQLSERVER_HOST: ${SQLSERVER_HOST:-sqlserver}
-      SQLSERVER_PORT: ${SQLSERVER_PORT:-1433}
-      SQLSERVER_USER: ${SQLSERVER_USER}
-      SQLSERVER_PASSWORD: ${SQLSERVER_PASSWORD}
-      SQLSERVER_DB: ${SQLSERVER_DB}
-      REDIS_HOST: ${REDIS_HOST:-redis}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_TTL_SECONDS: ${REDIS_TTL_SECONDS:-120}
-      JWT_SECRET: ${JWT_SECRET}
-      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-3600s}
-      AUTH_SESSION_TTL_SECONDS: ${AUTH_SESSION_TTL_SECONDS:-3600}
-      MONGO_URI: ${MONGO_URI:-mongodb://mongo:27017/fleetcore}
-      RABBITMQ_URI: ${RABBITMQ_URI:-amqp://rabbitmq:5672}
-      RABBITMQ_EXCHANGE: ${RABBITMQ_EXCHANGE:-fleetcore.events}
-      RABBITMQ_QUEUE: ${RABBITMQ_QUEUE:-fleetcore.vehicles}
-      RABBITMQ_AUDIT_QUEUE: ${RABBITMQ_AUDIT_QUEUE:-fleetcore.audit}
-      NODE_ENV: production
-      ADMIN_NICKNAME: ${ADMIN_NICKNAME:-aivacol}
-      ADMIN_EMAIL: ${ADMIN_EMAIL:-aivacol@fleetcore.local}
-      ADMIN_NAME: ${ADMIN_NAME:-Aivacol Admin}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-aivacol123!}
+      NODE_ENV: "production"
+      HTTP_PORT: "${HTTP_PORT:-3000}"
+
+      SQLSERVER_HOST: "sqlserver"
+      SQLSERVER_PORT: "1433"
+      SQLSERVER_USER: "${SQLSERVER_USER:-sa}"
+      SQLSERVER_PASSWORD: "${SQLSERVER_PASSWORD:-YourStrong@Passw0rd}"
+      SQLSERVER_PASSWORD_FALLBACK: "${SQLSERVER_PASSWORD_FALLBACK:-YourStrong@Passw0rd}"
+      SQLSERVER_DB: "${SQLSERVER_DB:-fleetcore}"
+
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
+      REDIS_TTL_SECONDS: "${REDIS_TTL_SECONDS:-120}"
+
+      JWT_SECRET: "${JWT_SECRET:-fleetcore_dev_secret_change_me}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-3600s}"
+      AUTH_SESSION_TTL_SECONDS: "${AUTH_SESSION_TTL_SECONDS:-3600}"
+
+      MONGO_URI: "mongodb://mongo:27017/fleetcore"
+
+      RABBITMQ_URI: "amqp://rabbitmq:5672"
+      RABBITMQ_EXCHANGE: "${RABBITMQ_EXCHANGE:-fleetcore.events}"
+      RABBITMQ_QUEUE: "${RABBITMQ_QUEUE:-fleetcore.vehicles}"
+      RABBITMQ_AUDIT_QUEUE: "${RABBITMQ_AUDIT_QUEUE:-fleetcore.audit}"
+      RABBITMQ_CONNECT_TIMEOUT_MS: "${RABBITMQ_CONNECT_TIMEOUT_MS:-15000}"
+      RABBITMQ_RECONNECT_SECONDS: "${RABBITMQ_RECONNECT_SECONDS:-5}"
+      RABBITMQ_HEARTBEAT_SECONDS: "${RABBITMQ_HEARTBEAT_SECONDS:-30}"
+
+      ADMIN_NICKNAME: "${ADMIN_NICKNAME:-aivacol}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-aivacol@fleetcore.local}"
+      ADMIN_NAME: "${ADMIN_NAME:-Aivacol Admin}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:-aivacol123!}"
     ports:
-      - '${HTTP_PORT:-3000}:3000'
+      - "${HTTP_PORT:-3000}:3000"
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -111,13 +123,14 @@ services:
   frontend:
     build:
       context: ./frontend
+    container_name: fleetcore-frontend
     environment:
-      NODE_ENV: production
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://backend:3000/api}
-      NEXT_PUBLIC_APP_NAME: ${NEXT_PUBLIC_APP_NAME:-Fleetcore Web}
-      NEXT_PUBLIC_CACHE_TTL_SECONDS: ${REDIS_TTL_SECONDS:-120}
+      NODE_ENV: "production"
+      NEXT_PUBLIC_API_URL: "${NEXT_PUBLIC_API_URL:-http://localhost:3000/api}"
+      NEXT_PUBLIC_APP_NAME: "${NEXT_PUBLIC_APP_NAME:-Fleetcore Web}"
+      NEXT_PUBLIC_CACHE_TTL_SECONDS: "${REDIS_TTL_SECONDS:-120}"
     ports:
-      - '${FRONTEND_PORT:-3001}:3000'
+      - "${FRONTEND_PORT:-3001}:3000"
     depends_on:
       backend:
         condition: service_started
