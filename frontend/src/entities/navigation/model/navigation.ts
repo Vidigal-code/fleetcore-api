@@ -72,7 +72,6 @@ const privateNavigation: NavigationConfig = {
       id: 'account',
       label: 'Conta',
       links: [
-        { id: 'settings', label: 'Configurações', href: ROUTES.settings },
         { id: 'profile', label: 'Perfil', href: ROUTES.profile },
       ],
     },

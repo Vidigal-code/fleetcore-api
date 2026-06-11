@@ -8,7 +8,6 @@ export const ROUTES = {
   models: '/models',
   brands: '/brands',
   profile: '/profile',
-  settings: '/settings',
   documentation: 'https://vidigal-code.github.io/fleetcore-api/docs/',
   status: 'https://github.com/Vidigal-code/fleetcore-api',
   privacy: '/politica-de-privacidade',
