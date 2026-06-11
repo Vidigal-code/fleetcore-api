@@ -13,47 +13,76 @@ export interface NavigationGroup {
   links: NavigationLink[];
 }
 
+export type NavigationCategory = NavigationGroup;
+
 export interface NavigationConfig {
   scope: 'public' | 'private';
-  primary: NavigationLink[];
+  categories: NavigationCategory[];
   support: NavigationLink[];
   spotlight: NavigationLink[];
   cta?: NavigationLink;
 }
 
+const SUPPORT_LINKS: NavigationLink[] = [
+  { id: 'docs', label: 'Documentação', href: ROUTES.documentation, external: true },
+  { id: 'status', label: 'Status', href: ROUTES.status, external: true },
+];
+
 const publicNavigation: NavigationConfig = {
   scope: 'public',
-  primary: [
-    { id: 'overview', label: 'Visão geral', href: '#inicio' },
-    { id: 'features', label: 'Recursos', href: '#recursos' },
-    { id: 'pricing', label: 'Planos', href: '#planos' },
+  categories: [
+    {
+      id: 'product',
+      label: 'Produto',
+      links: [
+        { id: 'overview', label: 'Visão geral', href: '#inicio' },
+        { id: 'features', label: 'Recursos', href: '#recursos' },
+        { id: 'pricing', label: 'Planos', href: '#planos' },
+      ],
+    },
+    {
+      id: 'resources',
+      label: 'Recursos',
+      links: SUPPORT_LINKS,
+    },
   ],
-  support: [
-    { id: 'docs', label: 'Documentação', href: ROUTES.documentation, external: true },
-    { id: 'status', label: 'Status', href: ROUTES.status, external: true },
-  ],
+  support: SUPPORT_LINKS,
   spotlight: [
     { id: 'login', label: 'Entrar', href: ROUTES.login },
     { id: 'register', label: 'Criar conta', href: ROUTES.register },
     { id: 'recover', label: 'Recuperar acesso', href: ROUTES.recoverPassword },
   ],
-  cta: { id: 'primary-cta', label: 'Começar agora', href: ROUTES.register },
+  cta: undefined,
 };
 
 const privateNavigation: NavigationConfig = {
   scope: 'private',
-  primary: [
-    { id: 'dashboard', label: 'Painel', href: ROUTES.dashboard },
-    { id: 'vehicles', label: 'Veículos', href: ROUTES.vehicles },
-    { id: 'models', label: 'Modelos', href: ROUTES.models },
-    { id: 'brands', label: 'Marcas', href: ROUTES.brands },
-    { id: 'settings', label: 'Configurações', href: ROUTES.settings },
-    { id: 'profile', label: 'Perfil', href: ROUTES.profile },
+  categories: [
+    {
+      id: 'operations',
+      label: 'Operação',
+      links: [
+        { id: 'dashboard', label: 'Painel', href: ROUTES.dashboard },
+        { id: 'vehicles', label: 'Veículos', href: ROUTES.vehicles },
+        { id: 'models', label: 'Modelos', href: ROUTES.models },
+        { id: 'brands', label: 'Marcas', href: ROUTES.brands },
+      ],
+    },
+    {
+      id: 'account',
+      label: 'Conta',
+      links: [
+        { id: 'settings', label: 'Configurações', href: ROUTES.settings },
+        { id: 'profile', label: 'Perfil', href: ROUTES.profile },
+      ],
+    },
+    {
+      id: 'resources',
+      label: 'Recursos',
+      links: SUPPORT_LINKS,
+    },
   ],
-  support: [
-    { id: 'docs', label: 'Documentação', href: ROUTES.documentation, external: true },
-    { id: 'status', label: 'Status', href: ROUTES.status, external: true },
-  ],
+  support: SUPPORT_LINKS,
   spotlight: [],
   cta: undefined,
 };
@@ -80,13 +109,19 @@ const footerBaseGroups: NavigationGroup[] = [
 export const getNavigationConfig = (isAuthenticated: boolean): NavigationConfig =>
   isAuthenticated ? privateNavigation : publicNavigation;
 
+const getProductCategories = (config: NavigationConfig): NavigationCategory[] =>
+  config.categories.filter((category) => category.links !== config.support);
+
+export const getPrimaryLinks = (config: NavigationConfig): NavigationLink[] =>
+  getProductCategories(config).flatMap((category) => category.links);
+
 export const getFooterGroups = (isAuthenticated: boolean): NavigationGroup[] => {
   const navigation = getNavigationConfig(isAuthenticated);
   return [
     {
       id: 'product',
       label: 'Produto',
-      links: navigation.primary,
+      links: getPrimaryLinks(navigation),
     },
     ...footerBaseGroups,
   ];

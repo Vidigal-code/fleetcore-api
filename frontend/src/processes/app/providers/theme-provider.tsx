@@ -6,9 +6,10 @@ import { createContext, startTransition, useContext, useEffect, useMemo, useStat
 import {
   DEFAULT_THEME,
   THEME_STORAGE_KEY,
+  applyThemeClass,
+  readStoredTheme,
   type ThemeMode,
 } from '@/shared/config/theme';
-import { designTokens } from '@/shared/constants/theme-tokens';
 
 interface ThemeContextValue {
   theme: ThemeMode;
@@ -19,39 +20,11 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const readStoredTheme = (): ThemeMode | null => {
+const persistTheme = (mode: ThemeMode) => {
   if (typeof window === 'undefined') {
-    return null;
-  }
-
-  const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (stored === 'light' || stored === 'dark') {
-    return stored;
-  }
-  return null;
-};
-
-const toCssVarName = (token: string) =>
-  token.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
-
-const applyThemeClass = (mode: ThemeMode) => {
-  if (typeof document === 'undefined') {
     return;
   }
-
-  const root = document.documentElement;
-  root.classList.remove('light', 'dark');
-  root.classList.add(mode);
-  root.dataset.theme = mode;
-
-  const palette = designTokens.palette[mode];
-  Object.entries(palette).forEach(([token, value]) => {
-    root.style.setProperty(`--color-${toCssVarName(token)}`, value);
-  });
-
-  root.style.setProperty('--shadow-elevated', designTokens.shadow.elevated);
-  root.style.setProperty('--shadow-floating', designTokens.shadow.floating);
-  root.style.setProperty('--color-warning-foreground', palette.foreground);
+  window.localStorage.setItem(THEME_STORAGE_KEY, mode);
 };
 
 interface ThemeProviderProps {
@@ -64,16 +37,18 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     const initial = readStoredTheme() ?? DEFAULT_THEME;
+    applyThemeClass(initial);
     startTransition(() => {
       setThemeState(initial);
       setIsReady(true);
     });
-    applyThemeClass(initial);
   }, []);
 
   useEffect(() => {
-    if (!isReady) return;
-    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    if (!isReady) {
+      return;
+    }
+    persistTheme(theme);
     applyThemeClass(theme);
   }, [theme, isReady]);
 

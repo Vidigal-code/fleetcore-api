@@ -1,12 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
-import { LogOut, Menu, X } from 'lucide-react';
+import { LogOut, Menu, Settings, User, X } from 'lucide-react';
 
 import { ThemeToggle } from '@/features/theme/toggle';
-import { getNavigationConfig } from '@/entities/navigation/model/navigation';
+import {
+  getNavigationConfig,
+  getPrimaryLinks,
+  type NavigationCategory,
+} from '@/entities/navigation/model/navigation';
 import { useAppSelector } from '@/processes/app/store/hooks';
 import {
   selectCurrentUser,
@@ -16,17 +20,17 @@ import { useLogout } from '@/processes/auth/model/use-logout';
 import { appConfig } from '@/shared/config/env';
 import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/lib/utils';
-import { Button } from '@/shared/ui/button';
+import { Dropdown, type DropdownItem } from '@/shared/ui/dropdown';
+import { NavSelect } from '@/shared/ui/nav-select';
+import { useLinkNavigation } from '@/widgets/layout/model/use-link-navigation';
 
 import {
   createPathMatcher,
-  getAriaCurrent,
   getBrandHref,
   getBrandMonogram,
   getLinkAttributes,
   getNavLinkClassName,
 } from '@/widgets/layout/navigation-helpers';
-import { RoleBadges } from '@/widgets/layout/role-badges';
 
 export interface MainHeaderProps {
   mobileMenuOpen: boolean;
@@ -34,8 +38,15 @@ export interface MainHeaderProps {
 }
 
 const BRAND_MARK_LENGTH = 2;
-const HEADER_HEIGHT = 'h-16';
 const HEADER_TAGLINE = 'Operação inteligente de frotas';
+
+type AccountActionId = 'profile' | 'settings' | 'logout';
+
+const ACCOUNT_MENU_ITEMS: DropdownItem[] = [
+  { id: 'profile', label: 'Perfil', icon: <User className="h-4 w-4" /> },
+  { id: 'settings', label: 'Configurações', icon: <Settings className="h-4 w-4" /> },
+  { id: 'logout', label: 'Sair', tone: 'danger', icon: <LogOut className="h-4 w-4" /> },
+];
 
 const MenuToggleButton = ({
   isOpen,
@@ -48,7 +59,7 @@ const MenuToggleButton = ({
     type="button"
     aria-label={isOpen ? 'Fechar navegação' : 'Abrir navegação'}
     onClick={onToggle}
-    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-surface/80 text-foreground shadow-sm transition hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 lg:hidden"
+    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border/60 bg-surface/80 text-foreground shadow-sm transition hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 xl:hidden"
   >
     {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
   </button>
@@ -66,169 +77,151 @@ const HeaderBrand = ({
   <Link
     href={href}
     aria-label={`Ir para ${appName}`}
-    className="group inline-flex items-center gap-3 rounded-full border border-transparent px-2 py-1 transition hover:border-accent/40"
+    className="group inline-flex min-w-0 items-center gap-2 rounded-full border border-transparent px-2 py-1 transition hover:border-accent/40"
   >
-    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/15 text-accent shadow-inner shadow-accent/15">
-      <span className="text-sm font-black tracking-[0.28em]">{monogram}</span>
+    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent shadow-inner shadow-accent/15">
+      <span className="text-[0.65rem] font-black tracking-[0.2em]">{monogram}</span>
     </span>
-    <span className="hidden flex-col leading-tight text-left sm:flex">
-      <span className="text-sm font-semibold text-foreground">{appName}</span>
-      <span className="text-[0.62rem] font-medium uppercase tracking-[0.28em] text-muted opacity-80">
+    <span className="hidden min-w-0 flex-col leading-tight text-left sm:flex">
+      <span className="truncate text-xs font-semibold text-foreground">{appName}</span>
+      <span className="hidden truncate text-[0.5rem] font-medium uppercase tracking-[0.2em] text-muted opacity-80 2xl:block">
         {HEADER_TAGLINE}
       </span>
     </span>
   </Link>
 );
 
-const PrimaryNavigation = ({
-  isActive,
-  links,
+const CategoryNavigation = ({
+  categories,
+  activeHref,
+  onSelectLink,
+  className,
 }: {
-  isActive: (href: string) => boolean;
-  links: ReturnType<typeof getNavigationConfig>['primary'];
+  categories: NavigationCategory[];
+  activeHref: string;
+  onSelectLink: (link: NavigationCategory['links'][number]) => void;
+  className?: string;
 }) => (
-  <nav className="hidden flex-1 items-center justify-center lg:flex">
-    <div className="flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2 py-1 backdrop-blur">
-      {links.map((link) => {
-        const active = isActive(link.href);
-        const { href, target, rel } = getLinkAttributes(link);
-        return (
-          <Link
-            key={link.id}
-            href={href}
-            target={target}
-            rel={rel}
-            aria-current={getAriaCurrent(active)}
-            className={getNavLinkClassName({ active, variant: 'primary', size: 'compact' })}
-          >
-            {link.label}
-          </Link>
-        );
-      })}
-    </div>
+  <nav className={cn('hidden items-center gap-2 xl:flex', className)}>
+    {categories.map((category) => (
+      <NavSelect
+        key={category.id}
+        label={category.label}
+        links={category.links}
+        activeHref={activeHref}
+        onSelectLink={onSelectLink}
+        className="w-36"
+      />
+    ))}
   </nav>
 );
 
-const SupportLinks = ({
+const GuestActions = ({
   isActive,
-  links,
+  spotlight,
 }: {
   isActive: (href: string) => boolean;
-  links: ReturnType<typeof getNavigationConfig>['support'];
+  spotlight: ReturnType<typeof getNavigationConfig>['spotlight'];
 }) => (
-  <nav className="hidden items-center gap-2 xl:flex">
-    {links.map((link) => {
-      const active = isActive(link.href);
-      const { href, target, rel } = getLinkAttributes(link);
+  <div className="hidden items-center gap-1.5 xl:flex">
+    {spotlight.map((action) => {
+      const { href, target, rel } = getLinkAttributes(action);
       return (
         <Link
-          key={link.id}
+          key={action.id}
           href={href}
           target={target}
           rel={rel}
-          aria-current={getAriaCurrent(active)}
-          className={getNavLinkClassName({ active, variant: 'support' })}
+          className={cn(
+            'whitespace-nowrap',
+            getNavLinkClassName({
+              active: isActive(action.href),
+              variant: 'support',
+              size: 'compact',
+            }),
+          )}
         >
-          {link.label}
+          {action.label}
         </Link>
       );
     })}
-  </nav>
-);
-
-const UserSummary = ({
-  name,
-  email,
-}: {
-  name: string;
-  email: string;
-}) => (
-  <div className="hidden min-w-[160px] flex-col items-end leading-tight text-right lg:flex">
-    <span className="text-sm font-semibold text-foreground">{name}</span>
-    <span className="text-[0.64rem] uppercase tracking-[0.26em] text-muted">{email}</span>
   </div>
 );
 
-const LogoutButton = ({ onLogout }: { onLogout: () => Promise<void> | void }) => (
-  <Button
-    type="button"
-    variant="ghost"
-    size="sm"
-    onClick={() => {
-      void onLogout();
-    }}
-    icon={<LogOut className="h-4 w-4" />}
-    className="hidden border border-border/60 bg-surface/70 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.22em] text-muted transition hover:border-accent/50 hover:text-accent lg:inline-flex"
-  >
-    Sair
-  </Button>
+const AccountMenu = ({
+  userName,
+  onAction,
+  className,
+}: {
+  userName: string;
+  onAction: (id: AccountActionId) => void;
+  className?: string;
+}) => (
+  <Dropdown
+    label={userName}
+    ariaLabel={`Conta de ${userName}`}
+    items={ACCOUNT_MENU_ITEMS}
+    onSelect={(item) => onAction(item.id as AccountActionId)}
+    align="end"
+    className={cn('w-44', className)}
+  />
 );
 
 export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderProps) => {
   const pathname = usePathname();
+  const router = useRouter();
   const user = useAppSelector(selectCurrentUser);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const logout = useLogout();
-
-  const currentRoles = user?.roles ?? [];
+  const navigateLink = useLinkNavigation();
 
   const isActive = useMemo(() => createPathMatcher(pathname), [pathname]);
   const navigation = useMemo(() => getNavigationConfig(!!isAuthenticated), [isAuthenticated]);
+  const primaryLinks = useMemo(() => getPrimaryLinks(navigation), [navigation]);
   const brandHref = isAuthenticated
-    ? getBrandHref(navigation.primary, ROUTES.dashboard)
+    ? getBrandHref(primaryLinks, ROUTES.dashboard)
     : ROUTES.landing;
   const brandMark = getBrandMonogram(appConfig.appName, BRAND_MARK_LENGTH);
 
+  const handleAccountAction = (id: AccountActionId) => {
+    if (id === 'profile') {
+      router.push(ROUTES.profile);
+      return;
+    }
+    if (id === 'settings') {
+      router.push(ROUTES.settings);
+      return;
+    }
+    void logout();
+  };
+
   return (
-    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
-      <div className={cn('mx-auto flex w-full max-w-6xl items-center gap-4 px-4 sm:px-6 lg:px-8 xl:px-12', HEADER_HEIGHT)}>
-        <div className="flex flex-1 items-center gap-3">
+    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/85 backdrop-blur-xl">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 py-2.5 sm:px-6 lg:px-8 xl:gap-6 xl:px-12">
+        <div className="flex min-w-0 items-center justify-start gap-3">
           <MenuToggleButton isOpen={mobileMenuOpen} onToggle={onMobileMenuToggle} />
+          <CategoryNavigation
+            categories={navigation.categories}
+            activeHref={pathname}
+            onSelectLink={navigateLink}
+          />
+        </div>
+
+        <div className="flex min-w-0 justify-center">
           <HeaderBrand href={brandHref} monogram={brandMark} appName={appConfig.appName} />
         </div>
 
-        <PrimaryNavigation isActive={isActive} links={navigation.primary} />
-
-        <div className="flex flex-1 items-center justify-end gap-3">
-          <SupportLinks isActive={isActive} links={navigation.support} />
-          <ThemeToggle />
+        <div className="flex min-w-0 items-center justify-end gap-3">
           {isAuthenticated && user ? (
-            <>
-              <UserSummary name={user.name} email={user.email} />
-              <RoleBadges roles={currentRoles} className="hidden lg:flex" />
-              <LogoutButton
-                onLogout={async () => {
-                  await logout();
-                }}
-              />
-            </>
+            <AccountMenu
+              userName={user.name}
+              onAction={handleAccountAction}
+              className="hidden md:block"
+            />
           ) : (
-            <div className="hidden items-center gap-2 lg:flex">
-              {navigation.spotlight.map((action) => {
-                const { href, target, rel } = getLinkAttributes(action);
-                return (
-                  <Link
-                    key={action.id}
-                    href={href}
-                    target={target}
-                    rel={rel}
-                    className={getNavLinkClassName({ active: isActive(action.href), variant: 'support', size: 'compact' })}
-                  >
-                    {action.label}
-                  </Link>
-                );
-              })}
-              {navigation.cta ? (
-                <Link
-                  key={navigation.cta.id}
-                  href={navigation.cta.href}
-                  className="inline-flex items-center justify-center rounded-full border border-accent/40 bg-accent px-4 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-background shadow-[0_10px_30px_rgba(229,166,19,0.35)] transition hover:-translate-y-0.5 hover:bg-accent-strong"
-                >
-                  {navigation.cta.label}
-                </Link>
-              ) : null}
-            </div>
+            <GuestActions isActive={isActive} spotlight={navigation.spotlight} />
           )}
+          <ThemeToggle />
         </div>
       </div>
     </header>

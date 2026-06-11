@@ -14,7 +14,6 @@ export const useLogout = () => {
     try {
       await authClient.logout();
     } catch {
-      // Best-effort logout; fallback to local cleanup.
     } finally {
       sessionStorage.clearSession();
       dispatch(authActions.loggedOut());

@@ -10,13 +10,35 @@ services:
       - "${SQLSERVER_PORT:-1433}:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
-      - ./docker/sqlserver:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q \"SELECT 1\" || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 20
       start_period: 60s
+    networks:
+      - fleetnet
+
+  # A imagem oficial do SQL Server NAO executa scripts de
+  # /docker-entrypoint-initdb.d automaticamente (isso e convencao do
+  # Postgres/MySQL). Este job roda o init.sql apos o SQL Server ficar
+  # saudavel para criar o banco `fleetcore` que o backend espera. Sem ele
+  # o backend conecta num banco inexistente e o erro 4060 aparece
+  # mascarado como "Login failed for user 'sa'".
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: fleetcore-sqlserver-init
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: "${SQLSERVER_PASSWORD:-YourStrong@Passw0rd}"
+    volumes:
+      - ./docker/sqlserver:/init:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - '/opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P "$${MSSQL_SA_PASSWORD}" -C -b -i /init/init.sql'
+    restart: "no"
     networks:
       - fleetnet
 
@@ -111,6 +133,8 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
       redis:
         condition: service_healthy
       mongo:
