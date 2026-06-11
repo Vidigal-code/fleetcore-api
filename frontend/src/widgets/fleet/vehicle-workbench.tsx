@@ -1,10 +1,14 @@
 'use client';
 
+import { useState } from 'react';
+
 import type { Vehicle } from '@/entities/vehicle/model/types';
 import { VehicleTable } from '@/entities/vehicle/ui/vehicle-table';
 import { VehicleFilterBar } from '@/features/vehicles/filter/ui/vehicle-filter-bar';
 import { VehicleForm } from '@/features/vehicles/manage/ui/vehicle-form';
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { PageSection, Stack, Surface } from '@/shared/ui/layout-primitives';
+import { Modal } from '@/shared/ui/modal';
 
 import { useVehicleWorkbench } from '@/widgets/fleet/vehicle-workbench/model/use-vehicle-workbench';
 
@@ -21,12 +25,17 @@ export const VehicleWorkbench = () => {
     feedback,
   } = state;
 
-  const handleDelete = (vehicle: Vehicle) => {
-    const confirmation = window.confirm(
-      `Remover definitivamente o veículo ${vehicle.licensePlate}? Essa ação não pode ser desfeita.`,
-    );
-    if (!confirmation) return;
-    void actions.deleteVehicle(vehicle.id);
+  const [pendingDelete, setPendingDelete] = useState<Vehicle | null>(null);
+
+  const closeEdit = () => {
+    actions.setEditingVehicle(null);
+    actions.resetFeedback();
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    await actions.deleteVehicle(pendingDelete.id);
+    setPendingDelete(null);
   };
 
   return (
@@ -55,22 +64,13 @@ export const VehicleWorkbench = () => {
       <PageSection id="vehicles" width="xl" layout="stack" className="gap-8">
         <Surface tone="base" radius="xl" className="mx-auto w-full max-w-5xl space-y-6">
           <VehicleForm
-            mode={editingVehicle ? 'edit' : 'create'}
+            mode="create"
             brands={brands}
             models={models}
-            initialVehicle={editingVehicle}
             submitting={isSubmitting}
-            errorMessage={feedback.error}
-            successMessage={feedback.success}
-            onSubmit={editingVehicle ? actions.updateVehicle : actions.createVehicle}
-            onCancel={
-              editingVehicle
-                ? () => {
-                    actions.setEditingVehicle(null);
-                    actions.resetFeedback();
-                  }
-                : undefined
-            }
+            errorMessage={editingVehicle ? null : feedback.error}
+            successMessage={editingVehicle ? null : feedback.success}
+            onSubmit={actions.createVehicle}
           />
         </Surface>
 
@@ -96,11 +96,46 @@ export const VehicleWorkbench = () => {
               total={collection.total}
               onPageChange={actions.changePage}
               onEdit={actions.setEditingVehicle}
-              onDelete={handleDelete}
+              onDelete={setPendingDelete}
             />
           </div>
         </Surface>
       </PageSection>
+
+      <Modal
+        open={Boolean(editingVehicle)}
+        onClose={closeEdit}
+        size="lg"
+        title="Atualizar veículo"
+        description="Defina placa, identificadores e relacione o veículo ao modelo correspondente."
+      >
+        <VehicleForm
+          mode="edit"
+          brands={brands}
+          models={models}
+          initialVehicle={editingVehicle}
+          submitting={isSubmitting}
+          errorMessage={feedback.error}
+          successMessage={feedback.success}
+          onSubmit={actions.updateVehicle}
+          onCancel={closeEdit}
+          showHeader={false}
+        />
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={confirmDelete}
+        loading={isSubmitting}
+        title="Remover veículo"
+        description={
+          pendingDelete
+            ? `Remover definitivamente o veículo "${pendingDelete.licensePlate}"? Essa ação não pode ser desfeita.`
+            : undefined
+        }
+        confirmLabel="Remover"
+      />
     </>
   );
 };

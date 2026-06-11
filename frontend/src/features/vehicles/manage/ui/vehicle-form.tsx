@@ -31,6 +31,7 @@ export interface VehicleFormProps {
   onSubmit: (payload: VehicleFormValues) => Promise<void> | void;
   onCancel?: () => void;
   className?: string;
+  showHeader?: boolean;
 }
 
 const emptyValues: VehicleFormValues = {
@@ -52,6 +53,7 @@ export const VehicleForm = ({
   onSubmit,
   onCancel,
   className,
+  showHeader = true,
 }: VehicleFormProps) => {
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema),
@@ -130,27 +132,29 @@ export const VehicleForm = ({
 
   return (
     <Stack gap="lg" className={cn('w-full', className)}>
-      <Surface
-        tone="strong"
-        elevation="low"
-        padding="sm"
-        radius="lg"
-        align="center"
-        glass="base"
-        className="mx-0 flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:text-left"
-      >
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
-          <Wrench className="h-5 w-5" />
-        </div>
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-foreground">
-            {mode === 'create' ? 'Registrar novo veículo' : 'Atualizar veículo'}
-          </h2>
-          <p className="text-sm text-muted">
-            Defina placa, identificadores e relacione o veículo ao modelo correspondente.
-          </p>
-        </div>
-      </Surface>
+      {showHeader ? (
+        <Surface
+          tone="strong"
+          elevation="low"
+          padding="sm"
+          radius="lg"
+          align="center"
+          glass="base"
+          className="mx-0 flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:text-left"
+        >
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
+            <Wrench className="h-5 w-5" />
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-foreground">
+              {mode === 'create' ? 'Registrar novo veículo' : 'Atualizar veículo'}
+            </h2>
+            <p className="text-sm text-muted">
+              Defina placa, identificadores e relacione o veículo ao modelo correspondente.
+            </p>
+          </div>
+        </Surface>
+      ) : null}
       <form className="grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
         <InputField
           label="Placa Mercosul"
