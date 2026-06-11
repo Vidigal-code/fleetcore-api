@@ -6,7 +6,7 @@ The backend uses TypeORM on SQL Server with a pure DDD layer. Persistence is set
 
 | Table | Key columns | Relationships |
 |-------|-------------|----------------|
-| `users` | `id`, `nickname`, `email`, `password_hash`, `roles` | Seeded admin (`aivacol`) with role set stored as CSV; referenced by audit metadata. |
+| `users` | `id`, `nickname`, `email`, `password_hash`, `roles` | Seeded admin (`aivacol` / `aivacol123!`, via `UsersService.ensureAdminSeed`) with `UserRole` set (Admin / Operator); referenced by audit metadata. |
 | `brands` | `id`, `name` | Unique constraint on `name`; optional parent for models. |
 | `models` | `id`, `name`, `brand_id` | Foreign key to `brands` (SET NULL on delete) enabling orphan models. |
 | `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `model_id` | Unique constraints on identifiers; cascade delete keeps referential integrity. |

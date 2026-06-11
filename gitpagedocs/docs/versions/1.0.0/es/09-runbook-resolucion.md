@@ -64,8 +64,8 @@ Asegúrate de que SQL Server, Redis, RabbitMQ y MongoDB estén disponibles local
 
 ## 6. Referencias útiles
 
-- Documentación Swagger (EN/PT).
-- Scripts del proyecto (`package.json`).
-- Esta base de conocimiento en GitPageDocs.
+- Documentación Swagger (EN/PT): tema oscuro Fleetcore, "Try it out" habilitado, ejemplos bilingües y `POST /auth/login` precargado con las credenciales seed.
+- Scripts del proyecto en los `package.json` de `backend/` y `frontend/` (no hay `package.json` en la raíz).
+- Esta base de conocimiento en GitPageDocs (publicada por el workflow de GitHub Actions).
 
 Sigue estos pasos para levantar, validar y solucionar problemas de la plataforma de gestión de flotas de extremo a extremo.

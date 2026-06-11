@@ -5,7 +5,7 @@ Snapshot of how the backend, domain and support services fit together.
 ## NestJS backend
 
 - Modular structure (`auth`, `fleet`, `users`, `audit`, `messaging`).
-- Global guards (`JwtAuthGuard`, `RolesGuard`) and Redis-backed `AuthSessionService`.
+- Global guards (`JwtAuthGuard`, `RolesGuard`) with RBAC (`UserRole` = Admin / Operator) and Redis-backed `AuthSessionService`.
 - Domain events flowing through `FleetDomainEventListener` into RabbitMQ.
 
 Refer to the Backend Architecture section in the menu for the full breakdown.

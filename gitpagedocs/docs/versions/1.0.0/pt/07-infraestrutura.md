@@ -7,6 +7,7 @@ O projeto foi pensado para ser executado tanto localmente quanto em ambientes co
 Arquivo `docker-compose.yml` orquestra todos os serviços obrigatórios:
 
 - `sqlserver`: imagem oficial 2022 Developer, volumes persistentes e senha parametrizável.
+- `sqlserver-init`: serviço de inicialização que cria o banco `fleetcore` executando `docker/sqlserver/init.sql`.
 - `redis`: modo append-only, usado para cache e sessões.
 - `mongo`: armazenamento da trilha de auditoria.
 - `rabbitmq`: broker com dashboard (`15672`).
@@ -15,24 +16,24 @@ Arquivo `docker-compose.yml` orquestra todos os serviços obrigatórios:
 
 ## Variáveis de ambiente
 
-- `.env.example` na raiz — consolida chaves compartilhadas entre backend e frontend (ex.: `SQLSERVER_*`, `JWT_SECRET`, `NEXT_PUBLIC_*`).
-- `backend/.env.sample` e `frontend/.env.sample` — variantes para execução isolada.
-- Novos parâmetros relevantes: `AUTH_SESSION_TTL_SECONDS`, `NEXT_PUBLIC_START_THEME`.
+- Existe um **único `.env` na raiz**, copiado de `envexample.txt` — consolida as chaves compartilhadas entre backend e frontend (ex.: `SQLSERVER_*`, `JWT_SECRET`, `NEXT_PUBLIC_*`).
+- Há também um `backend/envexample.txt` para execução isolada do backend.
+- Novos parâmetros relevantes: `AUTH_SESSION_TTL_SECONDS`, `NEXT_PUBLIC_START_THEME`, `REDIS_TTL_SECONDS`.
 
 ## Scripts úteis
 
 | Comando | Descrição |
 |---------|-----------|
 | `npm run build` / `npm run start:prod` (backend) | Builda e sobe a API em modo produção.
-| `npm run generate:openapi` | Gera artefatos Swagger (JSON) para consumo externo.
+| `npm run generate:openapi` | Gera artefatos Swagger (JSON) para consumo externo. O Swagger também é servido em `/docs` (EN) e `/docs-pt` (PT) com tema escuro Fleetcore, exemplos bilíngues, Try-it-out e login pré-preenchido.
 | `npm run export:schemas` | Exporta schemas Zod do backend para o frontend.
 | `npm run dev` (frontend) | Roda Next.js com HMR e integração com API local.
 | `npm run lint`, `npm test`, `npm run test:e2e` | Pipelines de qualidade para ambos os projetos.
 
 ## Documentação (GitPageDocs)
 
-- A pasta `gitpagedocs/` disponibiliza esta Wiki. O build é estático e pode ser publicado via GitHub Pages (`https://vidigal-code.github.io/fleetcore-api/`).
-- Configurações atualizadas para refletir o desafio (idiomas PT/EN, rotas personalizadas, sem dependência de áudio/vídeo externos).
+- A pasta `gitpagedocs/` disponibiliza esta Wiki. O build é estático e é publicado no GitHub Pages pelo workflow `.github/workflows/gitpagedocs-pages.yml` (não há `package.json` na raiz nem script `npm run gitpagedocs`). Publicado em `https://vidigal-code.github.io/fleetcore-api/`.
+- Configurações atualizadas para refletir o desafio (idiomas PT/EN, rotas personalizadas).
 
 ## Observabilidade e logs
 
@@ -42,7 +43,7 @@ Arquivo `docker-compose.yml` orquestra todos os serviços obrigatórios:
 
 ## Deploy recomendado
 
-1. Duplicar `.env.example` para `.env` e ajustar segredos.
+1. Copiar `envexample.txt` para `.env` na raiz e ajustar segredos.
 2. Executar `docker compose up --build`.
 3. Acessar `http://localhost:3000/api` (backend), `http://localhost:3000/docs` (Swagger EN), `http://localhost:3000/docs-pt` (Swagger PT-BR) e `http://localhost:3001` (frontend).
 4. RabbitMQ UI disponível em `http://localhost:15672` (user `guest`).

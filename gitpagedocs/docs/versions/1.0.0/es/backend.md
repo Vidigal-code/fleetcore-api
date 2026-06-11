@@ -6,7 +6,7 @@ Referencia rápida de la API NestJS, sus reglas de negocio y mecanismos de sopor
 
 - CRUD de marcas, modelos y vehículos en `fleet/interfaces/http`.
 - Rutas de autenticación (`/auth/login`, `/auth/register`, `/auth/logout`, `/auth/me`).
-- Swagger disponible en `/docs` (EN) y `/docs-pt` (PT-BR).
+- Swagger disponible en `/docs` (EN) y `/docs-pt` (PT-BR), con tema oscuro de la identidad Fleetcore, "Try it out" habilitado, ejemplos bilingües (PT/EN) en cada DTO y el cuerpo de `POST /auth/login` precargado con las credenciales seed (`aivacol` / `aivacol123!`).
 
 ## Reglas de negocio
 

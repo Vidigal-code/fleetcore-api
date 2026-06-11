@@ -10,7 +10,7 @@ Entregar uma solução completa (backend, frontend, infraestrutura e documentaç
 
 - **Arquitetura** — módulos, camadas e entidades disponíveis nas seções Arquitetura Backend e Modelagem de Dados do menu principal.
 - **Segurança e observabilidade** — estratégias de RBAC, auditoria e RabbitMQ centralizadas na seção Segurança, Auditoria e Mensageria.
-- **Experiência digital** — padrão FSD, temas laranja e fluxo de dados descritos na área Frontend e Experiência.
+- **Experiência digital** — padrão FSD, tema amarelo (claro/escuro) e fluxo de dados descritos na área Frontend e Experiência.
 - **Qualidade operacional** — rotinas de QA e troubleshooting detalhadas nas seções Qualidade e Testes e Guia de Execução.
 
 ## Resultado alcançado

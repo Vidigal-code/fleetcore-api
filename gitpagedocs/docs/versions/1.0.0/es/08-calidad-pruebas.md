@@ -5,7 +5,7 @@ Las puertas de calidad automatizadas eran un requisito central. La solución ofr
 ## Backend (Jest)
 
 - **Pruebas unitarias** (`backend/tests/unit`) cubren servicios de flota, flujos de auth, lógica de auditoría, feature toggles y repositorios usando colaboradores mockeados.
-- **Integración / e2e** (`backend/tests/e2e`) ejecuta sobre SQLite en memoria, validando flujos HTTP reales para vehículos y seguridad.
+- **Integración** valida la búsqueda y el orden de vehículos; **e2e** (`backend/tests/e2e`) ejecuta flujos HTTP reales de vehículos y seguridad.
 - **Comandos**:
   - `npm run lint`
   - `npm test`
@@ -14,8 +14,8 @@ Las puertas de calidad automatizadas eran un requisito central. La solución ofr
 
 ## Frontend (Jest + Playwright)
 
-- **Pruebas unitarias** (`frontend/tests/unit`) verifican reducers de Redux y hooks críticos.
-- **Playwright e2e** (`frontend/tests/e2e`) asegura la página de login y el comportamiento del shell principal.
+- **Pruebas unitarias** (`frontend/tests/unit`) cubren el slice de `auth`, el `ConfirmDialog` y el `SelectField`. El `testMatch` de Jest acepta `.spec.ts` y `.spec.tsx`.
+- **Playwright e2e** (`frontend/tests/e2e`) asegura la página de login.
 - **Comandos**:
   - `npm run lint`
   - `npm test`

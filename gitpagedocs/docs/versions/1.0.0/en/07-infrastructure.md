@@ -7,6 +7,7 @@ The repository ships with everything needed to run the platform locally or in CI
 `docker-compose.yml` provisions the full stack:
 
 - `sqlserver` — Microsoft SQL Server 2022 Developer edition with persistent volume and credentials from `SQLSERVER_*` env vars.
+- `sqlserver-init` — one-shot init job that creates the `fleetcore` database via `docker/sqlserver/init.sql`.
 - `redis` — Redis 7 in append-only mode to store sessions and cached queries.
 - `mongo` — MongoDB for the audit fallback worker.
 - `rabbitmq` — RabbitMQ with management UI exposed on `15672`.
@@ -15,8 +16,8 @@ The repository ships with everything needed to run the platform locally or in CI
 
 ## Environment configuration
 
-- Copy `.env.example` → `.env` to run the compose stack; it exposes shared variables for both apps (SQL Server, Redis, RabbitMQ, Mongo, JWT, feature flags, theme settings).
-- `backend/.env.sample` and `frontend/.env.sample` target standalone execution without Docker.
+- Copy `envexample.txt` → `.env` (a single root `.env`) to run the compose stack; it exposes shared variables for both apps (SQL Server, Redis, RabbitMQ, Mongo, JWT, feature flags, theme settings).
+- A `backend/envexample.txt` also exists for standalone backend execution without Docker.
 - Key variables:
   - `AUTH_SESSION_TTL_SECONDS`, `JWT_SECRET`, `FEATURE_FLAGS_*` control security behaviour.
   - `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME` configure the frontend runtime.
@@ -27,17 +28,16 @@ The repository ships with everything needed to run the platform locally or in CI
 | Command | Location | Purpose |
 |---------|----------|---------|
 | `npm run start:dev` / `npm run start:prod` | `backend/` | Run Nest API (watch or production). |
-| `npm run generate:openapi` | `backend/` | Rebuild Swagger JSON/PT-BR docs. |
+| `npm run generate:openapi` | `backend/` | Rebuild the branded bilingual Swagger docs (`/docs` en-US, `/docs-pt` pt-BR). |
 | `npm run export:schemas` | `backend/` | Export Zod schemas to `frontend/src/shared/schemas`. |
 | `npm run lint`, `npm test`, `npm run test:e2e` | `backend/` | Lint, unit/integration tests, e2e tests with SuperTest. |
 | `npm run dev`, `npm run build`, `npm start` | `frontend/` | Next.js development and production builds. |
-| `npm run test`, `npm run test:e2e` | `frontend/` | Unit tests (RTL) and Playwright scenarios. |
-| `npm run gitpagedocs` | repo root | Build the static documentation site under `gitpagedocs/.output`. |
+| `npm run test`, `npm run test:e2e` | `frontend/` | Unit tests (RTL) and the Playwright login spec. |
 
 ## Documentation pipeline
 
-- GitPagedocs configuration lives under `gitpagedocs/`; multilingual content is stored in `docs/versions/1.0.0/{pt,en,es}`.
-- Deploy by pushing to GitHub Pages (`https://vidigal-code.github.io/fleetcore-api/`) or serving the generated static files.
+- GitPageDocs configuration lives under `gitpagedocs/`; multilingual content is stored in `docs/versions/1.0.0/{pt,en,es}`.
+- There is no root `package.json`: the docs site is built and published to GitHub Pages by the GitHub Actions workflow `.github/workflows/gitpagedocs-pages.yml`, live at `https://vidigal-code.github.io/fleetcore-api/`.
 
 ## Observability hooks
 

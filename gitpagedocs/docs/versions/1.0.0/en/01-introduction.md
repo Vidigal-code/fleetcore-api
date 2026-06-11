@@ -3,9 +3,9 @@
 The Aivacol fleet-management challenge asks for a production-ready platform that spans backend services, a web client, asynchronous integrations and complete documentation. The `fleetcore-api` repository fulfils the brief with:
 
 - **Backend**: NestJS 11, TypeORM (SQL Server), Redis cache, RabbitMQ messaging and MongoDB audit trail.
-- **Frontend**: Next.js 14 (App Router) structured with the Feature-Sliced Design pattern, Redux Toolkit and React Query.
-- **Infrastructure**: Docker Compose for all dependencies, seed data, npm scripts and environment blueprints.
-- **Quality & Ops**: Automated tests, resilience policies, Swagger PT/EN, bilingual GitPageDocs.
+- **Frontend**: Next.js 16 (App Router) with React 19, structured with the Feature-Sliced Design pattern, Redux Toolkit and React Query.
+- **Infrastructure**: Docker Compose for all dependencies, seed data, npm scripts and a single root environment blueprint (`envexample.txt`).
+- **Quality & Ops**: Automated tests, resilience policies, branded bilingual Swagger (`/docs` EN, `/docs-pt` PT), GitHub Pages documentation.
 
 ## Deliverables at a glance
 
@@ -14,8 +14,8 @@ The Aivacol fleet-management challenge asks for a production-ready platform that
 | REST API | CRUD for brands, models and vehicles, auth/session management, audit worker | `backend/src/modules`, `backend/src/apps` |
 | Messaging & audit | RabbitMQ publisher/consumer, MongoDB audit writer, resilience wrappers | `backend/src/modules/messaging`, `backend/src/modules/audit` |
 | Web client | FSD layout, authentication shell, fleet dashboards, shared schemas | `frontend/src/app`, `frontend/src/{entities,features,processes,widgets,shared}` |
-| Docs & tooling | GitPagedocs site, Swagger builders, schema export scripts | `gitpagedocs/`, `backend/package.json` scripts |
-| Infrastructure | Compose stack, runtime envs, seed dataset | `docker-compose.yml`, `.env.example`, `backend/src/apps/api/app-bootstrap.service.ts`, `backend/seeds` |
+| Docs & tooling | GitPageDocs site (published to GitHub Pages), Swagger builders, schema export scripts | `gitpagedocs/`, `.github/workflows/gitpagedocs-pages.yml`, `backend/package.json` scripts |
+| Infrastructure | Compose stack, runtime envs, seed dataset | `docker-compose.yml`, `envexample.txt`, `backend/src/apps/api/app-bootstrap.service.ts`, `backend/seeds` |
 
 ## Repository structure (excerpt)
 
