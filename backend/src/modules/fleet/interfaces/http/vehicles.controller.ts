@@ -9,12 +9,7 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiQuery,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { CurrentUser } from '../../../auth/decorators/current-user.decorator';
 import { Roles } from '../../../auth/decorators/roles.decorator';
@@ -34,22 +29,7 @@ export class VehiclesController {
   constructor(private readonly vehiclesService: VehiclesService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Search Vehicles' })
-  @ApiQuery({
-    name: 'licensePlate',
-    required: false,
-    description: 'Filter by license plate (partial match).',
-  })
-  @ApiQuery({
-    name: 'modelId',
-    required: false,
-    description: 'Filter by model identifier.',
-  })
-  @ApiQuery({
-    name: 'brandId',
-    required: false,
-    description: 'Filter by brand identifier.',
-  })
+  @ApiOperation({ summary: 'Buscar veículos / Search vehicles' })
   async search(@Query() query: QueryVehiclesDto) {
     const result = await this.vehiclesService.search(query);
     return {
@@ -59,7 +39,7 @@ export class VehiclesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Retrieve Vehicle by id' })
+  @ApiOperation({ summary: 'Buscar veículo por ID / Retrieve vehicle by id' })
   async find(@Param('id') id: string) {
     const vehicle = await this.vehiclesService.findById(id);
     if (!vehicle) {
@@ -70,7 +50,7 @@ export class VehiclesController {
 
   @Roles(UserRole.Admin)
   @Post()
-  @ApiOperation({ summary: 'Create Vehicle' })
+  @ApiOperation({ summary: 'Cadastrar veículo / Create vehicle' })
   async create(@Body() dto: CreateVehicleDto, @CurrentUser() user: JwtPayload) {
     const vehicle = await this.vehiclesService.create(dto, resolveActor(user));
     return toVehicleResponse(vehicle);
@@ -78,7 +58,7 @@ export class VehiclesController {
 
   @Roles(UserRole.Admin)
   @Patch(':id')
-  @ApiOperation({ summary: 'Update Vehicle' })
+  @ApiOperation({ summary: 'Atualizar veículo / Update vehicle' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateVehicleDto,
@@ -94,7 +74,7 @@ export class VehiclesController {
 
   @Roles(UserRole.Admin)
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete Vehicle' })
+  @ApiOperation({ summary: 'Remover veículo / Delete vehicle' })
   remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.vehiclesService.remove(id, resolveActor(user));
   }
