@@ -30,7 +30,9 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  @ApiOperation({ summary: 'Authenticate user and issue JWT token.' })
+  @ApiOperation({
+    summary: 'Autenticar e emitir token JWT / Authenticate and issue JWT token',
+  })
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
@@ -38,7 +40,10 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Return the current authenticated user profile.' })
+  @ApiOperation({
+    summary:
+      'Perfil do usuário autenticado / Current authenticated user profile',
+  })
   async me(@CurrentUser() user: JwtPayload | undefined) {
     if (!user) {
       throw new NotFoundException('User context not found');
@@ -58,7 +63,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  @ApiOperation({ summary: 'Register a new user account.' })
+  @ApiOperation({ summary: 'Registrar novo usuário / Register a new user' })
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
@@ -66,7 +71,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('update/password')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update the current user password.' })
+  @ApiOperation({ summary: 'Atualizar senha / Update current user password' })
   async updatePassword(
     @CurrentUser() user: JwtPayload | undefined,
     @Body() dto: UpdatePasswordDto,
@@ -81,7 +86,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('update/profile')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update the current user profile.' })
+  @ApiOperation({ summary: 'Atualizar perfil / Update current user profile' })
   async updateProfile(
     @CurrentUser() user: JwtPayload | undefined,
     @Body() dto: UpdateProfileDto,
@@ -96,7 +101,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Invalidate the current session.' })
+  @ApiOperation({ summary: 'Encerrar sessão / Invalidate current session' })
   async logout(@CurrentUser() user: JwtPayload | undefined) {
     if (!user?.sessionId) {
       throw new UnauthorizedException('Invalid session context');

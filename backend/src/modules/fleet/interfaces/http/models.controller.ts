@@ -33,11 +33,13 @@ export class ModelsController {
   constructor(private readonly modelsService: ModelsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List Models' })
+  @ApiOperation({ summary: 'Listar modelos / List models' })
   @ApiQuery({
     name: 'brandId',
     required: false,
-    description: 'Filter models by brand identifier.',
+    description:
+      'Filtra modelos pela marca (UUID). / Filter models by brand identifier (UUID).',
+    example: 'b2c3d4e5-6f70-4812-9a3b-4c5d6e7f8a9b',
   })
   async list(@Query('brandId') brandId?: string) {
     const models = brandId
@@ -48,7 +50,7 @@ export class ModelsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Retrieve Model by id' })
+  @ApiOperation({ summary: 'Buscar modelo por ID / Retrieve model by id' })
   async find(@Param('id') id: string) {
     const model = await this.modelsService.findById(id);
     if (!model) {
@@ -59,7 +61,7 @@ export class ModelsController {
 
   @Roles(UserRole.Admin)
   @Post()
-  @ApiOperation({ summary: 'Create Model' })
+  @ApiOperation({ summary: 'Cadastrar modelo / Create model' })
   async create(@Body() dto: CreateModelDto, @CurrentUser() user: JwtPayload) {
     const model = await this.modelsService.create(dto, resolveActor(user));
     return toModelResponse(model);
@@ -67,7 +69,7 @@ export class ModelsController {
 
   @Roles(UserRole.Admin)
   @Patch(':id')
-  @ApiOperation({ summary: 'Update Model' })
+  @ApiOperation({ summary: 'Atualizar modelo / Update model' })
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateModelDto,
@@ -79,7 +81,7 @@ export class ModelsController {
 
   @Roles(UserRole.Admin)
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete Model' })
+  @ApiOperation({ summary: 'Remover modelo / Delete model' })
   remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.modelsService.remove(id, resolveActor(user));
   }
