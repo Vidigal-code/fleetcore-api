@@ -3,7 +3,6 @@
 import { Moon, Sun } from 'lucide-react';
 
 import { useTheme } from '@/processes/app/providers/theme-provider';
-import { Button } from '@/shared/ui/button';
 
 export const ThemeToggle = () => {
   const { theme, toggleTheme, isReady } = useTheme();
@@ -13,20 +12,17 @@ export const ThemeToggle = () => {
   }
 
   const isDark = theme === 'dark';
+  const label = isDark ? 'Ativar modo claro' : 'Ativar modo escuro';
 
   return (
-    <Button
+    <button
       type="button"
-      variant="ghost"
-      size="sm"
       onClick={toggleTheme}
-      aria-label={isDark ? 'Ativar modo claro' : 'Ativar modo escuro'}
-      icon={isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-      className="gap-2 rounded-full border border-border/50 bg-surface/60 px-3 py-1.5 text-foreground hover:border-accent/60 hover:bg-accent/10"
+      aria-label={label}
+      title={label}
+      className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border/50 bg-surface/60 text-foreground shadow-sm transition-colors duration-base ease-subtle hover:border-accent/60 hover:bg-accent/10 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
-      <span className="text-xs font-semibold uppercase tracking-[0.16em] text-muted sm:inline">
-        {isDark ? 'Claro' : 'Escuro'}
-      </span>
-    </Button>
+      {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+    </button>
   );
 };

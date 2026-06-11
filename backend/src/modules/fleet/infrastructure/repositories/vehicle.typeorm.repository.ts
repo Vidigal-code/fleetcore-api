@@ -52,24 +52,25 @@ export class VehicleTypeOrmRepository implements VehicleRepository {
   }
 
   async search(filters: VehicleSearchFilters): Promise<VehicleSearchResult> {
-    const baseQb = this.repository
+    const qb = this.repository
       .createQueryBuilder('vehicle')
-      .leftJoin('vehicle.model', 'model');
+      .leftJoin('vehicle.model', 'model')
+      .orderBy('vehicle.license_plate', 'ASC');
 
     if (filters.licensePlate) {
-      baseQb.andWhere('vehicle.license_plate LIKE :license', {
+      qb.andWhere('vehicle.license_plate LIKE :license', {
         license: `%${filters.licensePlate}%`,
       });
     }
 
     if (filters.modelId) {
-      baseQb.andWhere('vehicle.model_id = :modelId', {
+      qb.andWhere('vehicle.model_id = :modelId', {
         modelId: filters.modelId,
       });
     }
 
     if (filters.brandId) {
-      baseQb.andWhere('model.brand_id = :brandId', {
+      qb.andWhere('model.brand_id = :brandId', {
         brandId: filters.brandId,
       });
     }
@@ -77,14 +78,9 @@ export class VehicleTypeOrmRepository implements VehicleRepository {
     const page = filters.page ?? 1;
     const limit = filters.limit ?? 20;
 
-    const pagedQb = baseQb.clone();
-    pagedQb.orderBy('vehicle.license_plate', 'ASC');
-    pagedQb.skip((page - 1) * limit).take(limit);
+    qb.skip((page - 1) * limit).take(limit);
 
-    const [entities, total] = await Promise.all([
-      pagedQb.getMany(),
-      baseQb.clone().getCount(),
-    ]);
+    const [entities, total] = await qb.getManyAndCount();
 
     return {
       items: entities.map((entity) => VehicleMapper.toDomain(entity)),

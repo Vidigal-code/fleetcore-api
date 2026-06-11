@@ -86,6 +86,20 @@ export class AppConfigService {
         'messaging.auditQueue',
         'fleetcore.audit',
       ),
+      connection: {
+        timeoutMs: this.configService.get<number>(
+          'messaging.connection.timeoutMs',
+          15_000,
+        ),
+        reconnectSeconds: this.configService.get<number>(
+          'messaging.connection.reconnectSeconds',
+          5,
+        ),
+        heartbeatSeconds: this.configService.get<number>(
+          'messaging.connection.heartbeatSeconds',
+          30,
+        ),
+      },
     };
   }
 

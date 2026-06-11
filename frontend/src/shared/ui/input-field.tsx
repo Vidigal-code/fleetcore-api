@@ -3,9 +3,14 @@
 import { forwardRef, InputHTMLAttributes } from 'react';
 
 import { cn } from '@/shared/lib/utils';
+import {
+  FIELD_BASE_CLASSES,
+  FIELD_ERROR_CLASSES,
+  FIELD_LABEL_TEXT_CLASSES,
+  FIELD_LABEL_WRAPPER_CLASSES,
+} from '@/shared/ui/field-styles';
 
-const baseInputClasses =
-  'w-full rounded-[1.75rem] border border-border/50 bg-surface/80 px-5 py-3.5 text-sm text-foreground shadow-[0_14px_38px_rgba(15,23,42,0.12)] backdrop-blur focus:border-accent/60 focus:outline-none focus:ring-2 focus:ring-accent/40 focus:ring-offset-2 focus:ring-offset-background placeholder:text-muted transition-all duration-base ease-subtle hover:border-accent/40 hover:shadow-[0_18px_46px_rgba(15,23,42,0.16)]';
+const baseInputClasses = cn(FIELD_BASE_CLASSES, 'placeholder:text-muted');
 
 export interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -17,19 +22,12 @@ export const InputField = forwardRef<HTMLInputElement, InputFieldProps>(
   ({ className, label, hint, error, id, ...props }, ref) => {
     const inputId = id ?? props.name;
     return (
-      <label
-        className={cn('flex flex-col items-center gap-3 text-center sm:items-start sm:text-left', className)}
-        htmlFor={inputId}
-      >
-        {label ? (
-          <span className="text-xs font-semibold uppercase tracking-[0.22em] text-muted">
-            {label}
-          </span>
-        ) : null}
+      <label className={cn(FIELD_LABEL_WRAPPER_CLASSES, className)} htmlFor={inputId}>
+        {label ? <span className={FIELD_LABEL_TEXT_CLASSES}>{label}</span> : null}
         <input
           ref={ref}
           id={inputId}
-          className={cn(baseInputClasses, error && 'border-danger/60 focus:border-danger/70 focus:ring-danger/30')}
+          className={cn(baseInputClasses, error && FIELD_ERROR_CLASSES)}
           {...props}
         />
         {error ? (

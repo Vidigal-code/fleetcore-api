@@ -17,8 +17,8 @@ import { CreateVehicleDto } from '../../../src/modules/fleet/dto/create-vehicle.
 import { RepositoryCacheService } from '../../../src/shared/cache/repository-cache.service';
 import { UnitOfWork } from '../../../src/shared/unit-of-work/unit-of-work';
 import { VehicleTypeOrmRepository } from '../../../src/modules/fleet/infrastructure/repositories/vehicle.typeorm.repository';
-import { EventBusService } from '../../../src/shared/domain/events/event-bus.service';
-import { FeatureToggleService } from '../../../src/shared/features/feature-toggle.service';
+import { EventBusService } from '../../../src/shared/domain/events';
+import { FeatureToggleService } from '../../../src/shared/features';
 import {
   VEHICLE_EVENT_CREATED,
   VEHICLE_CACHE_NAMESPACE,

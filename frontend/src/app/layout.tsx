@@ -3,6 +3,7 @@ import { Manrope, Fira_Code } from 'next/font/google';
 
 import { AppProviders } from '@/processes/app/providers/app-providers';
 import { appConfig } from '@/shared/config/env';
+import { buildThemeBootstrapScript } from '@/shared/config/theme';
 
 import './globals.css';
 
@@ -30,7 +31,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={`${primaryFont.variable} ${monoFont.variable}`}>
+    <html lang="pt-BR" className={`${primaryFont.variable} ${monoFont.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: buildThemeBootstrapScript() }} />
+      </head>
       <body>
         <AppProviders>{children}</AppProviders>
       </body>

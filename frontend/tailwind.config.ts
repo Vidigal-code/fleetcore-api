@@ -32,6 +32,7 @@ const config: Config = {
         muted: withAlpha('--color-foreground-muted'),
         accent: withAlpha('--color-accent'),
         'accent-strong': withAlpha('--color-accent-strong'),
+        'accent-foreground': withAlpha('--color-accent-foreground'),
         warning: withAlpha('--color-warning'),
         danger: withAlpha('--color-danger'),
         positive: withAlpha('--color-positive'),
@@ -39,6 +40,9 @@ const config: Config = {
       boxShadow: {
         elevated: 'var(--shadow-elevated)',
         floating: 'var(--shadow-floating)',
+        cta: 'var(--shadow-cta)',
+        input: 'var(--shadow-input)',
+        'input-hover': 'var(--shadow-input-hover)',
       },
       borderRadius: {
         xl: '1.5rem',
