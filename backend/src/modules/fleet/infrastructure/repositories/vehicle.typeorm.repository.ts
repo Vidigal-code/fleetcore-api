@@ -55,7 +55,7 @@ export class VehicleTypeOrmRepository implements VehicleRepository {
     const qb = this.repository
       .createQueryBuilder('vehicle')
       .leftJoin('vehicle.model', 'model')
-      .orderBy('vehicle.license_plate', 'ASC');
+      .orderBy('vehicle.licensePlate', 'ASC');
 
     if (filters.licensePlate) {
       qb.andWhere('vehicle.license_plate LIKE :license', {

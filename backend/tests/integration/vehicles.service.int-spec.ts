@@ -17,8 +17,10 @@ import { VehicleTypeOrmRepository } from '../../src/modules/fleet/infrastructure
 import { ModelTypeOrmRepository } from '../../src/modules/fleet/infrastructure/repositories/model.typeorm.repository';
 import { BrandTypeOrmRepository } from '../../src/modules/fleet/infrastructure/repositories/brand.typeorm.repository';
 import { AuditService } from '../../src/modules/audit/audit.service';
-import { MessagingService } from '../../src/modules/messaging/messaging.service';
 import { RedisService } from '../../src/shared/cache/redis.service';
+import { RepositoryCacheService } from '../../src/shared/cache/repository-cache.service';
+import { EventBusService } from '../../src/shared/domain/events';
+import { FeatureToggleService } from '../../src/shared/features';
 
 describe('VehiclesService (integration)', () => {
   let dataSource: DataSource;
@@ -62,13 +64,29 @@ describe('VehiclesService (integration)', () => {
           inject: [DataSource],
         },
         { provide: AuditService, useValue: { record: jest.fn() } },
-        { provide: MessagingService, useValue: { publish: jest.fn() } },
         {
           provide: RedisService,
           useValue: {
             get: jest.fn().mockResolvedValue(null),
             set: jest.fn(),
             deleteByPattern: jest.fn(),
+          },
+        },
+        {
+          // Stub que delega direto ao loader (sem Redis), garantindo que a busca
+          // real do repositorio (incluindo o orderBy) seja exercitada.
+          provide: RepositoryCacheService,
+          useValue: {
+            fetch: ({ loader }: { loader: () => Promise<unknown> }) => loader(),
+            invalidate: jest.fn(),
+          },
+        },
+        { provide: EventBusService, useValue: { publish: jest.fn() } },
+        {
+          provide: FeatureToggleService,
+          useValue: {
+            isEnabled: jest.fn().mockReturnValue(true),
+            runIfEnabled: jest.fn().mockResolvedValue(undefined),
           },
         },
         {
@@ -110,5 +128,46 @@ describe('VehiclesService (integration)', () => {
 
     expect(vehicleRecord).toBeTruthy();
     expect(vehicleRecord?.licensePlate).toBe('ABC1D23');
+  });
+
+  it('searches vehicles ordered by license plate ascending', async () => {
+    const modelRepo = dataSource.getRepository(ModelOrmEntity);
+    const model = await modelRepo.save({
+      id: 'model-1',
+      name: 'Model S',
+      brandId: null,
+      createdBy: 'tester',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    await vehiclesService.create(
+      {
+        licensePlate: 'ZZZ9Z99',
+        chassis: 'CHASSIS-Z',
+        renavam: 'RENAVAM-Z',
+        year: 2024,
+        modelId: model.id,
+      },
+      'tester',
+    );
+    await vehiclesService.create(
+      {
+        licensePlate: 'AAA1A11',
+        chassis: 'CHASSIS-A',
+        renavam: 'RENAVAM-A',
+        year: 2023,
+        modelId: model.id,
+      },
+      'tester',
+    );
+
+    const result = await vehiclesService.search({ page: 1, limit: 20 });
+
+    expect(result.total).toBe(2);
+    expect(result.items.map((vehicle) => vehicle.licensePlate)).toEqual([
+      'AAA1A11',
+      'ZZZ9Z99',
+    ]);
   });
 });

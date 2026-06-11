@@ -8,7 +8,9 @@ import type { Model } from '@/entities/model/model/types';
 import { BrandForm } from '@/features/brands/manage/ui/brand-form';
 import { ModelForm } from '@/features/models/manage/ui/model-form';
 import { Button } from '@/shared/ui/button';
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { PageSection, ResponsiveGrid, Stack, Surface } from '@/shared/ui/layout-primitives';
+import { Modal } from '@/shared/ui/modal';
 import { Pagination } from '@/shared/ui/pagination';
 
 import {
@@ -92,6 +94,7 @@ interface SectionProps {
 const BrandSection = ({ state, actions }: SectionProps) => {
   const { brands, editingBrand, brandFeedback, brandSubmitting, isLoadingBrands } = state;
   const [page, setPage] = useState(1);
+  const [pendingDelete, setPendingDelete] = useState<Brand | null>(null);
   const ITEMS_PER_PAGE = 6;
   const totalPages = Math.max(1, Math.ceil(brands.length / ITEMS_PER_PAGE));
   const safePage = Math.min(page, totalPages);
@@ -101,10 +104,15 @@ const BrandSection = ({ state, actions }: SectionProps) => {
     return brands.slice(start, start + ITEMS_PER_PAGE);
   }, [brands, safePage]);
 
-  const handleDelete = (brand: Brand) => {
-    const confirmation = window.confirm(`Remover a marca ${brand.name}?`);
-    if (!confirmation) return;
-    void actions.deleteBrand(brand.id);
+  const closeEdit = () => {
+    actions.selectBrand(null);
+    actions.resetBrandFeedback();
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    await actions.deleteBrand(pendingDelete.id);
+    setPendingDelete(null);
   };
 
   return (
@@ -116,16 +124,11 @@ const BrandSection = ({ state, actions }: SectionProps) => {
       loading={isLoadingBrands}
       form={
         <BrandForm
-          mode={editingBrand ? 'edit' : 'create'}
-          initialBrand={editingBrand}
+          mode="create"
           submitting={brandSubmitting}
-          errorMessage={brandFeedback.error}
-          successMessage={brandFeedback.success}
-          onSubmit={editingBrand ? actions.updateBrand : actions.createBrand}
-          onCancel={() => {
-            actions.selectBrand(null);
-            actions.resetBrandFeedback();
-          }}
+          errorMessage={editingBrand ? null : brandFeedback.error}
+          successMessage={editingBrand ? null : brandFeedback.success}
+          onSubmit={actions.createBrand}
         />
       }
     >
@@ -138,7 +141,7 @@ const BrandSection = ({ state, actions }: SectionProps) => {
             actions.selectBrand(brand);
             actions.resetBrandFeedback();
           }}
-          onDelete={() => handleDelete(brand)}
+          onDelete={() => setPendingDelete(brand)}
         />
       ))}
       <Pagination
@@ -147,6 +150,37 @@ const BrandSection = ({ state, actions }: SectionProps) => {
         total={brands.length}
         onPageChange={setPage}
         className="mt-4"
+      />
+
+      <Modal
+        open={Boolean(editingBrand)}
+        onClose={closeEdit}
+        title="Editar marca"
+        description="Atualize os dados da marca selecionada."
+      >
+        <BrandForm
+          mode="edit"
+          initialBrand={editingBrand}
+          submitting={brandSubmitting}
+          errorMessage={brandFeedback.error}
+          successMessage={brandFeedback.success}
+          onSubmit={actions.updateBrand}
+          onCancel={closeEdit}
+        />
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={confirmDelete}
+        loading={brandSubmitting}
+        title="Remover marca"
+        description={
+          pendingDelete
+            ? `Remover a marca "${pendingDelete.name}"? Esta ação não pode ser desfeita.`
+            : undefined
+        }
+        confirmLabel="Remover"
       />
     </ReferencePanel>
   );
@@ -166,6 +200,8 @@ const ModelSection = ({ state, actions }: SectionProps) => {
   const totalPages = Math.max(1, Math.ceil(models.length / ITEMS_PER_PAGE));
   const safePage = Math.min(page, totalPages);
 
+  const [pendingDelete, setPendingDelete] = useState<Model | null>(null);
+
   const brandMap = useMemo(() => new Map(brands.map((brand) => [brand.id, brand])), [brands]);
 
   const paginatedModels = useMemo(() => {
@@ -173,10 +209,15 @@ const ModelSection = ({ state, actions }: SectionProps) => {
     return models.slice(start, start + ITEMS_PER_PAGE);
   }, [models, safePage]);
 
-  const handleDelete = (model: Model) => {
-    const confirmation = window.confirm(`Remover o modelo ${model.name}?`);
-    if (!confirmation) return;
-    void actions.deleteModel(model.id);
+  const closeEdit = () => {
+    actions.selectModel(null);
+    actions.resetModelFeedback();
+  };
+
+  const confirmDelete = async () => {
+    if (!pendingDelete) return;
+    await actions.deleteModel(pendingDelete.id);
+    setPendingDelete(null);
   };
 
   return (
@@ -188,17 +229,12 @@ const ModelSection = ({ state, actions }: SectionProps) => {
       loading={isLoadingModels}
       form={
         <ModelForm
-          mode={editingModel ? 'edit' : 'create'}
+          mode="create"
           brands={brands}
-          initialModel={editingModel}
           submitting={modelSubmitting}
-          errorMessage={modelFeedback.error}
-          successMessage={modelFeedback.success}
-          onSubmit={editingModel ? actions.updateModel : actions.createModel}
-          onCancel={() => {
-            actions.selectModel(null);
-            actions.resetModelFeedback();
-          }}
+          errorMessage={editingModel ? null : modelFeedback.error}
+          successMessage={editingModel ? null : modelFeedback.success}
+          onSubmit={actions.createModel}
         />
       }
     >
@@ -213,7 +249,7 @@ const ModelSection = ({ state, actions }: SectionProps) => {
               actions.selectModel(model);
               actions.resetModelFeedback();
             }}
-            onDelete={() => handleDelete(model)}
+            onDelete={() => setPendingDelete(model)}
           />
         );
       })}
@@ -223,6 +259,38 @@ const ModelSection = ({ state, actions }: SectionProps) => {
         total={models.length}
         onPageChange={setPage}
         className="mt-4"
+      />
+
+      <Modal
+        open={Boolean(editingModel)}
+        onClose={closeEdit}
+        title="Editar modelo"
+        description="Atualize o modelo e a marca associada."
+      >
+        <ModelForm
+          mode="edit"
+          brands={brands}
+          initialModel={editingModel}
+          submitting={modelSubmitting}
+          errorMessage={modelFeedback.error}
+          successMessage={modelFeedback.success}
+          onSubmit={actions.updateModel}
+          onCancel={closeEdit}
+        />
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        onClose={() => setPendingDelete(null)}
+        onConfirm={confirmDelete}
+        loading={modelSubmitting}
+        title="Remover modelo"
+        description={
+          pendingDelete
+            ? `Remover o modelo "${pendingDelete.name}"? Esta ação não pode ser desfeita.`
+            : undefined
+        }
+        confirmLabel="Remover"
       />
     </ReferencePanel>
   );
