@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useMemo } from 'react';
-import { LogOut, Menu, Settings, User, X } from 'lucide-react';
+import { LogOut, Menu, User, X } from 'lucide-react';
 
 import { ThemeToggle } from '@/features/theme/toggle';
 import {
@@ -40,11 +40,10 @@ export interface MainHeaderProps {
 const BRAND_MARK_LENGTH = 2;
 const HEADER_TAGLINE = 'Operação inteligente de frotas';
 
-type AccountActionId = 'profile' | 'settings' | 'logout';
+type AccountActionId = 'profile' | 'logout';
 
 const ACCOUNT_MENU_ITEMS: DropdownItem[] = [
   { id: 'profile', label: 'Perfil', icon: <User className="h-4 w-4" /> },
-  { id: 'settings', label: 'Configurações', icon: <Settings className="h-4 w-4" /> },
   { id: 'logout', label: 'Sair', tone: 'danger', icon: <LogOut className="h-4 w-4" /> },
 ];
 
@@ -186,10 +185,6 @@ export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderPro
   const handleAccountAction = (id: AccountActionId) => {
     if (id === 'profile') {
       router.push(ROUTES.profile);
-      return;
-    }
-    if (id === 'settings') {
-      router.push(ROUTES.settings);
       return;
     }
     void logout();

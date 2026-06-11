@@ -66,6 +66,9 @@ export const updateModelSchema = createModelSchema.partial();
 
 export const modelEntitySchema = createModelSchema.extend({
   id: z.string().uuid(),
+  // A API retorna brandId: null para modelos sem marca; optional() sozinho
+  // rejeita null e quebra o parse da lista inteira. nullish() aceita null.
+  brandId: z.string().uuid().nullish(),
   createdAt: z.string().datetime({ offset: true }),
   updatedAt: z.string().datetime({ offset: true }),
   createdBy: z.string(),
