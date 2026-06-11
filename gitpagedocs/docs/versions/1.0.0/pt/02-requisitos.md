@@ -29,13 +29,13 @@ Este capítulo mapeia o checklist do desafio para os artefatos de código corres
 | Auditoria MongoDB | `AuditService` e `AuditWriterService` garantem persistência mesmo com falha de fila. |
 | Schemas compartilhados | `npm run export:schemas` exporta validações para `frontend/src/shared/schemas`. |
 | Frontend FSD | Redux (`frontend/src/processes/app/store`), React Query (`entities/*/api`), UI em `shared/ui`. |
-| Documentação | Swagger builder (`backend/src/apps/api/swagger/swagger.factory.ts`) e este GitPagedocs. |
+| Documentação | Swagger builder (`backend/src/apps/api/swagger/swagger.factory.ts`) com dois docs (`/docs` EN e `/docs-pt` PT), tema escuro com identidade Fleetcore, exemplos bilíngues, Try-it-out habilitado e login pré-preenchido; além deste GitPagedocs. |
 
 ## Evidências complementares
 
-- Swagger PT/EN acessível em `/docs-pt` e `/docs`.
-- Suites de testes em `backend/tests` e `frontend/tests` (unitários, integração, e2e).
-- Scripts reprodutíveis (`docker-compose.yml`, `npm run export:schemas`, `npm run gitpagedocs`).
+- Swagger PT/EN acessível em `/docs-pt` e `/docs`, com tema escuro Fleetcore, exemplos bilíngues, Try-it-out e corpo do `POST /auth/login` pré-preenchido com as credenciais seed.
+- Suites de testes: backend (`backend/tests`) com unitários, integração (busca/ordenação de veículos) e e2e; frontend (`frontend/tests`) com unit (auth slice, ConfirmDialog, SelectField) e e2e de login.
+- Scripts reprodutíveis (`docker-compose.yml`, `npm run export:schemas`, `npm run generate:openapi`). A documentação GitPagedocs é publicada no GitHub Pages pelo workflow `.github/workflows/gitpagedocs-pages.yml`.
 - Feature toggles (`FeatureToggleService`) para ativar/desativar cache, eventos, worker de auditoria e Swagger conforme o ambiente.
 
 Todos os itens obrigatórios e bônus do desafio possuem apontamento direto para código e scripts de execução dentro do repositório.

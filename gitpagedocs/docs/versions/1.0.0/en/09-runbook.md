@@ -49,10 +49,11 @@ Ensure SQL Server, Redis, RabbitMQ and MongoDB services are reachable (local or 
 
 ## 4. Maintenance commands
 
-- `npm run generate:openapi` — regenerate Swagger specs.
+- `npm run generate:openapi` — regenerate the branded bilingual Swagger specs.
 - `npm run export:schemas` — synchronise backend validation with the frontend.
 - `npm run lint`, `npm test`, `npm run test:e2e` — execute quality gates.
-- `npm run gitpagedocs` — rebuild this documentation site.
+
+> The documentation site is rebuilt and published to GitHub Pages automatically by the `.github/workflows/gitpagedocs-pages.yml` workflow — there is no root `npm` script for it.
 
 ## 5. Troubleshooting matrix
 

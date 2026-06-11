@@ -6,7 +6,7 @@ El assessment técnico de **Aivacol** exige una plataforma completa de gestión 
 
 - Exponer APIs REST confiables para crear, leer, actualizar y eliminar **modelos**, **vehículos** y **marcas**.
 - Garantizar **seguridad empresarial** (JWT, RBAC, auditoría, traza en MongoDB y mensajería RabbitMQ).
-- Ofrecer un **frontend** responsivo construido con el patrón FSD, Redux Toolkit, React Query, Axios y temas configurables.
+- Ofrecer un **frontend** responsivo construido con el patrón FSD, Redux Toolkit, React Query, Axios y un tema claro/oscuro **amarillo** configurable.
 - Empaquetar todo con **Docker Compose**, scripts de automatización, pruebas Jest/Playwright y documentación bilingüe.
 
 ## Bloques principales
@@ -16,8 +16,8 @@ El assessment técnico de **Aivacol** exige una plataforma completa de gestión 
 | Backend API | NestJS 11 + TypeORM (SQL Server), DDD, Unit of Work, eventos de dominio, caché Redis | `backend/src/modules`, `backend/src/shared`, `backend/src/migrations` |
 | Mensajería y Auditoría | RabbitMQ para eventos de flota, MongoDB para la traza de auditoría | `backend/src/modules/messaging`, `backend/src/modules/audit` |
 | Seguridad | JWT con RBAC, sesiones respaldadas en Redis, interceptor de auditoría, sanitización de entrada | `backend/src/modules/auth`, `backend/src/apps/api/security` |
-| Frontend | Next.js 14 (App Router), FSD, Redux Toolkit, React Query, doble tema naranja | `frontend/src/app`, `frontend/src/{entities,features,processes,shared,widgets}` |
-| Infraestructura | Docker Compose (SQL Server, Redis, RabbitMQ, Mongo, API, frontend), scripts npm | `docker-compose.yml`, `.env.example`, `backend/.env.sample`, `frontend/.env.sample` |
+| Frontend | Next.js 16 (App Router), React 19, FSD, Redux Toolkit, React Query, doble tema amarillo claro/oscuro | `frontend/src/app`, `frontend/src/{entities,features,processes,shared,widgets}` |
+| Infraestructura | Docker Compose (SQL Server + init, Redis, RabbitMQ, Mongo, API, frontend), Dockerfiles multietapa | `docker-compose.yml`, `envexample.txt` (env único en la raíz), `backend/envexample.txt` |
 | Calidad | Pruebas unitarias/de integración/e2e, linting, documentación en GitHub Pages | `backend/tests`, `frontend/tests`, `gitpagedocs/` |
 
 ## Estructura de la documentación
@@ -29,7 +29,7 @@ Esta wiki se divide en nueve capítulos que cubren todo el desafío:
 3. **Arquitectura Backend** – módulos, patrones, flujo de datos y resiliencia.
 4. **Modelado de Datos y Dominio** – entidades, migraciones y agregados.
 5. **Seguridad, Auditoría y Mensajería** – mecanismos de protección y observabilidad.
-6. **Frontend y Experiencia** – estructura FSD, flujo de datos en el cliente y UI naranja responsiva.
+6. **Frontend y Experiencia** – estructura FSD, flujo de datos en el cliente y UI amarilla responsiva.
 7. **Infraestructura y Despliegue** – Docker, variables de entorno, scripts y documentación.
 8. **Calidad y Pruebas** – suites unitarias/integración/e2e, linting y puertas de calidad.
 9. **Runbook y Resolución de Problemas** – cómo ejecutar el proyecto y manejar fallas.

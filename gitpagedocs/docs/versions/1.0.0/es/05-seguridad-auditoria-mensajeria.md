@@ -10,15 +10,15 @@ La seguridad y la observabilidad se trataron como preocupaciones de primera clas
 
 ## Traza de auditoría en MongoDB
 
-- `AuditInterceptor` captura cada par petición/respuesta privada y asigna un `correlationId`.
-- `AuditService` publica payloads en la cola `audit.event`; si falla, recurre a `AuditWriterService`, persistiendo directamente en MongoDB.
+- El interceptor HTTP de auditoría captura cada par petición/respuesta privada y asigna un `correlationId`.
+- `AuditService` publica payloads en RabbitMQ (`audit.event`); el proceso `apps/audit-worker` (consumidor asíncrono) persiste los documentos en la colección `audit_events` de MongoDB vía Mongoose. Si la publicación falla, existe un fallback síncrono que escribe directamente en MongoDB.
 - Los esquemas viven en `backend/src/modules/audit/schemas`, manteniendo el log de auditoría consultable.
 
 ## Mensajería RabbitMQ
 
 - `FleetDomainEventListener` escucha eventos de dominio y los reenvía al exchange tópico `fleetcore.events` con claves como `vehicle.created`.
-- `MessagingService` envuelve `AmqpConnection` con políticas de reintento y circuit breaker (impulsadas por `ResilienceService`).
-- `VehicleEventsConsumer` demuestra el consumo y logging de esos eventos, sirviendo como plano para servicios downstream.
+- La integración de mensajería usa `@golevelup/nestjs-rabbitmq` sobre un exchange topic (`RABBITMQ_EXCHANGE=fleetcore.events`) con políticas de reintento y circuit breaker (cockatiel, impulsadas por `ResilienceService`).
+- Los consumidores `vehicle-events` y `audit-events` demuestran el consumo y logging de esos eventos, sirviendo como plano para servicios downstream.
 
 ## Logging y métricas
 

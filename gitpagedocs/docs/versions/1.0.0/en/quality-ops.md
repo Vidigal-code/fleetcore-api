@@ -5,8 +5,8 @@ Condensed view of the automation and operational routines that keep the solution
 ## Quality
 
 - `npm run lint`, `npm test`, `npm run test:e2e` gate backend and frontend changes.
-- Jest covers services, guards and integration flows.
-- Playwright validates mission-critical UI scenarios.
+- Jest covers backend services, guards and integration flows (incl. vehicle search/ordering), plus frontend units (auth slice, ConfirmDialog, SelectField).
+- Playwright validates the login flow.
 
 ## Operations
 

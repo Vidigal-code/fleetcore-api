@@ -5,7 +5,8 @@ Garantir cobertura automatizada foi requisito explícito do desafio. A solução
 ## Backend (Jest)
 
 - **Unitários** (`backend/tests/unit`) cobrem serviços de frota, auth, auditoria, toggles e repos, simulando dependências com `jest.fn()`.
-- **Integração / e2e** (`backend/tests/e2e`) utilizam SQLite in-memory para validar fluxos reais de veículos (criação/listagem) e segurança.
+- **Integração** (`backend/tests/integration`) valida a busca e a ordenação de veículos contra SQLite in-memory.
+- **E2E** (`backend/tests/e2e`) utiliza SQLite in-memory para validar fluxos reais de veículos (criação/listagem) e segurança.
 - **Comandos**:
   - `npm run lint`
   - `npm test`
@@ -14,8 +15,8 @@ Garantir cobertura automatizada foi requisito explícito do desafio. A solução
 
 ## Frontend (Jest + Playwright)
 
-- **Unitários** (`frontend/tests/unit`) validam reducers Redux e hooks críticos.
-- **E2E** (`frontend/tests/e2e`) com Playwright asseguram renderização da tela de login e interações básicas.
+- **Unitários** (`frontend/tests/unit`) validam o auth slice (Redux), o `ConfirmDialog` e o `SelectField`. O `testMatch` do Jest aceita `.spec.ts` e `.spec.tsx`.
+- **E2E** (`frontend/tests/e2e`) com Playwright asseguram o fluxo de login.
 - **Comandos**:
   - `npm run lint`
   - `npm test`
