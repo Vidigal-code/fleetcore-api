@@ -27,11 +27,18 @@ export interface JwtConfig {
   readonly expiresIn: string;
 }
 
+export interface MessagingConnectionConfig {
+  readonly timeoutMs: number;
+  readonly reconnectSeconds: number;
+  readonly heartbeatSeconds: number;
+}
+
 export interface MessagingConfig {
   readonly uri: string;
   readonly exchange: string;
   readonly queue: string;
   readonly auditQueue: string;
+  readonly connection: MessagingConnectionConfig;
 }
 
 export interface AuditConfig {

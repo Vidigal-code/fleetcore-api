@@ -15,7 +15,7 @@ import { SharedModule } from '../../shared/shared.module';
     RabbitMQModule.forRootAsync({
       inject: [AppConfigService],
       useFactory: (configService: AppConfigService): RabbitMQConfig => {
-        const { uri, exchange } = configService.messaging;
+        const { uri, exchange, connection } = configService.messaging;
 
         return {
           uri,
@@ -25,6 +25,14 @@ import { SharedModule } from '../../shared/shared.module';
               type: 'topic',
             },
           ],
+          connectionInitOptions: {
+            wait: true,
+            timeout: connection.timeoutMs,
+          },
+          connectionManagerOptions: {
+            reconnectTimeInSeconds: connection.reconnectSeconds,
+            heartbeatIntervalInSeconds: connection.heartbeatSeconds,
+          },
         } satisfies RabbitMQConfig;
       },
     }),

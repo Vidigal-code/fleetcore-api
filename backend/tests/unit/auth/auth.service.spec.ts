@@ -1,6 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 
 import { AuthService } from '../../../src/modules/auth/application/auth.service';
 import { AuthSessionService } from '../../../src/modules/auth/application/auth-session.service';

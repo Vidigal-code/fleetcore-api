@@ -8,7 +8,7 @@ describe('FeatureToggleService', () => {
     [FeatureFlagKey, boolean | undefined]
   >();
   const appConfigMock = {
-      getFeatureFlag: getFeatureFlagMock,
+    getFeatureFlag: getFeatureFlagMock,
   } as unknown as AppConfigService;
 
   const service = new FeatureToggleService(appConfigMock);

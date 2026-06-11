@@ -44,6 +44,19 @@ export const getNavLinkClassName = ({
   );
 };
 
+/**
+ * Estilo do item de navegacao do menu mobile. O item ativo recebe uma cor de
+ * marcacao (fundo + borda + texto em accent) em vez de uma linha/sublinhado,
+ * melhorando a legibilidade do estado selecionado em telas pequenas.
+ */
+export const getMobileNavItemClassName = ({ active }: { active: boolean }) =>
+  cn(
+    'flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-sm font-semibold uppercase tracking-[0.2em] shadow-sm transition-colors duration-base ease-subtle',
+    active
+      ? 'border-accent/70 bg-accent/15 text-accent'
+      : 'border-border/60 bg-surface/80 text-foreground hover:border-accent/50 hover:bg-accent/10 hover:text-accent',
+  );
+
 export const createPathMatcher = (pathname: string) => {
   const trimmed = pathname.replace(/\/+$/, '') || '/';
 

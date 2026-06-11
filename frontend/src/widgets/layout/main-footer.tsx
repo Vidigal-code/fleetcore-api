@@ -11,6 +11,7 @@ import { selectIsAuthenticated } from '@/processes/auth/model/auth-selectors';
 import { appConfig } from '@/shared/config/env';
 import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/lib/utils';
+import { CtaLink } from '@/shared/ui/cta-link';
 import {
   createPathMatcher,
   getAriaCurrent,
@@ -41,9 +42,9 @@ const FooterBrand = ({
   ctaHref: string;
   ctaLabel: string;
 }) => (
-  <div className="flex flex-col gap-6">
-    <div className="flex items-center gap-3">
-      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/15 text-accent shadow-inner shadow-accent/15">
+  <div className="flex flex-col items-center gap-6 text-center lg:items-start lg:text-left">
+    <div className="flex flex-col items-center gap-3 sm:flex-row sm:text-left">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent/15 text-accent shadow-inner shadow-accent/15">
         <span className="text-sm font-black tracking-[0.28em]">{monogram}</span>
       </span>
       <div className="flex flex-col leading-tight">
@@ -54,12 +55,9 @@ const FooterBrand = ({
       </div>
     </div>
     <p className="max-w-md text-sm text-muted">{FOOTER_HERO_BODY}</p>
-    <Link
-      href={ctaHref}
-      className="inline-flex w-fit items-center justify-center rounded-full border border-accent/50 bg-accent px-6 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-background shadow-[0_12px_32px_rgba(229,166,19,0.35)] transition hover:-translate-y-0.5 hover:bg-accent-strong"
-    >
+    <CtaLink href={ctaHref} className="w-fit">
       {ctaLabel}
-    </Link>
+    </CtaLink>
   </div>
 );
 
@@ -72,9 +70,9 @@ const FooterGroupColumn = ({
   links: NavigationGroup['links'];
   isActive: (href: string) => boolean;
 }) => (
-  <div className="space-y-3">
+  <div className="flex flex-col items-center gap-3 text-center lg:items-start lg:text-left">
     <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-muted">{label}</h3>
-    <ul className="space-y-2.5">
+    <ul className="flex flex-col items-center gap-2.5 lg:items-start">
       {links.map((link) => {
         const active = isActive(link.href);
         const { href, target, rel } = getLinkAttributes(link);
@@ -103,7 +101,7 @@ const FooterNavigation = ({
   isActive: (href: string) => boolean;
   groups: NavigationGroup[];
 }) => (
-  <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+  <div className="flex w-full flex-col items-center gap-10 lg:grid lg:w-auto lg:grid-cols-3 lg:items-start">
     {groups.map((group) => (
       <FooterGroupColumn key={group.id} label={group.label} links={group.links} isActive={isActive} />
     ))}
@@ -142,7 +140,7 @@ export const MainFooter = () => {
 
   return (
     <footer className="border-t border-border/60 bg-surface/70 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-12 sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:px-8 xl:px-12">
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-12 px-4 py-12 text-center sm:px-6 lg:flex-row lg:items-start lg:justify-between lg:text-left lg:px-8 xl:px-12">
         <FooterBrand monogram={monogram} ctaHref={ctaHref} ctaLabel={ctaLabel} />
         <FooterNavigation isActive={isActive} groups={groups} />
       </div>

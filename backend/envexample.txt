@@ -5,16 +5,11 @@ HTTP_PORT=3000
 SQLSERVER_HOST=sqlserver
 SQLSERVER_PORT=1433
 SQLSERVER_USER=sa
-SQLSERVER_PASSWORD=YourStrong!Passw0rd
+# Important: must match the SA password provisioned in sqlserver service
+SQLSERVER_PASSWORD=Teste12345@
+# Optional: kept for legacy deployments; remove if not needed
+SQLSERVER_PASSWORD_FALLBACK=Teste12345@
 SQLSERVER_DB=fleetcore
-SQLSERVER_SERVER=sqlserver
-SQLSERVER_TCP_PORT=1433
-SQLSERVER_DATABASE=fleetcore
-SA_USER=sa
-SA_PASSWORD=YourStrong!Passw0rd
-DB_HOST=sqlserver
-DB_PORT=1433
-DB_NAME=fleetcore
 
 # Redis
 REDIS_HOST=redis
@@ -31,6 +26,9 @@ MONGO_URI=mongodb://mongo:27017/fleetcore
 
 # RabbitMQ
 RABBITMQ_URI=amqp://rabbitmq:5672
+RABBITMQ_CONNECT_TIMEOUT_MS=15000
+RABBITMQ_RECONNECT_SECONDS=5
+RABBITMQ_HEARTBEAT_SECONDS=30
 RABBITMQ_EXCHANGE=fleetcore.events
 RABBITMQ_QUEUE=fleetcore.vehicles
 RABBITMQ_AUDIT_QUEUE=fleetcore.audit

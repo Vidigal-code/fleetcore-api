@@ -15,12 +15,13 @@ import { useLogout } from '@/processes/auth/model/use-logout';
 import { appConfig } from '@/shared/config/env';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/ui/button';
+import { CtaLink } from '@/shared/ui/cta-link';
 import {
   createPathMatcher,
   getAriaCurrent,
   getBrandMonogram,
   getLinkAttributes,
-  getNavLinkClassName,
+  getMobileNavItemClassName,
 } from '@/widgets/layout/navigation-helpers';
 import { RoleBadges } from '@/widgets/layout/role-badges';
 
@@ -30,7 +31,7 @@ export interface MobileMenuProps {
 }
 
 const MOBILE_PANEL_CLASS =
-  'fixed inset-0 z-50 flex h-full flex-col bg-background/92 backdrop-blur-xl lg:hidden';
+  'fixed inset-0 z-50 flex h-full flex-col bg-background/92 backdrop-blur-xl xl:hidden';
 
 const MobileMenuHeader = ({
   appName,
@@ -41,14 +42,14 @@ const MobileMenuHeader = ({
   monogram: string;
   onClose: () => void;
 }) => (
-  <div className="flex items-center justify-between border-b border-border/50 px-6 py-5">
-    <div className="flex items-center gap-3">
-      <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/15 text-accent shadow-inner shadow-accent/15">
-        <span className="text-sm font-black tracking-[0.28em]">{monogram}</span>
+  <div className="flex items-center justify-between border-b border-border/50 px-6 py-4">
+    <div className="flex min-w-0 items-center gap-2.5">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent shadow-inner shadow-accent/15">
+        <span className="text-[0.65rem] font-black tracking-[0.2em]">{monogram}</span>
       </span>
-      <div className="flex flex-col leading-tight">
-        <span className="text-sm font-semibold text-foreground">{appName}</span>
-        <span className="text-[0.62rem] uppercase tracking-[0.26em] text-muted opacity-80">
+      <div className="flex min-w-0 flex-col leading-tight">
+        <span className="truncate text-xs font-semibold text-foreground">{appName}</span>
+        <span className="truncate text-[0.5rem] uppercase tracking-[0.2em] text-muted opacity-80">
           Menu principal
         </span>
       </div>
@@ -88,71 +89,42 @@ const MobileGuestSummary = () => (
   </div>
 );
 
-const MobilePrimaryNavigation = ({
+const MobileCategoryNavigation = ({
   isActive,
   onNavigate,
-  links,
+  categories,
 }: {
   isActive: (href: string) => boolean;
   onNavigate: () => void;
-  links: ReturnType<typeof getNavigationConfig>['primary'];
+  categories: ReturnType<typeof getNavigationConfig>['categories'];
 }) => (
-  <nav className="flex flex-col gap-3">
-    {links.map((link) => {
-      const active = isActive(link.href);
-      const { href, target, rel } = getLinkAttributes(link);
-      return (
-        <Link
-          key={link.id}
-          href={href}
-          target={target}
-          rel={rel}
-          aria-current={getAriaCurrent(active)}
-          onClick={onNavigate}
-          className={cn(
-            getNavLinkClassName({ active, variant: 'primary' }),
-            'w-full justify-between rounded-2xl border border-border/60 bg-surface/80 px-4 py-3 text-sm tracking-[0.2em] text-foreground shadow-sm',
-          )}
-        >
-          <span>{link.label}</span>
-          <ChevronRight className="h-4 w-4 text-muted" />
-        </Link>
-      );
-    })}
-  </nav>
-);
-
-const MobileSupportNavigation = ({
-  onNavigate,
-  isActive,
-  links,
-}: {
-  onNavigate: () => void;
-  isActive: (href: string) => boolean;
-  links: ReturnType<typeof getNavigationConfig>['support'];
-}) => (
-  <nav className="flex flex-col gap-2">
-    {links.map((link) => {
-      const active = isActive(link.href);
-      const { href, target, rel } = getLinkAttributes(link);
-      return (
-        <Link
-          key={link.id}
-          href={href}
-          target={target}
-          rel={rel}
-          aria-current={getAriaCurrent(active)}
-          onClick={onNavigate}
-          className={cn(
-            getNavLinkClassName({ active, variant: 'support' }),
-            'w-full justify-start rounded-full border border-transparent px-3 py-1.5 text-[0.7rem] text-muted opacity-80 hover:border-accent/40',
-          )}
-        >
-          {link.label}
-        </Link>
-      );
-    })}
-  </nav>
+  <div className="flex flex-col gap-6">
+    {categories.map((category) => (
+      <nav key={category.id} className="flex flex-col items-center gap-3">
+        <span className="text-xs font-bold uppercase tracking-[0.3em] text-muted">
+          {category.label}
+        </span>
+        {category.links.map((link) => {
+          const active = isActive(link.href);
+          const { href, target, rel } = getLinkAttributes(link);
+          return (
+            <Link
+              key={link.id}
+              href={href}
+              target={target}
+              rel={rel}
+              aria-current={getAriaCurrent(active)}
+              onClick={onNavigate}
+              className={getMobileNavItemClassName({ active })}
+            >
+              <span>{link.label}</span>
+              <ChevronRight className={cn('h-4 w-4', active ? 'text-accent' : 'text-muted')} />
+            </Link>
+          );
+        })}
+      </nav>
+    ))}
+  </div>
 );
 
 const MobileSpotlightNavigation = ({
@@ -187,14 +159,9 @@ const MobileSpotlightNavigation = ({
         );
       })}
       {cta ? (
-        <Link
-          key={cta.id}
-          href={cta.href}
-          onClick={onNavigate}
-          className="flex w-full items-center justify-center rounded-full border border-accent/40 bg-accent px-4 py-3 text-sm font-semibold uppercase tracking-[0.24em] text-background shadow-[0_10px_30px_rgba(229,166,19,0.35)] transition hover:-translate-y-0.5 hover:bg-accent-strong"
-        >
+        <CtaLink href={cta.href} onClick={onNavigate} className="w-full">
           {cta.label}
-        </Link>
+        </CtaLink>
       ) : null}
     </div>
   );
@@ -261,15 +228,10 @@ export const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         ) : (
           <MobileGuestSummary />
         )}
-        <MobilePrimaryNavigation
+        <MobileCategoryNavigation
           isActive={isActive}
           onNavigate={handleNavigate}
-          links={navigation.primary}
-        />
-        <MobileSupportNavigation
-          isActive={isActive}
-          onNavigate={handleNavigate}
-          links={navigation.support}
+          categories={navigation.categories}
         />
         {!isAuthenticated ? (
           <MobileSpotlightNavigation
