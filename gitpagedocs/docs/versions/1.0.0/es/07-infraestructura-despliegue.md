@@ -7,6 +7,7 @@ El proyecto puede ejecutarse sin fricciones dentro de Docker o directamente en l
 `docker-compose.yml` orquesta todo el entorno:
 
 - `sqlserver` — imagen oficial 2022 Developer con volumen persistente y contraseña configurable.
+- `sqlserver-init` — servicio de inicialización que crea la base `fleetcore` ejecutando `docker/sqlserver/init.sql`.
 - `redis` — modo append-only; se utiliza para caché y almacenamiento de sesiones.
 - `mongo` — persiste la traza de auditoría.
 - `rabbitmq` — broker con interfaz de administración (`15672`).
@@ -15,8 +16,8 @@ El proyecto puede ejecutarse sin fricciones dentro de Docker o directamente en l
 
 ## Variables de entorno
 
-- El `.env.example` raíz provee valores compartidos para backend y frontend (`SQLSERVER_*`, `JWT_SECRET`, `AUTH_SESSION_TTL_SECONDS`, `NEXT_PUBLIC_*`).
-- `backend/.env.sample` y `frontend/.env.sample` ilustran ejecuciones independientes.
+- Existe un **único `.env` en la raíz**, copiado de `envexample.txt`, que provee los valores compartidos para backend y frontend (`SQLSERVER_*`, `JWT_SECRET`, `AUTH_SESSION_TTL_SECONDS`, `NEXT_PUBLIC_*`).
+- `backend/envexample.txt` ilustra la ejecución independiente del backend.
 - Novedades: `AUTH_SESSION_TTL_SECONDS` (sesiones Redis) y `NEXT_PUBLIC_START_THEME` (tema por defecto).
 
 ## Scripts útiles
@@ -32,8 +33,8 @@ El proyecto puede ejecutarse sin fricciones dentro de Docker o directamente en l
 ## Documentación (GitPageDocs)
 
 - La carpeta `gitpagedocs/` alimenta este sitio documental.
-- Se actualizaron los ajustes del sitio para reflejar el desafío (idiomas PT/EN, nueva navegación, sin extras de audio/video).
-- Puede publicarse vía GitHub Pages (`https://vidigal-code.github.io/fleetcore-api/`).
+- No existe `package.json` en la raíz del repositorio: el sitio se construye y publica automáticamente mediante el workflow de GitHub Actions `.github/workflows/gitpagedocs-pages.yml`.
+- Publicado en GitHub Pages: `https://vidigal-code.github.io/fleetcore-api/`.
 
 ## Observabilidad
 
@@ -43,7 +44,7 @@ El proyecto puede ejecutarse sin fricciones dentro de Docker o directamente en l
 
 ## Flujo de despliegue recomendado
 
-1. Copia `.env.example` a `.env` y ajusta secretos.
+1. Copia `envexample.txt` a `.env` y ajusta secretos.
 2. Ejecuta `docker compose up --build`.
 3. Accede a `http://localhost:3000/api` (API), `/docs` (Swagger EN), `/docs-pt` (Swagger PT-BR), `http://localhost:3001` (frontend) y `http://localhost:15672` (RabbitMQ).
 

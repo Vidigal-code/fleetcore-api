@@ -33,6 +33,6 @@ Este capítulo mapea cada ítem del desafío con el artefacto concreto dentro de
 
 ## Evidencias adicionales
 
-- **Documentación Swagger** en PT/EN (`/docs-pt`, `/docs`).
-- **Archivo `.env` unificado** para configurar backend y frontend.
+- **Documentación Swagger** en PT/EN (`/docs-pt`, `/docs`) con tema oscuro de la identidad Fleetcore, "Try it out" habilitado, ejemplos bilingües (PT/EN) en cada DTO y el cuerpo de `POST /auth/login` precargado con las credenciales seed (`aivacol` / `aivacol123!`).
+- **Archivo `.env` unificado** (`envexample.txt` copiado a `.env` en la raíz) para configurar backend y frontend.
 - **Esta instancia de GitPageDocs** resumiendo arquitectura y detalles de implementación para los revisores.

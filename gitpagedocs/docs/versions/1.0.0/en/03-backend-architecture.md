@@ -16,7 +16,7 @@ The backend is a NestJS 11 monorepo structured around Domain-Driven Design. Each
 
 Two Nest applications run side by side:
 
-- **API** (`backend/src/apps/api`) — exposes REST endpoints, guards (`JwtAuthGuard`, `RolesGuard`, `ThrottlerGuard`), Swagger PT/EN and audit interceptor.
+- **API** (`backend/src/apps/api`) — exposes REST endpoints, guards (`JwtAuthGuard`, `RolesGuard`, `ThrottlerGuard`), branded bilingual Swagger (`/docs` en-US, `/docs-pt` pt-BR) and the audit interceptor.
 - **Audit worker** (`backend/src/apps/audit-worker`) — processes audit messages asynchronously when feature toggles enable it.
 
 ## Layered flow
@@ -29,7 +29,8 @@ Two Nest applications run side by side:
 ## Cross-cutting concerns
 
 - **Configuration**: strongly typed providers under `shared/config`; `AppConfigService` centralises access and is validated by `env.validation.ts`.
-- **Resilience**: `ResilienceService` wraps messaging/audit calls with retry, timeout and circuit breaker policies.
+- **Authorization**: RBAC with `UserRole` (Admin / Operator); `@Roles()`, `@Public()` and `@CurrentUser()` decorators drive the global `JwtAuthGuard` + `RolesGuard`. Brand/model/vehicle mutations require the Admin role.
+- **Resilience**: `ResilienceService` (cockatiel) wraps messaging/audit calls with retry, timeout and circuit breaker policies.
 - **Feature toggles**: `FeatureToggleService` reads `FEATURE_FLAGS_*` env vars to enable/disable repository cache, domain events, Swagger, async worker.
 - **Metrics**: `DomainMetricsService` increments counters per event, ready for Prometheus/Grafana exporters.
 

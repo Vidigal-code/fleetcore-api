@@ -40,5 +40,5 @@ Archivos tipados en `shared/config` (`app`, `database`, `redis`, `jwt`, `auth`, 
 
 - Escala horizontalmente (API sin estado + Redis + RabbitMQ).
 - Mantiene la lógica de dominio aislada de los detalles de infraestructura.
-- Permite pruebas granulares (servicios inyectados vía DI; e2e cubre flujos HTTP reales usando SQLite en memoria).
+- Permite pruebas granulares (servicios inyectados vía DI; unit + integración de búsqueda/orden de vehículos + e2e que cubre flujos HTTP reales).
 - Añade ganchos de resiliencia para servicios externos poco confiables.

@@ -10,7 +10,7 @@ Resumen de las rutinas automatizadas y operativas que sostienen la plataforma.
 
 ## Operaciones
 
-- Docker Compose levanta SQL Server, Redis, RabbitMQ, MongoDB, API y frontend.
+- Docker Compose levanta SQL Server (+ servicio `sqlserver-init`), Redis, RabbitMQ, MongoDB, API y frontend.
 - `npm run generate:openapi` y `npm run export:schemas` sincronizan documentación y validaciones.
 - Feature toggles permiten ajustar caché, auditoría y eventos según el ambiente.
 

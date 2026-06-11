@@ -9,7 +9,7 @@ This documentation suite describes, end-to-end, the solution delivered for Aivac
 - **Backend Architecture** — NestJS modules, DDD layering, resilience and TypeORM usage.
 - **Data and Domain Modeling** — entities, migrations, and relationships for models, vehicles, brands and users.
 - **Security, Audit and Messaging** — JWT + RBAC, Redis sessions, RabbitMQ workflows, MongoDB audit trail.
-- **Frontend and Experience** — Next.js FSD, React Query, Redux Toolkit, orange theming and responsive UX.
+- **Frontend and Experience** — Next.js 16 / React 19 FSD, React Query, Redux Toolkit (auth only), yellow/amber theming and responsive UX.
 - **Infrastructure and Deployment** — Docker Compose stack, environment variables, scripts and docs generation.
 - **Quality and Testing** — unit/integration/e2e suites, linting and quality metrics.
 - **Runbook and Troubleshooting** — step-by-step bootstrapping, useful commands, seed credentials and recovery tips.
@@ -17,8 +17,8 @@ This documentation suite describes, end-to-end, the solution delivered for Aivac
 ## High-level stack
 
 - **Backend:** NestJS 11, TypeORM, SQL Server, Redis, RabbitMQ, MongoDB, Zod.
-- **Frontend:** Next.js 14 (App Router), Redux Toolkit, React Query, Axios, Tailwind, Playwright.
-- **Infrastructure:** Docker Compose, npm scripts, GitHub Pages powered by GitPageDocs.
+- **Frontend:** Next.js 16 (App Router), React 19, Redux Toolkit, React Query, Axios, Tailwind, Playwright.
+- **Infrastructure:** Docker Compose, a single root `envexample.txt`, GitHub Pages published via GitHub Actions (GitPageDocs).
 
 Each section dives deep into the topic and references the relevant paths, services, and commands in the repository.
 

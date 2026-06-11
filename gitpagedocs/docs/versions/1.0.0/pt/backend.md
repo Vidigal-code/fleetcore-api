@@ -6,7 +6,7 @@ Guia rápido dos endpoints, camadas e mecanismos de negócio da API NestJS.
 
 - CRUD de marcas, modelos e veículos em `fleet/interfaces/http`.
 - Autenticação (`/auth/login`, `/auth/register`, `/auth/logout`, `/auth/me`).
-- Documentação Swagger em `/docs` (EN) e `/docs-pt` (PT).
+- Documentação Swagger em `/docs` (EN) e `/docs-pt` (PT), com tema escuro Fleetcore, descrições e exemplos bilíngues, Try-it-out habilitado e o corpo do `POST /auth/login` pré-preenchido com as credenciais seed.
 
 ## Regras de negócio
 

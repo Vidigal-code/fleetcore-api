@@ -6,7 +6,7 @@ Quick reference to the NestJS API surface, business rules and supporting mechani
 
 - Brand, model and vehicle CRUD under `fleet/interfaces/http`.
 - Auth routes (`/auth/login`, `/auth/register`, `/auth/logout`, `/auth/me`).
-- Swagger available at `/docs` (EN) and `/docs-pt` (PT-BR).
+- Branded bilingual Swagger at `/docs` (en-US) and `/docs-pt` (pt-BR): dark Fleetcore theme, Try-it-out enabled, bilingual DTO examples and a `POST /auth/login` body pre-filled with the seed credentials (`aivacol` / `aivacol123!`).
 
 ## Business rules
 
