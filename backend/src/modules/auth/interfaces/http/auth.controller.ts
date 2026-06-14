@@ -9,6 +9,12 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import {
+  ApiAuthErrors,
+  ApiCreated,
+  ApiOk,
+} from '../../../../apps/api/swagger/api-docs.decorators';
+
 import { UsersService } from '../../../users/application/users.service';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { CurrentUser } from '../../decorators/current-user.decorator';
@@ -22,6 +28,7 @@ import { Public } from '../../decorators/public.decorator';
 import { AuthRateLimit } from '../../../../apps/api/security/rate-limit.decorator';
 
 @ApiTags('Authentication')
+@ApiAuthErrors()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -35,6 +42,10 @@ export class AuthController {
   @ApiOperation({
     summary: 'Autenticar e emitir token JWT / Authenticate and issue JWT token',
   })
+  @ApiOk(
+    'Token JWT, tipo, expiração e dados do usuário.',
+    'JWT token, type, expiration and user data.',
+  )
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
@@ -46,6 +57,7 @@ export class AuthController {
     summary:
       'Perfil do usuário autenticado / Current authenticated user profile',
   })
+  @ApiOk('Dados do usuário autenticado.', 'Authenticated user data.')
   async me(@CurrentUser() user: JwtPayload | undefined) {
     if (!user) {
       throw new NotFoundException('User context not found');
@@ -66,6 +78,7 @@ export class AuthController {
   @Public()
   @Post('register')
   @ApiOperation({ summary: 'Registrar novo usuário / Register a new user' })
+  @ApiCreated('Usuário criado.', 'User created.')
   async register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
@@ -74,6 +87,7 @@ export class AuthController {
   @Post('update/password')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Atualizar senha / Update current user password' })
+  @ApiOk('Senha atualizada.', 'Password updated.')
   async updatePassword(
     @CurrentUser() user: JwtPayload | undefined,
     @Body() dto: UpdatePasswordDto,
@@ -89,6 +103,7 @@ export class AuthController {
   @Post('update/profile')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Atualizar perfil / Update current user profile' })
+  @ApiOk('Perfil atualizado.', 'Profile updated.')
   async updateProfile(
     @CurrentUser() user: JwtPayload | undefined,
     @Body() dto: UpdateProfileDto,
@@ -104,6 +119,7 @@ export class AuthController {
   @Post('logout')
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Encerrar sessão / Invalidate current session' })
+  @ApiOk('Sessão encerrada.', 'Session invalidated.')
   async logout(@CurrentUser() user: JwtPayload | undefined) {
     if (!user?.sessionId) {
       throw new UnauthorizedException('Invalid session context');
