@@ -6,6 +6,34 @@ import {
   TableIndex,
 } from 'typeorm';
 
+// Cria o índice apenas se ele ainda não existir na tabela, tornando a migration
+// idempotente quando o schema já foi provisionado (ex.: volume reaproveitado sem
+// registro na tabela `migrations`), evitando o erro "index already exists".
+const ensureIndex = async (
+  queryRunner: QueryRunner,
+  tableName: string,
+  index: TableIndex,
+): Promise<void> => {
+  const table = await queryRunner.getTable(tableName);
+  if (!table?.indices.some((existing) => existing.name === index.name)) {
+    await queryRunner.createIndex(tableName, index);
+  }
+};
+
+// Idem para chaves estrangeiras: só cria se ainda não existir.
+const ensureForeignKey = async (
+  queryRunner: QueryRunner,
+  tableName: string,
+  foreignKey: TableForeignKey,
+): Promise<void> => {
+  const table = await queryRunner.getTable(tableName);
+  if (
+    !table?.foreignKeys.some((existing) => existing.name === foreignKey.name)
+  ) {
+    await queryRunner.createForeignKey(tableName, foreignKey);
+  }
+};
+
 export class InitSchema1717845600000 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
@@ -71,7 +99,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       true,
     );
 
-    await queryRunner.createIndex(
+    await ensureIndex(
+      queryRunner,
       'users',
       new TableIndex({
         name: 'IDX_users_nickname',
@@ -80,7 +109,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createIndex(
+    await ensureIndex(
+      queryRunner,
       'users',
       new TableIndex({
         name: 'IDX_users_email',
@@ -128,7 +158,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       true,
     );
 
-    await queryRunner.createIndex(
+    await ensureIndex(
+      queryRunner,
       'brands',
       new TableIndex({
         name: 'IDX_brands_name',
@@ -181,7 +212,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       true,
     );
 
-    await queryRunner.createIndex(
+    await ensureIndex(
+      queryRunner,
       'models',
       new TableIndex({
         name: 'IDX_models_name',
@@ -189,7 +221,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKey(
+    await ensureForeignKey(
+      queryRunner,
       'models',
       new TableForeignKey({
         name: 'FK_models_brand',
@@ -261,7 +294,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       true,
     );
 
-    await queryRunner.createIndex(
+    await ensureIndex(
+      queryRunner,
       'vehicles',
       new TableIndex({
         name: 'IDX_vehicles_license_plate',
@@ -270,7 +304,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createIndex(
+    await ensureIndex(
+      queryRunner,
       'vehicles',
       new TableIndex({
         name: 'IDX_vehicles_chassis',
@@ -279,7 +314,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createIndex(
+    await ensureIndex(
+      queryRunner,
       'vehicles',
       new TableIndex({
         name: 'IDX_vehicles_renavam',
@@ -288,7 +324,8 @@ export class InitSchema1717845600000 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKey(
+    await ensureForeignKey(
+      queryRunner,
       'vehicles',
       new TableForeignKey({
         name: 'FK_vehicles_model',
