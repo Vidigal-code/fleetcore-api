@@ -3,6 +3,7 @@ import {
   ApiBadRequestResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiHeader,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTooManyRequestsResponse,
@@ -61,3 +62,30 @@ export const ApiOk = (pt: string, en: string) =>
 /** 201 Created com descrição bilíngue. */
 export const ApiCreated = (pt: string, en: string) =>
   ApiCreatedResponse({ description: bilingual(pt, en) });
+
+/**
+ * Cabeçalhos opcionais de rastreio que a API realmente lê (segurança/auditoria)
+ * — permitem adicionar um header no "Try it out" para testar e rastrear a
+ * requisição na trilha de auditoria. Não conflitam com o Bearer (Authorize).
+ */
+export const ApiTraceHeaders = () =>
+  applyDecorators(
+    ApiHeader({
+      name: 'X-Correlation-Id',
+      required: false,
+      description: bilingual(
+        'ID de correlação para rastrear a requisição na auditoria (gerado se ausente).',
+        'Correlation ID to trace the request across the audit trail (generated when absent).',
+      ),
+      schema: { type: 'string', example: 'fleetcore-test-001' },
+    }),
+    ApiHeader({
+      name: 'X-Request-Id',
+      required: false,
+      description: bilingual(
+        'ID da requisição (gerado se ausente).',
+        'Request ID (generated when absent).',
+      ),
+      schema: { type: 'string', example: 'req-001' },
+    }),
+  );

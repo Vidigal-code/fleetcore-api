@@ -13,6 +13,7 @@ import {
   ApiAuthErrors,
   ApiCreated,
   ApiOk,
+  ApiTraceHeaders,
 } from '../../../../apps/api/swagger/api-docs.decorators';
 
 import { UsersService } from '../../../users/application/users.service';
@@ -29,6 +30,7 @@ import { AuthRateLimit } from '../../../../apps/api/security/rate-limit.decorato
 
 @ApiTags('Authentication')
 @ApiAuthErrors()
+@ApiTraceHeaders()
 @Controller('auth')
 export class AuthController {
   constructor(
