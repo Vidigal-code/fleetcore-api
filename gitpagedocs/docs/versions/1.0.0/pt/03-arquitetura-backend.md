@@ -4,13 +4,14 @@ O backend foi construído em **NestJS 11** com foco em modularidade, extraindo r
 
 ## Organização por módulos
 
-- `apps/api` — aplicação HTTP principal, registra guards globais (`JwtAuthGuard`, `RolesGuard`, `ThrottlerGuard`) e interceptor de auditoria.
+- `apps/api` — aplicação HTTP principal, registra guards globais (`JwtAuthGuard`, `RolesGuard`, `ThrottlerGuard`, `RateLimitGuard`) e interceptores de auditoria e idempotência.
 - `modules/auth` — autenticação, emissão/validação JWT, `AuthSessionService` (Redis) e controladores `login/me/logout/register`.
 - `modules/fleet` — contexto de frota com serviços para **brands**, **models** e **vehicles**, eventos de domínio e listeners RabbitMQ.
-- `modules/audit` — interceptores, serviço de auditoria e writer MongoDB.
+- `modules/audit` — interceptores, serviço de auditoria e writer MongoDB; o `AuditInterceptor` audita toda rota não-pública com evento enriquecido (`eventId`, `correlationId`, `sessionId`, `route`, `statusCode`, etc.) e o `audit-worker` (`apps/audit-worker`) consome `fleetcore.audit`.
 - `modules/messaging` — integração com RabbitMQ via `@golevelup/nestjs-rabbitmq` e consumer de eventos.
 - `modules/users` — seed `aivacol`, criação e busca de usuários, repositórios TypeORM.
-- `shared` — cross-cutting concerns: cache Redis, feature toggles, unit of work, métricas, resiliência e configurações.
+- `apps/api/security` — guards de borda: `RateLimitGuard`/`RateLimitService` (rate limit Redis dedicado, global) e `IdempotencyInterceptor`.
+- `shared` — cross-cutting concerns: cache Redis (`RepositoryCacheService`), lock distribuído (`RedisLockService`), idempotência (`IdempotencyService`), feature toggles, unit of work, métricas, resiliência e configurações.
 
 ## Camadas e padrões
 
@@ -21,14 +22,15 @@ O backend foi construído em **NestJS 11** com foco em modularidade, extraindo r
 
 ## Resiliência e observabilidade
 
-- **Resilience Service** (`shared/resilience`): encapsula políticas de retry, circuit breaker e timeout para chamadas externas (RabbitMQ/Audit).
+- **Resilience Service** (`shared/resilience`): encapsula políticas de retry, circuit breaker e timeout para chamadas externas (RabbitMQ/Audit), além de `executeWithRetry`, `executeWithFallback` (erro controlado → fallback) e `executeWithRollback` (compensações na ordem inversa). O rollback transacional do banco permanece no `UnitOfWork`.
+- **Proteções Redis** (`shared/cache`): `RepositoryCacheService` (cache de leitura), `RedisLockService` (lock distribuído `SET NX EX` + Lua compare-and-del/pexpire) e `IdempotencyService` (header `Idempotency-Key`, 409 em duplicidade) protegem o banco em operações críticas.
 - **Feature toggles** (`shared/features`): permitem habilitar/desabilitar cache, eventos e processamento assíncrono via env (`FEATURE_FLAGS`).
 - **Domain Metrics** (`shared/metrics`): incrementa contadores por evento publicado.
 
 ## Fluxo de requisição
 
-1. Requisição HTTP passa pelo `SanitizeInputPipe` e pelos guards (JWT + Roles + Throttler).
-2. Controlador injeta serviço que aplica validações de negócio, utilizando `UnitOfWork` para commits transacionais.
+1. Requisição HTTP passa pelo `SanitizeInputPipe`, pelo `RateLimitGuard` (Redis) e pelos guards (JWT + Roles + Throttler). A `JwtStrategy` valida a sessão Redis, renova seu TTL (sliding) e recusa sessões bloqueadas (401). Mutações com `Idempotency-Key` passam pelo `IdempotencyInterceptor` (409 em duplicidade).
+2. Controlador injeta serviço que aplica validações de negócio, utilizando `UnitOfWork` para commits transacionais (e `RedisLockService` para serializar operações concorrentes quando necessário).
 3. Após persistência, o serviço registra auditoria, invalida cache Redis e publica eventos de domínio.
 4. `FleetDomainEventListener` trata os eventos e encaminha payloads para RabbitMQ (mensageria) quando o toggle estiver ativo.
 

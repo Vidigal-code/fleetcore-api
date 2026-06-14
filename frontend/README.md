@@ -41,6 +41,7 @@ npm run start        # serve o build gerado
 - Esquemas Zod compartilhados com o backend (`shared/schemas`).
 - Tema amarelo claro/escuro: as cores vivem no `globals.css` (fonte única de verdade) e são aplicadas por troca de classe via `ThemeProvider`, com script anti-FOUC; a preferência é guardada em `localStorage` (`fleetcore.theme-preference`).
 - CRUD padronizado: `ConfirmDialog` reutilizável substitui `window.confirm` em exclusões, edição em `Modal` e `SelectField` customizado (dropdown com portal e navegação por teclado) sobre um `<select>` nativo oculto para integração com formulários.
+- Integração com a API: o token JWT é injetado via interceptor Axios (`shared/api`) e o `401` dispara logout automático. O backend mantém a sessão no Redis (TTL deslizante) e aplica rate limit — o cliente pode receber `429 { success, message, retryAfter }`; mutações aceitam o header opcional `Idempotency-Key`.
 
 </details>
 
@@ -83,5 +84,6 @@ npm run start        # serve the built app
 - Validation schemas shared with the backend (`shared/schemas`).
 - Yellow light/dark theme: colors live in `globals.css` (single source of truth) and are applied by class toggling via `ThemeProvider` with an anti-FOUC script; the preference is stored in `localStorage` (`fleetcore.theme-preference`).
 - Standardized CRUD: a reusable `ConfirmDialog` replaces `window.confirm` for deletions, editing happens in a `Modal`, and a custom `SelectField` (portal dropdown with keyboard navigation) is backed by a hidden native `<select>` for form integration.
+- API integration: the JWT is injected via an Axios interceptor (`shared/api`) and a `401` triggers automatic logout. The backend keeps the session in Redis (sliding TTL) and enforces rate limiting — the client may receive `429 { success, message, retryAfter }`; mutations accept the optional `Idempotency-Key` header.
 
 </details>

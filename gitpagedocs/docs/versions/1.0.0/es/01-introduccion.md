@@ -14,8 +14,8 @@ El assessment técnico de **Aivacol** exige una plataforma completa de gestión 
 | Pilar | Descripción | Carpetas/archivos clave |
 |-------|-------------|-------------------------|
 | Backend API | NestJS 11 + TypeORM (SQL Server), DDD, Unit of Work, eventos de dominio, caché Redis | `backend/src/modules`, `backend/src/shared`, `backend/src/migrations` |
-| Mensajería y Auditoría | RabbitMQ para eventos de flota, MongoDB para la traza de auditoría | `backend/src/modules/messaging`, `backend/src/modules/audit` |
-| Seguridad | JWT con RBAC, sesiones respaldadas en Redis, interceptor de auditoría, sanitización de entrada | `backend/src/modules/auth`, `backend/src/apps/api/security` |
+| Mensajería y Auditoría | RabbitMQ para eventos de flota, auditoría enriquecida procesada por el worker `audit-worker` hacia MongoDB | `backend/src/modules/messaging`, `backend/src/modules/audit`, `backend/src/apps/audit-worker` |
+| Seguridad | JWT con RBAC, sesiones Redis con TTL deslizante y lock, rate limit dedicado, idempotencia, interceptor de auditoría, sanitización de entrada | `backend/src/modules/auth`, `backend/src/apps/api/security` |
 | Frontend | Next.js 16 (App Router), React 19, FSD, Redux Toolkit, React Query, doble tema amarillo claro/oscuro | `frontend/src/app`, `frontend/src/{entities,features,processes,shared,widgets}` |
 | Infraestructura | Docker Compose (SQL Server + init, Redis, RabbitMQ, Mongo, API, frontend), Dockerfiles multietapa | `docker-compose.yml`, `envexample.txt` (env único en la raíz), `backend/envexample.txt` |
 | Calidad | Pruebas unitarias/de integración/e2e, linting, documentación en GitHub Pages | `backend/tests`, `frontend/tests`, `gitpagedocs/` |

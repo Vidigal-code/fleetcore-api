@@ -5,7 +5,7 @@ Este panorama reforça como o backend, o domínio e os serviços de suporte se c
 ## Backend NestJS
 
 - Modularização em `auth`, `fleet`, `users`, `audit` e `messaging`.
-- Guardas globais (`JwtAuthGuard`, `RolesGuard`) e `AuthSessionService` com Redis.
+- Guardas globais (`JwtAuthGuard`, `RolesGuard`, `RateLimitGuard`) e `AuthSessionService` com Redis (TTL deslizante + lock).
 - Eventos de domínio propagados por `FleetDomainEventListener` para RabbitMQ.
 
 Saiba mais na seção Arquitetura Backend do menu.
@@ -20,8 +20,8 @@ Veja detalhes na seção Modelagem de Dados e Domínio.
 
 ## Observabilidade
 
-- Interceptor de auditoria escrevendo em MongoDB.
+- Interceptor de auditoria (rotas não-públicas) com evento enriquecido, consumido pelo `audit-worker` e escrito em MongoDB.
 - Métricas de domínio para monitoramento.
-- Resiliência configurável via `ResilienceService` e feature toggles.
+- Resiliência configurável via `ResilienceService` (retry/fallback/rollback) e feature toggles.
 
 Consulte a seção Segurança, Auditoria e Mensageria para o fluxo completo.

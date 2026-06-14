@@ -8,7 +8,11 @@ Para manter dependências claras, facilitar testes unitários e permitir evoluç
 
 ## Como a segurança garante revogação de sessão?
 
-`AuthSessionService` mantém tokens em Redis com TTL e remove sessões no logout, permitindo revogar acessos específicos sem derrubar todos os tokens. Consulte a seção Segurança, Auditoria e Mensageria.
+`AuthSessionService` mantém a sessão **somente no Redis** com TTL deslizante (renovado a cada requisição via `refresh`) e remove sessões no logout, permitindo revogar acessos específicos sem derrubar todos os tokens. Há ainda `lock`/`unlock`/`isLocked` para bloquear uma sessão (a `JwtStrategy` recusa sessões bloqueadas com 401). Consulte a seção Segurança, Auditoria e Mensageria.
+
+## Como o banco é protegido contra carga e concorrência?
+
+Por uma camada Redis: cache de leitura (`RepositoryCacheService`), idempotência via header `Idempotency-Key` (409 em duplicidade), lock distribuído (`RedisLockService`) e rate limit dedicado (`RateLimitGuard`, 429 ao exceder). Falhas externas usam retry/fallback/rollback do `ResilienceService`, com o `UnitOfWork` cuidando do rollback transacional.
 
 ## Como o frontend compartilha regras de validação?
 

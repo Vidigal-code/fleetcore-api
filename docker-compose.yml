@@ -109,6 +109,7 @@ services:
       REDIS_HOST: "redis"
       REDIS_PORT: "6379"
       REDIS_TTL_SECONDS: "${REDIS_TTL_SECONDS:-120}"
+      REDIS_LOCK_TTL: "${REDIS_LOCK_TTL:-30}"
 
       JWT_SECRET: "${JWT_SECRET:-fleetcore_dev_secret_change_me}"
       JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-3600s}"
@@ -120,9 +121,22 @@ services:
       RABBITMQ_EXCHANGE: "${RABBITMQ_EXCHANGE:-fleetcore.events}"
       RABBITMQ_QUEUE: "${RABBITMQ_QUEUE:-fleetcore.vehicles}"
       RABBITMQ_AUDIT_QUEUE: "${RABBITMQ_AUDIT_QUEUE:-fleetcore.audit}"
+      RABBITMQ_RETRY_QUEUE: "${RABBITMQ_RETRY_QUEUE:-fleetcore.retry}"
+      RABBITMQ_DLQ: "${RABBITMQ_DLQ:-fleetcore.dead-letter}"
       RABBITMQ_CONNECT_TIMEOUT_MS: "${RABBITMQ_CONNECT_TIMEOUT_MS:-15000}"
       RABBITMQ_RECONNECT_SECONDS: "${RABBITMQ_RECONNECT_SECONDS:-5}"
       RABBITMQ_HEARTBEAT_SECONDS: "${RABBITMQ_HEARTBEAT_SECONDS:-30}"
+
+      WORKER_CONCURRENCY: "${WORKER_CONCURRENCY:-2}"
+
+      RATE_LIMIT_ENABLED: "${RATE_LIMIT_ENABLED:-true}"
+      RATE_LIMIT_WINDOW_SECONDS: "${RATE_LIMIT_WINDOW_SECONDS:-60}"
+      RATE_LIMIT_MAX_REQUESTS: "${RATE_LIMIT_MAX_REQUESTS:-100}"
+      RATE_LIMIT_AUTH_MAX_REQUESTS: "${RATE_LIMIT_AUTH_MAX_REQUESTS:-10}"
+      RATE_LIMIT_AUTH_WINDOW_SECONDS: "${RATE_LIMIT_AUTH_WINDOW_SECONDS:-60}"
+
+      RETRY_MAX_ATTEMPTS: "${RETRY_MAX_ATTEMPTS:-5}"
+      RETRY_INITIAL_DELAY: "${RETRY_INITIAL_DELAY:-1000}"
 
       ADMIN_NICKNAME: "${ADMIN_NICKNAME:-aivacol}"
       ADMIN_EMAIL: "${ADMIN_EMAIL:-aivacol@fleetcore.local}"
@@ -140,6 +154,53 @@ services:
       mongo:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+    networks:
+      - fleetnet
+
+  # Consumidor dedicado da fila de auditoria (audit.queue): le os eventos
+  # publicados no RabbitMQ e persiste em MongoDB (audit_logs/audit_events).
+  # Usa a mesma imagem do backend, mas com o entrypoint do worker.
+  audit-worker:
+    build:
+      context: ./backend
+    container_name: fleetcore-audit-worker
+    command: ["node", "dist/src/apps/audit-worker/main.js"]
+    environment:
+      NODE_ENV: "production"
+      REDIS_HOST: "redis"
+      REDIS_PORT: "6379"
+      REDIS_TTL_SECONDS: "${REDIS_TTL_SECONDS:-120}"
+      REDIS_LOCK_TTL: "${REDIS_LOCK_TTL:-30}"
+      SQLSERVER_HOST: "sqlserver"
+      SQLSERVER_PORT: "1433"
+      SQLSERVER_USER: "${SQLSERVER_USER:-sa}"
+      SQLSERVER_PASSWORD: "${SQLSERVER_PASSWORD:-YourStrong@Passw0rd}"
+      SQLSERVER_PASSWORD_FALLBACK: "${SQLSERVER_PASSWORD_FALLBACK:-YourStrong@Passw0rd}"
+      SQLSERVER_DB: "${SQLSERVER_DB:-fleetcore}"
+      JWT_SECRET: "${JWT_SECRET:-fleetcore_dev_secret_change_me}"
+      JWT_EXPIRES_IN: "${JWT_EXPIRES_IN:-3600s}"
+      MONGO_URI: "mongodb://mongo:27017/fleetcore"
+      RABBITMQ_URI: "amqp://rabbitmq:5672"
+      RABBITMQ_EXCHANGE: "${RABBITMQ_EXCHANGE:-fleetcore.events}"
+      RABBITMQ_QUEUE: "${RABBITMQ_QUEUE:-fleetcore.vehicles}"
+      RABBITMQ_AUDIT_QUEUE: "${RABBITMQ_AUDIT_QUEUE:-fleetcore.audit}"
+      RABBITMQ_RETRY_QUEUE: "${RABBITMQ_RETRY_QUEUE:-fleetcore.retry}"
+      RABBITMQ_DLQ: "${RABBITMQ_DLQ:-fleetcore.dead-letter}"
+      RABBITMQ_CONNECT_TIMEOUT_MS: "${RABBITMQ_CONNECT_TIMEOUT_MS:-15000}"
+      RABBITMQ_RECONNECT_SECONDS: "${RABBITMQ_RECONNECT_SECONDS:-5}"
+      RABBITMQ_HEARTBEAT_SECONDS: "${RABBITMQ_HEARTBEAT_SECONDS:-30}"
+      WORKER_CONCURRENCY: "${WORKER_CONCURRENCY:-2}"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      sqlserver-init:
+        condition: service_completed_successfully
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - fleetnet

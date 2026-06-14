@@ -27,6 +27,21 @@ interface ExecuteOptions {
   readonly timeoutMs?: number;
 }
 
+interface RetryOnlyOptions {
+  readonly name: string;
+  readonly retry?: Partial<RetryPolicyConfig>;
+  readonly timeoutMs?: number;
+}
+
+export interface RollbackStep<T = unknown> {
+  readonly execute: () => Promise<T>;
+  readonly compensate?: (result: T) => Promise<void>;
+}
+
+const DISABLED_CIRCUIT_BREAKER: Partial<CircuitBreakerConfig> = {
+  failureThreshold: 0,
+};
+
 @Injectable()
 export class ResilienceService {
   private readonly logger = new Logger(ResilienceService.name);
@@ -64,6 +79,77 @@ export class ResilienceService {
     }
 
     return operation();
+  }
+
+  /** Runs a task with retry only (circuit breaker disabled). */
+  async executeWithRetry<TResult>(
+    task: () => Promise<TResult>,
+    options: RetryOnlyOptions,
+  ): Promise<TResult> {
+    return this.execute(task, {
+      ...options,
+      circuitBreaker: DISABLED_CIRCUIT_BREAKER,
+    });
+  }
+
+  /**
+   * Runs a task and, if it fails after its resilience policies are exhausted,
+   * resolves with the controlled fallback instead of throwing.
+   */
+  async executeWithFallback<TResult>(
+    task: () => Promise<TResult>,
+    fallback: (error: unknown) => Promise<TResult>,
+    options?: ExecuteOptions,
+  ): Promise<TResult> {
+    try {
+      return options ? await this.execute(task, options) : await task();
+    } catch (error) {
+      this.logger.warn(
+        `Falling back for ${options?.name ?? 'operation'}: ${
+          error instanceof Error ? error.message : 'unknown error'
+        }`,
+      );
+      return fallback(error);
+    }
+  }
+
+  /**
+   * Runs steps sequentially. If any step fails, the compensations of the
+   * already-completed steps run in reverse order before the error rethrows.
+   */
+  async executeWithRollback(steps: RollbackStep[]): Promise<unknown[]> {
+    const completed: Array<{ step: RollbackStep; result: unknown }> = [];
+
+    try {
+      const results: unknown[] = [];
+      for (const step of steps) {
+        const result = await step.execute();
+        completed.push({ step, result });
+        results.push(result);
+      }
+      return results;
+    } catch (error) {
+      await this.compensate(completed);
+      throw error;
+    }
+  }
+
+  private async compensate(
+    completed: Array<{ step: RollbackStep; result: unknown }>,
+  ): Promise<void> {
+    for (const { step, result } of [...completed].reverse()) {
+      if (!step.compensate) {
+        continue;
+      }
+      try {
+        await step.compensate(result);
+      } catch (compensationError) {
+        this.logger.error(
+          'Rollback compensation failed',
+          compensationError as Error,
+        );
+      }
+    }
   }
 
   getDefaultMessagingPolicy(): ResiliencePolicyConfig {

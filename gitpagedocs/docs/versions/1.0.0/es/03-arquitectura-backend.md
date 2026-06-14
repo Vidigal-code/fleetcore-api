@@ -4,13 +4,14 @@ El backend se basa en **NestJS 11** con un diseño modular orientado al dominio.
 
 ## Panorama de módulos
 
-- `apps/api` — bootstrap HTTP; registra guards globales (`JwtAuthGuard`, `RolesGuard`, `ThrottlerGuard`) y el interceptor de auditoría.
-- `modules/auth` — autenticación, emisión/validación de JWT, `AuthSessionService` (Redis) y endpoints HTTP (`login`, `register`, `logout`, `me`).
+- `apps/api` — bootstrap HTTP; registra guards globales (`JwtAuthGuard`, `RolesGuard`, `ThrottlerGuard`, `RateLimitGuard`) y los interceptores de auditoría e idempotencia. La seguridad dedicada vive en `apps/api/security/` (`RateLimitService`, `RateLimitGuard`, decorador `@AuthRateLimit()`).
+- `apps/audit-worker` — proceso consumidor independiente que lee la cola `fleetcore.audit` y persiste la auditoría en MongoDB; su concurrencia (`prefetchCount`) se rige por `WORKER_CONCURRENCY`.
+- `modules/auth` — autenticación, emisión/validación de JWT, `AuthSessionService` (Redis, con TTL deslizante vía `refresh` y bloqueo vía `lock`/`unlock`/`isLocked`) y endpoints HTTP (`login`, `register`, `logout`, `me`).
 - `modules/fleet` — dominio de flota (marcas, modelos, vehículos) con servicios, agregados y eventos de dominio.
-- `modules/audit` — interceptores, servicio de auditoría y escritor en MongoDB (`AuditWriterService`).
+- `modules/audit` — interceptores, servicio de auditoría y escritor en MongoDB (`AuditWriterService`); eventos enriquecidos con `correlationId`/`requestId`/`sessionId`/`statusCode`.
 - `modules/messaging` — integración con RabbitMQ vía `@golevelup/nestjs-rabbitmq` y el consumidor de eventos de vehículos.
 - `modules/users` — seed del admin (`aivacol`) y operaciones del repositorio de usuarios.
-- `shared` — preocupaciones transversales (caché, feature toggles, unit of work, métricas, resiliencia, objetos de configuración).
+- `shared` — preocupaciones transversales: caché (`RepositoryCacheService`), lock distribuido (`RedisLockService` en `shared/cache`), idempotencia (`IdempotencyService`), feature toggles, unit of work, métricas, resiliencia (`ResilienceService`) y objetos de configuración.
 
 ## Enfoque por capas
 
@@ -21,9 +22,11 @@ El backend se basa en **NestJS 11** con un diseño modular orientado al dominio.
 
 ## Resiliencia y feature flags
 
-- `ResilienceService` ofrece políticas de reintento, circuit breaker y timeout para llamadas externas (mensajería/auditoría).
+- `ResilienceService` ofrece políticas de reintento, circuit breaker y timeout para llamadas externas (mensajería/auditoría), más los helpers `executeWithRetry`, `executeWithFallback` (ruta alternativa ante error controlado) y `executeWithRollback` (compensaciones en orden inverso ante fallo). `UnitOfWork` permanece como rollback transaccional de la base.
 - `FeatureToggleService` lee banderas (`auditAsyncWorker`, `domainEvents`, `repositoryCache`, `swaggerDocs`) para habilitar comportamientos por ambiente.
 - `DomainMetricsService` incrementa contadores por evento publicado.
+
+> Todos estos servicios son **aditivos**: la estructura modular y el flujo de petición existentes se preservaron; las protecciones (sesiones deslizantes, lock, idempotencia, rate limit, auditoría enriquecida) se sumaron sin alterar la arquitectura previa.
 
 ## Flujo de una petición
 

@@ -69,6 +69,7 @@ jobs:
 - **Controles Geo/IP:** bloqueie regiões desnecessárias; atualize listas de ameaça diariamente.
 - **Observabilidade:** replique logs do WAF para Kinesis Firehose → S3 → Athena e alerte via SNS sobre picos (≥10 bloqueios/min).
 - **Gateway/Proxy:** preserve `X-Forwarded-*`, imponha TLS 1.2+, aplique rate limiting adicional (API Gateway usage plans/Cloudflare) e limite tamanho de payload (`client_max_body_size`, `maxBodySize`).
+- **Rate limit na aplicação (defense-in-depth):** além do WAF, a API aplica um `RateLimitGuard` baseado em Redis por usuário/IP/endpoint (`RATE_LIMIT_*`), com orçamento mais estrito para `POST /auth/login` (`RATE_LIMIT_AUTH_*`) e resposta `429 { success, message, retryAfter }`; tentativas bloqueadas são auditadas.
 - **Pentest recorrente:** review trimestral das regras + OWASP ZAP baseline atrás do WAF.
 
 </details>
@@ -144,6 +145,7 @@ jobs:
 - **Geo/IP Controls:** block unused regions, ingest threat intel feeds daily.
 - **Observability:** stream logs to Kinesis Firehose → S3 → Athena; raise SNS alerts on spikes (>=10 blocks/min).
 - **Gateway / Reverse Proxy:** maintain `X-Forwarded-*`, enforce TLS 1.2+, add gateway-side throttling (API Gateway usage plans, Cloudflare rules), and cap body sizes (`client_max_body_size`, `maxBodySize`).
+- **Application-level rate limit (defense-in-depth):** beyond the WAF, the API enforces a Redis-backed `RateLimitGuard` per user/IP/endpoint (`RATE_LIMIT_*`), with a stricter budget for `POST /auth/login` (`RATE_LIMIT_AUTH_*`) and a `429 { success, message, retryAfter }` response; blocked attempts are audited.
 - **Pen Testing Loop:** quarterly rule reviews plus OWASP ZAP baseline exercises behind the WAF.
 
 </details>

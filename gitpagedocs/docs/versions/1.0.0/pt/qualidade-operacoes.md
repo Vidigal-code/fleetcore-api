@@ -10,9 +10,10 @@ Visão condensada dos rituais de qualidade e das rotinas operacionais que susten
 
 ## Operações
 
-- Docker Compose levanta SQL Server, Redis, RabbitMQ, MongoDB, API e frontend.
+- Docker Compose levanta SQL Server, Redis, RabbitMQ, MongoDB, API, `audit-worker` e frontend.
 - `npm run generate:openapi` e `npm run export:schemas` mantêm documentação e validação sincronizadas.
 - Feature toggles permitem ajustar auditoria, cache e eventos sem alterar código.
+- Proteções operacionais via Redis: rate limit dedicado (`RATE_LIMIT_*`), idempotência (`Idempotency-Key`) e lock distribuído (`REDIS_LOCK_TTL`); resiliência com retry/fallback/rollback (`RETRY_MAX_ATTEMPTS`, `RETRY_INITIAL_DELAY`) e worker de auditoria (`WORKER_CONCURRENCY`).
 
 ## Referências
 

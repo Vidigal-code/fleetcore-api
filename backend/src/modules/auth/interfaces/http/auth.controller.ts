@@ -19,6 +19,7 @@ import { RegisterDto } from '../../dto/register.dto';
 import { UpdatePasswordDto } from '../../dto/update-password.dto';
 import { UpdateProfileDto } from '../../dto/update-profile.dto';
 import { Public } from '../../decorators/public.decorator';
+import { AuthRateLimit } from '../../../../apps/api/security/rate-limit.decorator';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -29,6 +30,7 @@ export class AuthController {
   ) {}
 
   @Public()
+  @AuthRateLimit()
   @Post('login')
   @ApiOperation({
     summary: 'Autenticar e emitir token JWT / Authenticate and issue JWT token',
