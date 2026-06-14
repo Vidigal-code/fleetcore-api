@@ -52,8 +52,8 @@ export const SWAGGER_DARK_PALETTE: SwaggerPalette = {
   surface: '#1b272d',
   surfaceAlt: '#243640',
   border: '#33474f',
-  text: '#f4f4f4',
-  muted: '#a8b4ba',
+  text: '#ffffff',
+  muted: '#e6edf2',
   accent: '#f8be0e',
   accentStrong: '#fbd048',
   accentContrast: '#1b2d35',
@@ -71,6 +71,9 @@ interface ThemeRule {
 }
 
 const THEME_RULES: ThemeRule[] = [
+  // Catch-all: todo texto herda a cor do tema (branco no escuro, escuro no
+  // claro). Menor especificidade, então links/badges/botões ainda vencem.
+  { selectors: ['*'], style: 'color:var(--fc-text);' },
   // Texto base e títulos
   {
     selectors: ['', '.wrapper', '.information-container'],
