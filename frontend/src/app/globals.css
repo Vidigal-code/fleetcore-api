@@ -4,18 +4,22 @@
 
 :root {
   color-scheme: light;
-  --palette-light-background: 255 248 214;
-  --palette-light-surface: 255 242 194;
-  --palette-light-surface-strong: 255 232 168;
-  --palette-light-border: 224 170 38;
-  --palette-light-foreground: 31 31 31;
-  --palette-light-foreground-muted: 64 58 38;
-  --palette-light-accent: 255 191 0;
-  --palette-light-accent-strong: 214 158 0;
-  --palette-light-accent-foreground: 31 31 31;
-  --palette-light-warning: 245 197 66;
-  --palette-light-danger: 226 106 64;
-  --palette-light-positive: 75 175 114;
+  /* Paleta clara — cinza claro de fundo, superfícies brancas e identidade amarela */
+  --palette-light-background: 244 244 244; /* #F4F4F4 */
+  --palette-light-surface: 255 255 255;
+  --palette-light-surface-strong: 248 247 243;
+  --palette-light-border: 164 141 75; /* #A48D4B cinza médio com amarelo */
+  --palette-light-foreground: 34 34 34; /* #222222 */
+  --palette-light-foreground-muted: 92 86 66;
+  --palette-light-accent: 248 190 14; /* #F8BE0E primária */
+  --palette-light-accent-strong: 214 158 0; /* gold mais escuro: hover/links legíveis no claro */
+  --palette-light-accent-soft: 247 217 131; /* #F7D983 amarelo suave */
+  --palette-light-accent-foreground: 34 34 34;
+  --palette-light-contrast: 27 45 53; /* #1B2D35 azul petróleo */
+  --palette-light-contrast-foreground: 244 244 244;
+  --palette-light-warning: 224 168 0;
+  --palette-light-danger: 214 90 70;
+  --palette-light-positive: 62 160 110;
 
   --color-background: var(--palette-light-background);
   --color-surface: var(--palette-light-surface);
@@ -25,36 +29,43 @@
   --color-foreground-muted: var(--palette-light-foreground-muted);
   --color-accent: var(--palette-light-accent);
   --color-accent-strong: var(--palette-light-accent-strong);
+  --color-accent-soft: var(--palette-light-accent-soft);
   --color-accent-foreground: var(--palette-light-accent-foreground);
+  --color-contrast: var(--palette-light-contrast);
+  --color-contrast-foreground: var(--palette-light-contrast-foreground);
   --color-warning: var(--palette-light-warning);
   --color-danger: var(--palette-light-danger);
   --color-positive: var(--palette-light-positive);
 
   --gradient-app:
-    radial-gradient(circle at 10% 18%, rgb(var(--color-accent) / 0.28), transparent 58%),
-    radial-gradient(circle at 78% 12%, rgb(var(--color-accent-strong) / 0.2), transparent 60%),
-    linear-gradient(140deg, rgb(var(--color-surface) / 0.85), rgb(var(--color-background)));
-  --shadow-elevated: 0 28px 72px rgb(var(--color-foreground) / 0.22);
-  --shadow-floating: 0 18px 46px rgb(var(--color-accent) / 0.25);
-  --shadow-cta: 0 12px 32px rgb(var(--color-accent) / 0.35);
-  --shadow-input: 0 14px 38px rgb(var(--color-foreground) / 0.12);
-  --shadow-input-hover: 0 18px 46px rgb(var(--color-foreground) / 0.16);
+    radial-gradient(circle at 12% 14%, rgb(var(--color-accent) / 0.18), transparent 56%),
+    radial-gradient(circle at 84% 8%, rgb(var(--color-contrast) / 0.07), transparent 60%),
+    linear-gradient(160deg, rgb(var(--color-surface) / 0.6), rgb(var(--color-background)));
+  --shadow-elevated: 0 28px 72px rgb(var(--color-contrast) / 0.16);
+  --shadow-floating: 0 18px 46px rgb(var(--color-accent) / 0.22);
+  --shadow-cta: 0 12px 32px rgb(var(--color-accent) / 0.32);
+  --shadow-input: 0 14px 38px rgb(var(--color-contrast) / 0.1);
+  --shadow-input-hover: 0 18px 46px rgb(var(--color-contrast) / 0.14);
   --blur-glass-md: 18px;
   --blur-glass-lg: 24px;
 }
 
 .dark {
   color-scheme: dark;
-  --palette-dark-background: 26 23 16;
-  --palette-dark-surface: 38 34 24;
-  --palette-dark-surface-strong: 48 43 30;
-  --palette-dark-border: 143 107 12;
-  --palette-dark-foreground: 247 240 224;
-  --palette-dark-foreground-muted: 201 188 158;
-  --palette-dark-accent: 224 168 0;
-  --palette-dark-accent-strong: 176 130 0;
-  --palette-dark-accent-foreground: 26 23 16;
-  --palette-dark-warning: 224 178 56;
+  /* Paleta escura — grafite petróleo profundo, amarelo vivo e leitura confortável */
+  --palette-dark-background: 18 26 30; /* derivado do petróleo #1B2D35 */
+  --palette-dark-surface: 27 39 45;
+  --palette-dark-surface-strong: 37 52 60;
+  --palette-dark-border: 84 102 110;
+  --palette-dark-foreground: 244 244 244;
+  --palette-dark-foreground-muted: 168 180 186;
+  --palette-dark-accent: 248 190 14; /* #F8BE0E */
+  --palette-dark-accent-strong: 251 208 72; /* #FBD048 amarelo claro para hover/submenu no escuro */
+  --palette-dark-accent-soft: 247 217 131; /* #F7D983 */
+  --palette-dark-accent-foreground: 27 45 53; /* texto petróleo sobre amarelo */
+  --palette-dark-contrast: 27 45 53;
+  --palette-dark-contrast-foreground: 244 244 244;
+  --palette-dark-warning: 251 208 72;
   --palette-dark-danger: 226 106 64;
   --palette-dark-positive: 75 175 114;
 
@@ -66,20 +77,23 @@
   --color-foreground-muted: var(--palette-dark-foreground-muted);
   --color-accent: var(--palette-dark-accent);
   --color-accent-strong: var(--palette-dark-accent-strong);
+  --color-accent-soft: var(--palette-dark-accent-soft);
   --color-accent-foreground: var(--palette-dark-accent-foreground);
+  --color-contrast: var(--palette-dark-contrast);
+  --color-contrast-foreground: var(--palette-dark-contrast-foreground);
   --color-warning: var(--palette-dark-warning);
   --color-danger: var(--palette-dark-danger);
   --color-positive: var(--palette-dark-positive);
 
   --gradient-app:
-    radial-gradient(circle at 14% 18%, rgb(var(--color-accent) / 0.18), transparent 60%),
-    radial-gradient(circle at 82% 10%, rgb(var(--color-accent-strong) / 0.16), transparent 62%),
-    linear-gradient(120deg, rgb(var(--color-surface) / 0.85), rgb(var(--color-background)));
-  --shadow-elevated: 0 28px 72px rgba(0, 0, 0, 0.45);
-  --shadow-floating: 0 18px 46px rgba(0, 0, 0, 0.4);
-  --shadow-cta: 0 12px 32px rgb(var(--color-accent) / 0.28);
-  --shadow-input: 0 14px 38px rgba(0, 0, 0, 0.4);
-  --shadow-input-hover: 0 18px 46px rgba(0, 0, 0, 0.5);
+    radial-gradient(circle at 14% 16%, rgb(var(--color-accent) / 0.12), transparent 60%),
+    radial-gradient(circle at 84% 10%, rgb(var(--color-contrast-foreground) / 0.05), transparent 62%),
+    linear-gradient(140deg, rgb(var(--color-surface) / 0.7), rgb(var(--color-background)));
+  --shadow-elevated: 0 28px 72px rgba(0, 0, 0, 0.5);
+  --shadow-floating: 0 18px 46px rgba(0, 0, 0, 0.42);
+  --shadow-cta: 0 12px 32px rgb(var(--color-accent) / 0.3);
+  --shadow-input: 0 14px 38px rgba(0, 0, 0, 0.42);
+  --shadow-input-hover: 0 18px 46px rgba(0, 0, 0, 0.52);
   --blur-glass-md: 18px;
   --blur-glass-lg: 26px;
 }
@@ -136,5 +150,21 @@
 
   .app-gradient {
     background-image: var(--gradient-app);
+  }
+
+  /*
+   * Barra superior em azul petróleo (#1B2D35) nos dois temas. Reescrevemos os
+   * tokens de cor apenas neste escopo, então todos os componentes filhos
+   * (brand, dropdowns de navegação, toggle, botão sair) se adaptam para texto
+   * claro + destaque amarelo sem edição individual.
+   */
+  .app-header {
+    --color-surface: 38 56 64;
+    --color-surface-strong: 50 70 80;
+    --color-foreground: 244 244 244;
+    --color-foreground-muted: 176 189 195;
+    --color-border: 104 124 132;
+    --color-accent-strong: 251 208 72;
+    background-color: rgb(var(--color-contrast));
   }
 }
