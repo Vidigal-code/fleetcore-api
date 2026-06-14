@@ -44,10 +44,12 @@ export class VehicleTypeOrmRepository implements VehicleRepository {
   }
 
   async listByModel(modelId: string): Promise<Vehicle[]> {
-    const entities = await this.repository.find({
-      where: { modelId },
-      order: { licensePlate: 'ASC' },
-    });
+    // `modelId` é @RelationId (somente leitura); filtramos pela coluna FK real.
+    const entities = await this.repository
+      .createQueryBuilder('vehicle')
+      .where('vehicle.model_id = :modelId', { modelId })
+      .orderBy('vehicle.licensePlate', 'ASC')
+      .getMany();
     return entities.map((entity) => VehicleMapper.toDomain(entity));
   }
 
