@@ -1,4 +1,3 @@
-
 # Shared ports
 HTTP_PORT=3000
 FRONTEND_PORT=3001
@@ -17,16 +16,19 @@ SQLSERVER_DB=fleetcore
 REDIS_HOST=redis
 REDIS_PORT=6379
 REDIS_TTL_SECONDS=120
+# TTL (seconds) for distributed locks (RedisLockService / session lock)
+REDIS_LOCK_TTL=30
 
-# JWT
+# JWT / Session
 JWT_SECRET=supersecretjwt
 JWT_EXPIRES_IN=3600s
+# Redis session TTL (seconds). Sessions are stored in Redis and refreshed (sliding TTL).
 AUTH_SESSION_TTL_SECONDS=3600
 
-# MongoDB
+# MongoDB (audit trail)
 MONGO_URI=mongodb://mongo:27017/fleetcore
 
-# RabbitMQ
+# RabbitMQ (audit + domain events)
 RABBITMQ_URI=amqp://rabbitmq:5672
 RABBITMQ_CONNECT_TIMEOUT_MS=15000
 RABBITMQ_RECONNECT_SECONDS=5
@@ -34,8 +36,13 @@ RABBITMQ_HEARTBEAT_SECONDS=30
 RABBITMQ_EXCHANGE=fleetcore.events
 RABBITMQ_QUEUE=fleetcore.vehicles
 RABBITMQ_AUDIT_QUEUE=fleetcore.audit
+RABBITMQ_RETRY_QUEUE=fleetcore.retry
+RABBITMQ_DLQ=fleetcore.dead-letter
 
-# Security
+# Workers (RabbitMQ prefetch / concurrency). Default 2 when unset.
+WORKER_CONCURRENCY=2
+
+# Security (Helmet/CORS + base throttler)
 SECURITY_CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
 SECURITY_RATE_LIMIT_TTL=60
 SECURITY_RATE_LIMIT_MAX=100
@@ -43,18 +50,22 @@ SECURITY_EXPECT_CT_ENFORCE=true
 SECURITY_EXPECT_CT_MAX_AGE=86400
 SECURITY_ORIGIN_AGENT_CLUSTER=true
 
+# Rate limit (Redis-backed guard: per user/IP/endpoint + stricter auth budget)
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_WINDOW_SECONDS=60
+RATE_LIMIT_MAX_REQUESTS=100
+RATE_LIMIT_AUTH_MAX_REQUESTS=10
+RATE_LIMIT_AUTH_WINDOW_SECONDS=60
+
+# Resilience (retry/fallback/rollback)
+RETRY_MAX_ATTEMPTS=5
+RETRY_INITIAL_DELAY=1000
+
 # Seed admin
 ADMIN_NICKNAME=aivacol
 ADMIN_EMAIL=aivacol@fleetcore.local
 ADMIN_NAME=Aivacol Admin
 ADMIN_PASSWORD=aivacol123!
-
-# Frontend public vars
-NEXT_PUBLIC_API_URL=http://backend:3000/api
-NEXT_PUBLIC_APP_NAME=Fleetcore Web
-NEXT_PUBLIC_CACHE_TTL_SECONDS=60
-NEXT_PUBLIC_START_THEME=light
-
 
 # Frontend public vars
 NEXT_PUBLIC_API_URL=http://backend:3000/api

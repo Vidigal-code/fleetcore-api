@@ -29,6 +29,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException('Session expired or revoked');
     }
 
+    const locked = await this.authSessionService.isLocked(payload.sessionId);
+    if (locked) {
+      throw new UnauthorizedException('Session is locked');
+    }
+
+    await this.authSessionService.refresh(payload.sessionId);
+
     return payload;
   }
 }

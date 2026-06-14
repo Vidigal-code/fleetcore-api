@@ -5,6 +5,12 @@ Las puertas de calidad automatizadas eran un requisito central. La solución ofr
 ## Backend (Jest)
 
 - **Pruebas unitarias** (`backend/tests/unit`) cubren servicios de flota, flujos de auth, lógica de auditoría, feature toggles y repositorios usando colaboradores mockeados.
+- **Nuevas suites unitarias** para las protecciones aditivas:
+  - `auth/auth-session.service.spec.ts` — `refresh`/`lock`/`unlock` de las sesiones Redis.
+  - `shared/redis-lock.service.spec.ts` — adquisición/liberación segura del lock distribuido.
+  - `shared/idempotency.service.spec.ts` — marcado y detección de duplicados.
+  - `shared/rate-limit.service.spec.ts` — conteo y bloqueo por usuario/IP/endpoint.
+  - `shared/resilience.service.spec.ts` (extendida) — `executeWithFallback` y `executeWithRollback`.
 - **Integración** valida la búsqueda y el orden de vehículos; **e2e** (`backend/tests/e2e`) ejecuta flujos HTTP reales de vehículos y seguridad.
 - **Comandos**:
   - `npm run lint`

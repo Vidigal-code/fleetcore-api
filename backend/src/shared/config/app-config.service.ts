@@ -14,6 +14,7 @@ import {
   FeatureToggleMap,
   JwtConfig,
   MessagingConfig,
+  RateLimitConfig,
   ResilienceConfig,
   RedisConfig,
 } from './app-config.types';
@@ -44,7 +45,23 @@ export class AppConfigService {
       host: this.configService.get<string>('redis.host', 'redis'),
       port: this.configService.get<number>('redis.port', 6379),
       ttlSeconds: this.configService.get<number>('redis.ttlSeconds', 60),
+      lockTtlSeconds: this.configService.get<number>(
+        'redis.lockTtlSeconds',
+        30,
+      ),
     };
+  }
+
+  get rateLimit(): RateLimitConfig {
+    return (
+      this.configService.get<RateLimitConfig>('rateLimit') ?? {
+        enabled: true,
+        windowSeconds: 60,
+        maxRequests: 100,
+        authWindowSeconds: 60,
+        authMaxRequests: 10,
+      }
+    );
   }
 
   get auth(): AuthConfig {
@@ -85,6 +102,18 @@ export class AppConfigService {
       auditQueue: this.configService.get<string>(
         'messaging.auditQueue',
         'fleetcore.audit',
+      ),
+      retryQueue: this.configService.get<string>(
+        'messaging.retryQueue',
+        'fleetcore.retry',
+      ),
+      deadLetterQueue: this.configService.get<string>(
+        'messaging.deadLetterQueue',
+        'fleetcore.dead-letter',
+      ),
+      workerConcurrency: this.configService.get<number>(
+        'messaging.workerConcurrency',
+        2,
       ),
       connection: {
         timeoutMs: this.configService.get<number>(

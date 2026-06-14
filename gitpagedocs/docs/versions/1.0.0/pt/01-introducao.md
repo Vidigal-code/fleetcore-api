@@ -2,7 +2,7 @@
 
 O desafio de gestão de frotas da Aivacol solicita uma plataforma pronta para produção que una backend, frontend, integrações assíncronas e documentação. O repositório `fleetcore-api` entrega:
 
-- **Backend**: NestJS 11, TypeORM (SQL Server), cache Redis, mensageria RabbitMQ e trilha de auditoria em MongoDB.
+- **Backend**: NestJS 11, TypeORM (SQL Server), cache Redis (com sessões de TTL deslizante, lock distribuído, idempotência e rate limit), mensageria RabbitMQ e trilha de auditoria enriquecida em MongoDB.
 - **Frontend**: Next.js 16 (App Router) com React 19, estruturado com o padrão Feature-Sliced Design, Redux Toolkit e React Query.
 - **Infraestrutura**: Docker Compose para todos os serviços, seeds iniciais, scripts npm e um único `.env` na raiz.
 - **Qualidade & Operações**: testes automatizados, políticas de resiliência, Swagger PT/EN (tema escuro, exemplos bilíngues, Try-it-out) e GitPagedocs bilíngue.
@@ -24,7 +24,7 @@ backend/
   src/
     apps/
       api/                # Bootstrap HTTP, guards, Swagger
-      audit-worker/       # Worker assíncrono para fallback de auditoria
+      audit-worker/       # Worker assíncrono que consome fleetcore.audit e grava no MongoDB
     modules/
       auth/
       fleet/

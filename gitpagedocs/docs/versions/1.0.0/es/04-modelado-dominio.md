@@ -11,6 +11,20 @@ El sistema se apoya en **TypeORM** con SQL Server. Una única migración (`backe
 | `models` | `id`, `name`, `brand_id`, metadata | `brand_id` opcional; FK usa `SET NULL`. |
 | `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `year`, `model_id`, metadata | Unicidad en placa/chasis/renavam; FK elimina en cascada para mantener la integridad referencial. |
 
+## Colección de auditoría (MongoDB)
+
+La traza de auditoría no vive en SQL Server: se persiste en la colección `audit_events` de MongoDB (`backend/src/modules/audit/schemas/audit-event.schema.ts`). El documento lo escribe el worker de auditoría con los campos enriquecidos del evento más metadatos de procesamiento:
+
+| Grupo | Campos |
+|-------|--------|
+| Identidad del evento | `eventId`, `eventType`, `correlationId`, `requestId` |
+| Actor/sesión | `actor`, `userId`, `sessionId` |
+| Petición | `method`, `route`, `action`, `statusCode`, `success` |
+| Entidad | `entity`, `entityId`, `payload`, `metadata`, `occurredAt` |
+| Procesamiento | `status` (`processed`), `retries`, `sourceQueue`, `processedAt` |
+
+Los campos enriquecidos son opcionales (compatibles con documentos previos) y la escritura usa `ResilienceService` (retry/fallback).
+
 ## Capa de dominio
 
 - Los agregados (`User`, `Brand`, `Model`, `Vehicle`) encapsulan invariantes y exponen métodos de mutación con transiciones de estado controladas.

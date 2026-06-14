@@ -9,7 +9,7 @@ Deliver a production-ready stack that satisfies every requirement from the Aivac
 ## Pillars
 
 - **Architecture** — modules, layers and entities covered in the Backend Architecture and Data and Domain Modeling sections.
-- **Security & observability** — RBAC, audit logs and RabbitMQ flows summarized in the Security, Audit and Messaging chapter.
+- **Security & observability** — RBAC, Redis sessions (sliding TTL + lock), distributed lock, idempotency, a dedicated rate-limit guard, enriched audit logs and RabbitMQ flows summarized in the Security, Audit and Messaging chapter. These are additive: the existing structure and flow were preserved.
 - **User experience** — FSD structure, theming and data flow documented under Frontend and Experience.
 - **Quality & operations** — QA and support routines detailed in the Quality and Testing and Runbook sections.
 

@@ -8,7 +8,7 @@ Este espacio documenta de forma transparente la solución entregada para el desa
 - **Requisitos y Criterios** — checklist completa del enunciado y dónde se cumple cada ítem.
 - **Arquitectura Backend** — módulos NestJS, capas DDD y mecanismos de resiliencia.
 - **Modelado de Datos y Dominio** — entidades, migraciones y relaciones entre tablas.
-- **Seguridad, Auditoría y Mensajería** — JWT, RBAC, Redis, RabbitMQ y trazas en MongoDB.
+- **Seguridad, Auditoría y Mensajería** — JWT, RBAC, sesiones Redis con TTL deslizante y lock, rate limit dedicado, idempotencia, RabbitMQ y trazas enriquecidas en MongoDB.
 - **Frontend y Experiencia** — Next.js 16 FSD, React Query, Redux Toolkit y diseño amarillo responsivo.
 - **Infraestructura y Despliegue** — Docker Compose, variables de entorno, scripts y documentación.
 - **Calidad y Pruebas** — matriz de tests unitarios/integrados/e2e, linting y monitoreo.

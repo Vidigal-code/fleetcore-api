@@ -4,8 +4,9 @@ Panorama de cómo se conectan backend, dominio y servicios de soporte.
 
 ## Backend NestJS
 
-- Módulos `auth`, `fleet`, `users`, `audit` y `messaging`.
-- Guards globales (`JwtAuthGuard`, `RolesGuard`) y `AuthSessionService` sobre Redis.
+- Módulos `auth`, `fleet`, `users`, `audit` y `messaging`, más la app worker `audit-worker`.
+- Guards globales (`JwtAuthGuard`, `RolesGuard`, `RateLimitGuard`) y `AuthSessionService` sobre Redis con TTL deslizante y lock de sesión.
+- Protecciones aditivas en Redis: lock distribuido (`RedisLockService`), idempotencia (`IdempotencyService`) y rate limit por usuario/IP/endpoint.
 - Eventos de dominio procesados por `FleetDomainEventListener` y enviados a RabbitMQ.
 
 Consulta la sección Arquitectura Backend del menú para el detalle completo.
@@ -20,8 +21,8 @@ Más información en la sección Modelado de Datos y Dominio.
 
 ## Observabilidad
 
-- Interceptor de auditoría que graba en MongoDB y publica en RabbitMQ.
+- `AuditInterceptor` que publica eventos enriquecidos (`correlationId`, `requestId`, `sessionId`, `statusCode`…) en RabbitMQ (`fleetcore.audit`); el worker `audit-worker` los persiste en MongoDB con metadatos de procesamiento.
 - Métricas de dominio para monitoreo.
-- `ResilienceService` y feature toggles controlan reintentos, timeouts y comportamientos opcionales.
+- `ResilienceService` (retry/fallback/rollback) y feature toggles controlan reintentos, timeouts y comportamientos opcionales; `UnitOfWork` aporta el rollback transaccional SQL.
 
 Profundiza en la sección Seguridad, Auditoría y Mensajería.

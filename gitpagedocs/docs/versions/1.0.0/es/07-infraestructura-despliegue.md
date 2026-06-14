@@ -12,13 +12,19 @@ El proyecto puede ejecutarse sin fricciones dentro de Docker o directamente en l
 - `mongo` — persiste la traza de auditoría.
 - `rabbitmq` — broker con interfaz de administración (`15672`).
 - `backend` — app NestJS construida con `backend/Dockerfile` multietapa; depende de todos los servicios de datos.
+- `audit-worker` — mismo imagen del backend, arrancado con `node dist/src/apps/audit-worker/main.js`; consume la cola `fleetcore.audit` y escribe la traza de auditoría en MongoDB. Su concurrencia (`prefetchCount`) se controla con `WORKER_CONCURRENCY`.
 - `frontend` — app Next.js (multietapa `frontend/Dockerfile`) servida en el puerto 3001.
 
 ## Variables de entorno
 
 - Existe un **único `.env` en la raíz**, copiado de `envexample.txt`, que provee los valores compartidos para backend y frontend (`SQLSERVER_*`, `JWT_SECRET`, `AUTH_SESSION_TTL_SECONDS`, `NEXT_PUBLIC_*`).
 - `backend/envexample.txt` ilustra la ejecución independiente del backend.
-- Novedades: `AUTH_SESSION_TTL_SECONDS` (sesiones Redis) y `NEXT_PUBLIC_START_THEME` (tema por defecto).
+- Novedades de sesión/tema: `AUTH_SESSION_TTL_SECONDS` (sesiones Redis con TTL deslizante) y `NEXT_PUBLIC_START_THEME` (tema por defecto).
+- Variables aditivas de resiliencia, worker, lock y rate limit (nombres existentes preservados):
+  - Lock distribuido: `REDIS_LOCK_TTL=30`.
+  - Worker de auditoría: `WORKER_CONCURRENCY=2`, `RABBITMQ_RETRY_QUEUE=fleetcore.retry`, `RABBITMQ_DLQ=fleetcore.dead-letter`.
+  - Rate limit Redis: `RATE_LIMIT_ENABLED=true`, `RATE_LIMIT_WINDOW_SECONDS=60`, `RATE_LIMIT_MAX_REQUESTS=100`, `RATE_LIMIT_AUTH_MAX_REQUESTS=10`, `RATE_LIMIT_AUTH_WINDOW_SECONDS=60`.
+  - Reintentos: `RETRY_MAX_ATTEMPTS=5`, `RETRY_INITIAL_DELAY=1000`.
 
 ## Scripts útiles
 
@@ -39,7 +45,7 @@ El proyecto puede ejecutarse sin fricciones dentro de Docker o directamente en l
 ## Observabilidad
 
 - Los logs de NestJS resaltan reintentos, aperturas del circuit breaker y fallbacks de auditoría.
-- Los datos de auditoría viven en MongoDB; RabbitMQ ofrece una traza completa de eventos.
+- Los datos de auditoría viven en MongoDB (enriquecidos con `correlationId`/`requestId`/`sessionId`/`statusCode` y metadatos del worker como `status`, `retries`, `processedAt`); RabbitMQ ofrece una traza completa de eventos a través de la cola `fleetcore.audit` y las colas auxiliares `fleetcore.retry` y `fleetcore.dead-letter`.
 - Las métricas de dominio permiten integrar fácilmente Prometheus/Grafana.
 
 ## Flujo de despliegue recomendado

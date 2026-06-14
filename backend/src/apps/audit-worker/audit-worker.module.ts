@@ -12,6 +12,7 @@ import authConfig from '../../shared/config/auth.config';
 import securityConfig from '../../shared/config/security.config';
 import featureToggleConfig from '../../shared/config/feature-toggle.config';
 import resilienceConfig from '../../shared/config/resilience.config';
+import rateLimitConfig from '../../shared/config/rate-limit.config';
 import swaggerConfig from '../../shared/config/swagger.config';
 import { SharedModule } from '../../shared/shared.module';
 import { AuditModule } from '../../modules/audit/audit.module';
@@ -33,6 +34,7 @@ import { AuditEventsConsumer } from '../../modules/audit/consumers/audit-events.
         securityConfig,
         featureToggleConfig,
         resilienceConfig,
+        rateLimitConfig,
         swaggerConfig,
       ],
       validate: validateEnvironment,

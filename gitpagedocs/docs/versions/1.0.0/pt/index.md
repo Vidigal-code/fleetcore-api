@@ -8,7 +8,7 @@ Este espaço documenta, em detalhes, a solução entregue para o teste técnico 
 - **Requisitos e Critérios** — checklist completo do enunciado e onde cada item foi atendido.
 - **Arquitetura Backend** — módulos NestJS, camadas DDD e mecanismos de resiliência.
 - **Modelagem de Dados e Domínio** — entidades, migrations e relacionamento entre tabelas.
-- **Segurança, Auditoria e Mensageria** — JWT, RBAC, Redis, RabbitMQ e trilha em MongoDB.
+- **Segurança, Auditoria e Mensageria** — JWT, RBAC, sessões Redis (TTL deslizante + lock), rate limit, idempotência, lock distribuído, RabbitMQ e trilha enriquecida em MongoDB.
 - **Frontend e Experiência** — Next.js FSD, React Query, Redux Toolkit e design responsivo amarelo.
 - **Infraestrutura e Deployment** — Docker Compose, variáveis de ambiente, scripts e documentação.
 - **Qualidade e Testes** — matriz de testes unitários/integrados/e2e, linting e monitoramento.

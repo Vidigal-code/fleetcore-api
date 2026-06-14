@@ -11,8 +11,9 @@ Guia rápido dos endpoints, camadas e mecanismos de negócio da API NestJS.
 ## Regras de negócio
 
 - Serviços (`models.service.ts`, `vehicles.service.ts`) validam relacionamentos e disparam eventos.
-- Cache Redis reduz consultas de busca e invalidações ocorrem após mutações.
-- Mensagens RabbitMQ registram mudanças relevantes de veículos.
+- Cache Redis reduz consultas de busca e invalidações ocorrem após mutações; operações críticas contam ainda com idempotência (`Idempotency-Key`), lock distribuído (`RedisLockService`) e rate limit (`RateLimitGuard`).
+- Sessões ficam no Redis com TTL deslizante e suporte a bloqueio (`AuthSessionService`).
+- Mensagens RabbitMQ registram mudanças relevantes de veículos; a auditoria enriquecida é gravada no MongoDB pelo `audit-worker`.
 
 ## Como aprofundar
 
