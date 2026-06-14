@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { SharedModule } from '../../shared/shared.module';
@@ -29,6 +29,7 @@ import { RolesGuard } from '../../modules/auth/guards/roles.guard';
 import { AuditInterceptor } from '../../modules/audit/interceptors/audit.interceptor';
 import { RateLimitGuard } from './security/rate-limit.guard';
 import { IdempotencyInterceptor } from '../../shared/cache/idempotency.interceptor';
+import { AllExceptionsFilter } from './filters/all-exceptions.filter';
 
 @Module({
   imports: [
@@ -76,6 +77,10 @@ import { IdempotencyInterceptor } from '../../shared/cache/idempotency.intercept
   ],
   providers: [
     AppBootstrapService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
