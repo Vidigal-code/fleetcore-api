@@ -1,11 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-
 import type { Vehicle } from '@/entities/vehicle/model/types';
 import { VehicleTable } from '@/entities/vehicle/ui/vehicle-table';
 import { VehicleFilterBar } from '@/features/vehicles/filter/ui/vehicle-filter-bar';
 import { VehicleForm } from '@/features/vehicles/manage/ui/vehicle-form';
+import { useConfirmation } from '@/shared/hooks/use-confirmation';
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { PageSection, Stack, Surface } from '@/shared/ui/layout-primitives';
 import { Modal } from '@/shared/ui/modal';
@@ -25,17 +24,13 @@ export const VehicleWorkbench = () => {
     feedback,
   } = state;
 
-  const [pendingDelete, setPendingDelete] = useState<Vehicle | null>(null);
+  const deletion = useConfirmation<Vehicle>((vehicle) =>
+    actions.deleteVehicle(vehicle.id),
+  );
 
   const closeEdit = () => {
     actions.setEditingVehicle(null);
     actions.resetFeedback();
-  };
-
-  const confirmDelete = async () => {
-    if (!pendingDelete) return;
-    await actions.deleteVehicle(pendingDelete.id);
-    setPendingDelete(null);
   };
 
   return (
@@ -62,7 +57,12 @@ export const VehicleWorkbench = () => {
       </PageSection>
 
       <PageSection id="vehicles" width="xl" layout="stack" className="gap-8">
-        <Surface tone="base" radius="xl" className="mx-auto w-full max-w-5xl space-y-6">
+        <Surface
+          tone="base"
+          radius="xl"
+          align="center"
+          className="mx-auto w-full max-w-3xl space-y-6"
+        >
           <VehicleForm
             mode="create"
             brands={brands}
@@ -96,7 +96,7 @@ export const VehicleWorkbench = () => {
               total={collection.total}
               onPageChange={actions.changePage}
               onEdit={actions.setEditingVehicle}
-              onDelete={setPendingDelete}
+              onDelete={deletion.request}
             />
           </div>
         </Surface>
@@ -124,14 +124,14 @@ export const VehicleWorkbench = () => {
       </Modal>
 
       <ConfirmDialog
-        open={Boolean(pendingDelete)}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={confirmDelete}
+        open={deletion.isOpen}
+        onClose={deletion.cancel}
+        onConfirm={deletion.confirm}
         loading={isSubmitting}
         title="Remover veículo"
         description={
-          pendingDelete
-            ? `Remover definitivamente o veículo "${pendingDelete.licensePlate}"? Essa ação não pode ser desfeita.`
+          deletion.target
+            ? `Remover definitivamente o veículo "${deletion.target.licensePlate}"? Essa ação não pode ser desfeita.`
             : undefined
         }
         confirmLabel="Remover"

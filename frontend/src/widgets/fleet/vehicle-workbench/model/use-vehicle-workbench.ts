@@ -14,8 +14,9 @@ import {
 } from '@/entities/vehicle/api/vehicle-api';
 import type { Vehicle, VehicleFilters } from '@/entities/vehicle/model/types';
 import type { VehicleFormValues } from '@/features/vehicles/manage/model/vehicle-schema';
+import { FLEET_LIST_PAGE_SIZE } from '@/shared/config/pagination';
 
-const DEFAULT_LIMIT = 10;
+const DEFAULT_LIMIT = FLEET_LIST_PAGE_SIZE;
 
 const initialFilters: VehicleFilters = {
   page: 1,
