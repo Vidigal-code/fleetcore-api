@@ -23,10 +23,14 @@ export class ModelTypeOrmRepository implements ModelRepository {
   }
 
   async listByBrand(brandId: string): Promise<Model[]> {
-    const entities = await this.repository.find({
-      where: { brandId },
-      order: { name: 'ASC' },
-    });
+    // `brandId` é uma propriedade @RelationId (somente leitura) e não pode ser
+    // usada no `where` do find. Filtramos pela coluna FK real (`brand_id`) via
+    // query builder, mesmo padrão usado na busca de veículos.
+    const entities = await this.repository
+      .createQueryBuilder('model')
+      .where('model.brand_id = :brandId', { brandId })
+      .orderBy('model.name', 'ASC')
+      .getMany();
     return entities.map((entity) => ModelMapper.toDomain(entity));
   }
 
