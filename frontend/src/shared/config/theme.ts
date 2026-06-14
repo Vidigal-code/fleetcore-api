@@ -14,12 +14,12 @@ export const themeOptions: ThemeOption[] = [
   {
     value: 'light',
     label: 'Claro',
-    description: 'Amarelo claro, superfícies suaves e contraste quente.',
+    description: 'Fundo cinza claro, superfícies brancas e destaque amarelo.',
   },
   {
     value: 'dark',
     label: 'Escuro',
-    description: 'Amarelo escuro, superfícies grafite e leitura confortável.',
+    description: 'Grafite petróleo, amarelo vivo e leitura confortável.',
   },
 ];
 

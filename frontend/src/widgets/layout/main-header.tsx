@@ -1,9 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useMemo } from 'react';
-import { LogOut, Menu, User, X } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 
 import { ThemeToggle } from '@/features/theme/toggle';
 import {
@@ -12,15 +12,11 @@ import {
   type NavigationCategory,
 } from '@/entities/navigation/model/navigation';
 import { useAppSelector } from '@/processes/app/store/hooks';
-import {
-  selectCurrentUser,
-  selectIsAuthenticated,
-} from '@/processes/auth/model/auth-selectors';
+import { selectIsAuthenticated } from '@/processes/auth/model/auth-selectors';
 import { useLogout } from '@/processes/auth/model/use-logout';
 import { appConfig } from '@/shared/config/env';
 import { ROUTES } from '@/shared/constants/routes';
 import { cn } from '@/shared/lib/utils';
-import { Dropdown, type DropdownItem } from '@/shared/ui/dropdown';
 import { NavSelect } from '@/shared/ui/nav-select';
 import { useLinkNavigation } from '@/widgets/layout/model/use-link-navigation';
 
@@ -39,13 +35,6 @@ export interface MainHeaderProps {
 
 const BRAND_MARK_LENGTH = 2;
 const HEADER_TAGLINE = 'Operação inteligente de frotas';
-
-type AccountActionId = 'profile' | 'logout';
-
-const ACCOUNT_MENU_ITEMS: DropdownItem[] = [
-  { id: 'profile', label: 'Perfil', icon: <User className="h-4 w-4" /> },
-  { id: 'logout', label: 'Sair', tone: 'danger', icon: <LogOut className="h-4 w-4" /> },
-];
 
 const MenuToggleButton = ({
   isOpen,
@@ -147,29 +136,29 @@ const GuestActions = ({
   </div>
 );
 
-const AccountMenu = ({
-  userName,
-  onAction,
+const LogoutButton = ({
+  onLogout,
   className,
 }: {
-  userName: string;
-  onAction: (id: AccountActionId) => void;
+  onLogout: () => void;
   className?: string;
 }) => (
-  <Dropdown
-    label={userName}
-    ariaLabel={`Conta de ${userName}`}
-    items={ACCOUNT_MENU_ITEMS}
-    onSelect={(item) => onAction(item.id as AccountActionId)}
-    align="end"
-    className={cn('w-44', className)}
-  />
+  <button
+    type="button"
+    onClick={onLogout}
+    aria-label="Sair da conta"
+    className={cn(
+      'inline-flex h-10 items-center gap-2 rounded-full border border-border/60 bg-surface/80 px-4 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-foreground shadow-sm backdrop-blur transition-colors duration-base ease-subtle hover:border-accent/60 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+      className,
+    )}
+  >
+    <LogOut className="h-4 w-4" />
+    <span>Sair</span>
+  </button>
 );
 
 export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderProps) => {
   const pathname = usePathname();
-  const router = useRouter();
-  const user = useAppSelector(selectCurrentUser);
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const logout = useLogout();
   const navigateLink = useLinkNavigation();
@@ -182,16 +171,8 @@ export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderPro
     : ROUTES.landing;
   const brandMark = getBrandMonogram(appConfig.appName, BRAND_MARK_LENGTH);
 
-  const handleAccountAction = (id: AccountActionId) => {
-    if (id === 'profile') {
-      router.push(ROUTES.profile);
-      return;
-    }
-    void logout();
-  };
-
   return (
-    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/85 backdrop-blur-xl">
+    <header className="app-header sticky top-0 z-50 border-b border-white/10 backdrop-blur-xl">
       <div className="mx-auto grid w-full max-w-7xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 px-4 py-2.5 sm:px-6 lg:px-8 xl:gap-6 xl:px-12">
         <div className="flex min-w-0 items-center justify-start gap-3">
           <MenuToggleButton isOpen={mobileMenuOpen} onToggle={onMobileMenuToggle} />
@@ -207,12 +188,8 @@ export const MainHeader = ({ mobileMenuOpen, onMobileMenuToggle }: MainHeaderPro
         </div>
 
         <div className="flex min-w-0 items-center justify-end gap-3">
-          {isAuthenticated && user ? (
-            <AccountMenu
-              userName={user.name}
-              onAction={handleAccountAction}
-              className="hidden md:block"
-            />
+          {isAuthenticated ? (
+            <LogoutButton onLogout={() => void logout()} className="hidden md:inline-flex" />
           ) : (
             <GuestActions isActive={isActive} spotlight={navigation.spotlight} />
           )}
