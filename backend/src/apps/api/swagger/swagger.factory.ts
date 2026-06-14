@@ -38,6 +38,10 @@ const formatPath = (path: string) => (path.startsWith('/') ? path : `/${path}`);
 const buildDocumentOptions = (): SwaggerDocumentOptions => ({
   operationIdFactory: (controllerKey: string, methodKey: string) =>
     `${controllerKey.replace(/Controller$/u, '')}.${methodKey}`,
+  // O prefixo global (/api) é exposto uma única vez via server (addServer).
+  // Sem isto, o @nestjs/swagger também o injeta em cada path, e o Swagger UI
+  // concatena server + path resultando em "/api/api/..." (404 ao testar).
+  ignoreGlobalPrefix: true,
 });
 
 const createDocumentBuilder = (
