@@ -11,8 +11,10 @@ Este capítulo mapeia o checklist do desafio para os artefatos de código corres
 | CRUD de **veículos** | `vehicles.controller.ts`, `vehicles.service.ts` | Consulta com cache Redis (`RepositoryCacheService`) e expõe eventos `vehicle.*`. |
 | Consistência veículo-modelo-marca | Agregados em `backend/src/modules/fleet/domain` | Services checam existência de modelo/marca antes de persistir veículo. |
 | Seed do usuário `aivacol` | `backend/src/apps/api/app-bootstrap.service.ts`, `UsersService.ensureAdminSeed()` | Cria admin inicial com roles configuráveis. |
-| Autenticação JWT/RBAC | `backend/src/modules/auth/interfaces/http/auth.controller.ts` | Endpoints `login`, `register`, `logout`, `me` com sessões no Redis. |
-| Trilha de auditoria | `backend/src/modules/audit/interceptors/audit.interceptor.ts`, `audit-writer.service.ts` | Captura requisição/resposta e persiste em MongoDB quando necessário. |
+| Autenticação JWT/RBAC | `backend/src/modules/auth/interfaces/http/auth.controller.ts` | Endpoints `login`, `register`, `logout`, `me` com sessões no Redis (TTL deslizante + lock via `AuthSessionService`). |
+| Trilha de auditoria | `backend/src/modules/audit/interceptors/audit.interceptor.ts`, `audit-writer.service.ts` | Audita toda rota não-pública, publica em `audit.event` e persiste em MongoDB com campos enriquecidos (`eventId`, `correlationId`, `sessionId`, etc.). |
+| Proteção do banco com Redis | `RepositoryCacheService`, `IdempotencyService`/`IdempotencyInterceptor`, `RedisLockService` | Cache de leitura, idempotência via header `Idempotency-Key` (409 em duplicidade) e lock distribuído nas operações críticas. |
+| Rate limiting Redis | `RateLimitService` + `RateLimitGuard` (`backend/src/apps/api/security/`) | Limites por usuário/IP/endpoint (100/60s; `login` 10/60s), resposta 429 e auditoria `rate_limit.blocked`. |
 | Mensageria RabbitMQ | `backend/src/modules/messaging/messaging.service.ts`, `FleetDomainEventListener` | Publica eventos no exchange `fleetcore.events` e mantém consumidor de exemplo. |
 | Frontend de gestão | `frontend/src/app/dashboard/page.tsx`, `frontend/src/widgets` | Dashboards, formulários e filtros integrados via React Query. |
 
@@ -24,12 +26,30 @@ Este capítulo mapeia o checklist do desafio para os artefatos de código corres
 | Persistência SQL Server | Migração `backend/src/migrations/1717845600000-InitSchema.ts`, repositórios TypeORM em `backend/src/modules/fleet/infrastructure`. |
 | Cache Redis obrigatório | `backend/src/shared/cache/repository-cache.service.ts` controla o namespace `fleetcore:cache:*`. |
 | JWT + RBAC | `JwtStrategy`, `JwtAuthGuard`, `RolesGuard`, sessões via `AuthSessionService`. |
-| Sanitização e rate limiting | Configuração em `backend/src/apps/api/security/security-setup.ts` com `SanitizeInputPipe` + `ThrottlerGuard`. |
+| Sanitização e rate limiting | `SanitizeInputPipe` + `ThrottlerGuard` (`security-setup.ts`) como base, complementados por `RateLimitGuard` Redis dedicado (`RATE_LIMIT_*`). |
 | Mensageria | `MessagingService` e `vehicle-events.consumer.ts` implementam troca de mensagens resiliente. |
 | Auditoria MongoDB | `AuditService` e `AuditWriterService` garantem persistência mesmo com falha de fila. |
 | Schemas compartilhados | `npm run export:schemas` exporta validações para `frontend/src/shared/schemas`. |
 | Frontend FSD | Redux (`frontend/src/processes/app/store`), React Query (`entities/*/api`), UI em `shared/ui`. |
 | Documentação | Swagger builder (`backend/src/apps/api/swagger/swagger.factory.ts`) com dois docs (`/docs` EN e `/docs-pt` PT), tema escuro com identidade Fleetcore, exemplos bilíngues, Try-it-out habilitado e login pré-preenchido; além deste GitPagedocs. |
+
+## Variáveis de ambiente adicionais
+
+Os nomes existentes foram **preservados** (sem renomear). Foram acrescentadas, de forma aditiva, as chaves abaixo (presentes em `envexample.txt` e `docker-compose.yml`):
+
+| Variável | Padrão | Função |
+|----------|--------|--------|
+| `REDIS_LOCK_TTL` | `30` | TTL (s) do lock distribuído (`RedisLockService`). |
+| `WORKER_CONCURRENCY` | `2` | `prefetchCount` do RabbitMQ no `audit-worker`. |
+| `RABBITMQ_RETRY_QUEUE` | `fleetcore.retry` | Fila de reprocessamento. |
+| `RABBITMQ_DLQ` | `fleetcore.dead-letter` | Dead-letter queue. |
+| `RATE_LIMIT_ENABLED` | `true` | Liga/desliga o guard de rate limit. |
+| `RATE_LIMIT_WINDOW_SECONDS` | `60` | Janela padrão de rate limit. |
+| `RATE_LIMIT_MAX_REQUESTS` | `100` | Máximo de requisições por janela. |
+| `RATE_LIMIT_AUTH_MAX_REQUESTS` | `10` | Máximo para `POST /auth/login`. |
+| `RATE_LIMIT_AUTH_WINDOW_SECONDS` | `60` | Janela do `POST /auth/login`. |
+| `RETRY_MAX_ATTEMPTS` | `5` | Tentativas máximas no `ResilienceService`. |
+| `RETRY_INITIAL_DELAY` | `1000` | Delay inicial (ms) do backoff. |
 
 ## Evidências complementares
 

@@ -10,6 +10,15 @@ export interface RedisConfig {
   readonly host: string;
   readonly port: number;
   readonly ttlSeconds: number;
+  readonly lockTtlSeconds: number;
+}
+
+export interface RateLimitConfig {
+  readonly enabled: boolean;
+  readonly windowSeconds: number;
+  readonly maxRequests: number;
+  readonly authWindowSeconds: number;
+  readonly authMaxRequests: number;
 }
 
 export interface AuthConfig {
@@ -38,6 +47,9 @@ export interface MessagingConfig {
   readonly exchange: string;
   readonly queue: string;
   readonly auditQueue: string;
+  readonly retryQueue: string;
+  readonly deadLetterQueue: string;
+  readonly workerConcurrency: number;
   readonly connection: MessagingConnectionConfig;
 }
 

@@ -12,6 +12,7 @@ The repository ships with everything needed to run the platform locally or in CI
 - `mongo` — MongoDB for the audit fallback worker.
 - `rabbitmq` — RabbitMQ with management UI exposed on `15672`.
 - `backend` — Multistage Nest build defined in `backend/Dockerfile`; depends on the data services above.
+- `audit-worker` — same backend image, started with `node dist/src/apps/audit-worker/main.js`; consumes the `fleetcore.audit` queue and writes audit events to MongoDB. Its RabbitMQ `prefetchCount` is driven by `WORKER_CONCURRENCY` (default `2`), logged at boot.
 - `frontend` — Multistage Next.js build (`frontend/Dockerfile`) serving the web client on `3001`.
 
 ## Environment configuration
@@ -22,6 +23,10 @@ The repository ships with everything needed to run the platform locally or in CI
   - `AUTH_SESSION_TTL_SECONDS`, `JWT_SECRET`, `FEATURE_FLAGS_*` control security behaviour.
   - `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME` configure the frontend runtime.
   - `AUDIT_MONGO_URI`, `RABBITMQ_URI` wire audit/messaging.
+  - **Rate limit**: `RATE_LIMIT_ENABLED=true`, `RATE_LIMIT_WINDOW_SECONDS=60`, `RATE_LIMIT_MAX_REQUESTS=100`, `RATE_LIMIT_AUTH_MAX_REQUESTS=10`, `RATE_LIMIT_AUTH_WINDOW_SECONDS=60`.
+  - **Locking / worker / messaging**: `REDIS_LOCK_TTL=30`, `WORKER_CONCURRENCY=2`, `RABBITMQ_RETRY_QUEUE=fleetcore.retry`, `RABBITMQ_DLQ=fleetcore.dead-letter`.
+  - **Resilience**: `RETRY_MAX_ATTEMPTS=5`, `RETRY_INITIAL_DELAY=1000`.
+  - These variables are additive — existing names were preserved (no renames).
 
 ## Build & tooling scripts
 

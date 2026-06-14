@@ -15,10 +15,12 @@ import { SharedModule } from '../../shared/shared.module';
     RabbitMQModule.forRootAsync({
       inject: [AppConfigService],
       useFactory: (configService: AppConfigService): RabbitMQConfig => {
-        const { uri, exchange, connection } = configService.messaging;
+        const { uri, exchange, connection, workerConcurrency } =
+          configService.messaging;
 
         return {
           uri,
+          prefetchCount: workerConcurrency,
           exchanges: [
             {
               name: exchange,

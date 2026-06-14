@@ -259,6 +259,62 @@ class EnvironmentVariables {
   @IsOptional()
   @IsString()
   DATABASE_SQLITE_PATH?: string;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  REDIS_LOCK_TTL?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  WORKER_CONCURRENCY?: number;
+
+  @IsOptional()
+  @IsString()
+  RABBITMQ_AUDIT_QUEUE?: string;
+
+  @IsOptional()
+  @IsString()
+  RABBITMQ_RETRY_QUEUE?: string;
+
+  @IsOptional()
+  @IsString()
+  RABBITMQ_DLQ?: string;
+
+  @IsOptional()
+  @IsString()
+  RATE_LIMIT_ENABLED?: string;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RATE_LIMIT_WINDOW_SECONDS?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RATE_LIMIT_MAX_REQUESTS?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RATE_LIMIT_AUTH_MAX_REQUESTS?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RATE_LIMIT_AUTH_WINDOW_SECONDS?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RETRY_MAX_ATTEMPTS?: number;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  RETRY_INITIAL_DELAY?: number;
 }
 
 export const validateEnvironment = (config: Record<string, unknown>) => {

@@ -12,6 +12,10 @@ Configuraciones clave:
 - `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`
 - `RABBITMQ_URI`, `MONGO_URI`, `REDIS_*`
 - `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME`
+- Lock distribuido: `REDIS_LOCK_TTL`
+- Worker de auditoría: `WORKER_CONCURRENCY`, `RABBITMQ_RETRY_QUEUE`, `RABBITMQ_DLQ`
+- Rate limit: `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_AUTH_MAX_REQUESTS`, `RATE_LIMIT_AUTH_WINDOW_SECONDS`
+- Reintentos: `RETRY_MAX_ATTEMPTS`, `RETRY_INITIAL_DELAY`
 
 ## 2. Levantar el stack Docker
 
@@ -26,6 +30,8 @@ Servicios disponibles:
 - Swagger PT-BR: `http://localhost:3000/docs-pt`
 - Frontend: `http://localhost:3001`
 - RabbitMQ UI: `http://localhost:15672`
+
+Además del `backend`, el stack levanta el servicio `audit-worker` (consumidor de `fleetcore.audit`). Verifica en sus logs la concurrency registrada al arranque (`WORKER_CONCURRENCY`) y, en la UI de RabbitMQ, la actividad de la cola `fleetcore.audit`.
 
 Seed admin: `aivacol` / `aivacol123!`
 
@@ -57,8 +63,11 @@ Asegúrate de que SQL Server, Redis, RabbitMQ y MongoDB estén disponibles local
 | Síntoma | Acción sugerida |
 |---------|-----------------|
 | Errores de conexión a SQL Server | Confirma `SQLSERVER_*` en `.env` y revisa la salud de los contenedores (`docker compose ps`). |
-| Respuestas `401 Unauthorized` | Genera un nuevo token vía `/auth/login` y verifica que Redis esté corriendo (`AUTH_SESSION_TTL_SECONDS`). |
-| Documentos de auditoría faltantes | Inspecciona los logs de `AuditService`; si RabbitMQ cae, el fallback escribe directamente en MongoDB. |
+| Respuestas `401 Unauthorized` | Genera un nuevo token vía `/auth/login` y verifica que Redis esté corriendo (`AUTH_SESSION_TTL_SECONDS`). Si la sesión está **bloqueada** (`isLocked`), desbloquéala o reautentica; el TTL se renueva en cada petición válida. |
+| Respuestas `429 Too Many Requests` | Se alcanzó el rate limit (`{ "success": false, "message": "Rate limit exceeded", "retryAfter": <s> }`). Espera `retryAfter` o ajusta `RATE_LIMIT_*`; recuerda que `POST /auth/login` está limitado a 10/60 s. Los bloqueos se auditan como `rate_limit.blocked`. |
+| Respuestas `409 Conflict` en mutaciones | El header `Idempotency-Key` se repitió y `IdempotencyInterceptor` detectó un duplicado. Usa una clave nueva por operación. |
+| Documentos de auditoría faltantes | Verifica que el servicio `audit-worker` esté arriba y consumiendo `fleetcore.audit`; revisa los logs del worker y, si RabbitMQ cae, el fallback de `ResilienceService` escribe directamente en MongoDB. |
+| Bloqueos/deadlocks aparentes en operaciones críticas | Revisa el lock distribuido (`RedisLockService`); los locks expiran por `REDIS_LOCK_TTL` y solo el token dueño puede liberarlos. |
 | Caché que no se invalida | Asegúrate de que el toggle `repositoryCache` esté habilitado (`FEATURE_FLAGS`). |
 | Tema siempre claro | Define `NEXT_PUBLIC_START_THEME=dark` y limpia el `localStorage` (`fleetcore.theme-preference`). |
 

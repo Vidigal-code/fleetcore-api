@@ -1,5 +1,7 @@
 export const AUTH_SESSION_NAMESPACE = 'auth.sessions';
 
+export const AUTH_SESSION_LOCK_NAMESPACE = 'auth.sessions.lock';
+
 export const STRONG_PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{12,}$/u;
 

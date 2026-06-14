@@ -17,6 +17,7 @@ import securityConfig, {
 import featureToggleConfig from '../../shared/config/feature-toggle.config';
 import swaggerConfig from '../../shared/config/swagger.config';
 import resilienceConfig from '../../shared/config/resilience.config';
+import rateLimitConfig from '../../shared/config/rate-limit.config';
 import { AuthModule } from '../../modules/auth/auth.module';
 import { FleetModule } from '../../modules/fleet/fleet.module';
 import { AuditModule } from '../../modules/audit/audit.module';
@@ -26,6 +27,8 @@ import { AppBootstrapService } from './app-bootstrap.service';
 import { JwtAuthGuard } from '../../modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../modules/auth/guards/roles.guard';
 import { AuditInterceptor } from '../../modules/audit/interceptors/audit.interceptor';
+import { RateLimitGuard } from './security/rate-limit.guard';
+import { IdempotencyInterceptor } from '../../shared/cache/idempotency.interceptor';
 
 @Module({
   imports: [
@@ -43,6 +46,7 @@ import { AuditInterceptor } from '../../modules/audit/interceptors/audit.interce
         featureToggleConfig,
         swaggerConfig,
         resilienceConfig,
+        rateLimitConfig,
       ],
       validate: validateEnvironment,
     }),
@@ -83,6 +87,14 @@ import { AuditInterceptor } from '../../modules/audit/interceptors/audit.interce
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RateLimitGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: IdempotencyInterceptor,
     },
     {
       provide: APP_INTERCEPTOR,

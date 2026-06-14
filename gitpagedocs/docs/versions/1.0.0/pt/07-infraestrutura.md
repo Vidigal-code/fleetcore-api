@@ -12,13 +12,17 @@ Arquivo `docker-compose.yml` orquestra todos os serviços obrigatórios:
 - `mongo`: armazenamento da trilha de auditoria.
 - `rabbitmq`: broker com dashboard (`15672`).
 - `backend`: build multistage em `backend/Dockerfile`, expõe `HTTP_PORT` (padrão 3000) e depende de todos os serviços de dados.
+- `audit-worker`: mesma imagem do backend, com comando `node dist/src/apps/audit-worker/main.js`; consome a fila `fleetcore.audit` e grava a auditoria no MongoDB. A concurrency (`prefetchCount`) é definida por `WORKER_CONCURRENCY` (padrão 2) e logada no boot.
 - `frontend`: build multistage (`frontend/Dockerfile`) servindo a aplicação Next.js no porto 3001.
 
 ## Variáveis de ambiente
 
 - Existe um **único `.env` na raiz**, copiado de `envexample.txt` — consolida as chaves compartilhadas entre backend e frontend (ex.: `SQLSERVER_*`, `JWT_SECRET`, `NEXT_PUBLIC_*`).
 - Há também um `backend/envexample.txt` para execução isolada do backend.
-- Novos parâmetros relevantes: `AUTH_SESSION_TTL_SECONDS`, `NEXT_PUBLIC_START_THEME`, `REDIS_TTL_SECONDS`.
+- Novos parâmetros relevantes (aditivos, sem renomear os existentes): `AUTH_SESSION_TTL_SECONDS`, `NEXT_PUBLIC_START_THEME`, `REDIS_TTL_SECONDS`.
+- **Lock e worker**: `REDIS_LOCK_TTL=30`, `WORKER_CONCURRENCY=2`.
+- **Filas de resiliência**: `RABBITMQ_RETRY_QUEUE=fleetcore.retry`, `RABBITMQ_DLQ=fleetcore.dead-letter`, `RETRY_MAX_ATTEMPTS=5`, `RETRY_INITIAL_DELAY=1000`.
+- **Rate limit**: `RATE_LIMIT_ENABLED=true`, `RATE_LIMIT_WINDOW_SECONDS=60`, `RATE_LIMIT_MAX_REQUESTS=100`, `RATE_LIMIT_AUTH_MAX_REQUESTS=10`, `RATE_LIMIT_AUTH_WINDOW_SECONDS=60`.
 
 ## Scripts úteis
 
@@ -37,8 +41,8 @@ Arquivo `docker-compose.yml` orquestra todos os serviços obrigatórios:
 
 ## Observabilidade e logs
 
-- Logs estruturados via `Logger` do NestJS.
-- Auditoria persistida em MongoDB, além de event logs no RabbitMQ.
+- Logs estruturados via `Logger` do NestJS, incluindo retries, fallbacks e tentativas de rate limit bloqueadas (`rate_limit.blocked`).
+- Auditoria publicada em `fleetcore.audit` (RabbitMQ) e persistida em MongoDB pelo `audit-worker`, com metadados de processamento (`status`, `retries`, `sourceQueue`, `processedAt`).
 - Métricas de domínio expostas via `DomainMetricsService` (integração futura com Prometheus/Grafana é simples).
 
 ## Deploy recomendado

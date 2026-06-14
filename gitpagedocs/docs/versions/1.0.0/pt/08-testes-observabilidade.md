@@ -4,7 +4,12 @@ Garantir cobertura automatizada foi requisito explícito do desafio. A solução
 
 ## Backend (Jest)
 
-- **Unitários** (`backend/tests/unit`) cobrem serviços de frota, auth, auditoria, toggles e repos, simulando dependências com `jest.fn()`.
+- **Unitários** (`backend/tests/unit`) cobrem serviços de frota, auth, auditoria, toggles e repos, simulando dependências com `jest.fn()`. Suítes novas cobrem as proteções aditivas:
+  - `auth/auth-session.service.spec.ts` — `refresh` (TTL deslizante), `lock`/`unlock`/`isLocked`.
+  - `shared/redis-lock.service.spec.ts` — aquisição, liberação compare-and-del e renovação do lock distribuído.
+  - `shared/idempotency.service.spec.ts` — marcação de chave e detecção de duplicidade.
+  - `shared/rate-limit.service.spec.ts` — contagem por usuário/IP/endpoint e bloqueio.
+  - `shared/resilience.service.spec.ts` — estendido para cobrir `executeWithFallback` e `executeWithRollback`.
 - **Integração** (`backend/tests/integration`) valida a busca e a ordenação de veículos contra SQLite in-memory.
 - **E2E** (`backend/tests/e2e`) utiliza SQLite in-memory para validar fluxos reais de veículos (criação/listagem) e segurança.
 - **Comandos**:
@@ -30,9 +35,9 @@ Garantir cobertura automatizada foi requisito explícito do desafio. A solução
 
 ## Observabilidade
 
-- Logs padronizados do NestJS indicam retries, circuit breakers e fallback de auditoria.
+- Logs padronizados do NestJS indicam retries, circuit breakers, fallback/rollback de auditoria e bloqueios de rate limit (`rate_limit.blocked`).
 - Métricas de domínio (via `DomainMetricsService`) possibilitam instrumentação futura.
-- RabbitMQ e MongoDB preservam trilhas assíncronas para auditoria detalhada.
+- RabbitMQ (fila `fleetcore.audit`) e MongoDB preservam trilhas assíncronas para auditoria detalhada, agora com campos enriquecidos (`eventId`, `correlationId`, `requestId`, `sessionId`, `route`, `statusCode`) e metadados de processamento do `audit-worker`.
 
 ## Interpretação
 

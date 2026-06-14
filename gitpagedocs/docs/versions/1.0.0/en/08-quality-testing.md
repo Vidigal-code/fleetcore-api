@@ -4,11 +4,11 @@ Quality gates combine automated tests, linting and resilience utilities so regre
 
 ## Backend test suites
 
-- **Unit tests** (`backend/tests/unit`) mock repositories/cache to validate services, guards, feature toggles and event listeners.
+- **Unit tests** (`backend/tests/unit`) mock repositories/cache to validate services, guards, feature toggles and event listeners. Recent additions cover the new resilience features: `auth/auth-session.service.spec.ts` (refresh/lock/unlock), `shared/redis-lock.service.spec.ts`, `shared/idempotency.service.spec.ts`, `shared/rate-limit.service.spec.ts` and an extended `shared/resilience.service.spec.ts` (fallback/rollback). Run with `npm test`.
 - **Integration tests** (`backend/tests/integration`) exercise TypeORM repositories (including vehicle search/ordering) and migrations against a disposable SQL Server container.
 - **End-to-end tests** (`backend/tests/e2e`) spin up the Nest application with an in-memory database to hit real HTTP endpoints (auth + fleet CRUD).
 - **Coverage**: `npm run test:cov` generates Istanbul reports; `npm run lint` enforces coding standards via ESLint (Nest preset).
-- **Resilience checks**: tests simulate RabbitMQ outages ensuring `ResilienceService` fallbacks behave as expected.
+- **Resilience checks**: tests simulate RabbitMQ outages ensuring `ResilienceService` retry, fallback and rollback paths behave as expected; e2e flows run via `npm run test:e2e`.
 
 ## Frontend test suites
 

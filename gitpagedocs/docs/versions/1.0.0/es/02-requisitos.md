@@ -15,12 +15,14 @@ Este capítulo mapea cada ítem del desafío con el artefacto concreto dentro de
 ## Requisitos técnicos
 
 - **Arquitectura limpia / DDD**: módulos aislados (`auth`, `fleet`, `audit`, `messaging`, `users`, `shared`), agregados, repositorios y `UnitOfWork`.
-- **Seguridad robusta**: guard de JWT + `RolesGuard`, sesiones Redis (`AuthSessionService`), interceptor de auditoría, pipe de sanitización.
+- **Seguridad robusta**: guard de JWT + `RolesGuard`, sesiones Redis con TTL deslizante y lock (`AuthSessionService`: `refresh`/`lock`/`unlock`/`isLocked`), interceptor de auditoría, pipe de sanitización y rate limit dedicado en Redis (`RateLimitGuard`).
+- **Protección de la base con Redis**: caché de lectura, idempotencia (`IdempotencyService` + `IdempotencyInterceptor`, header `Idempotency-Key`, 409 ante duplicados), lock distribuido (`RedisLockService`) y rate limit por usuario/IP/endpoint.
 - **Modelado estandarizado**: migraciones TypeORM (`backend/src/migrations/1717845600000-InitSchema.ts`) con columnas y metadatos de SQL Server.
 - **Caché Redis**: `RepositoryCacheService` almacenando resultados de búsqueda de vehículos (namespace `vehicles.search`) con TTL configurable (`REDIS_TTL_SECONDS`).
 - **Mensajería RabbitMQ** (bonus): módulo dedicado + `FleetDomainEventListener` retransmitiendo eventos de dominio.
-- **Traza de auditoría en MongoDB** (bonus): `AuditService` produce mensajes, `AuditWriterService` persiste documentos de respaldo vía Mongoose.
-- **Stack Docker completo**: `docker-compose.yml` levanta SQL Server, Redis, RabbitMQ, MongoDB, API y frontend.
+- **Traza de auditoría en MongoDB** (bonus): el `AuditInterceptor` publica eventos enriquecidos (`eventId`, `correlationId`, `requestId`, `sessionId`, `statusCode`…) en la cola `fleetcore.audit` y la app `audit-worker` los persiste vía Mongoose con metadatos de procesamiento (`status`, `retries`, `processedAt`).
+- **Resiliencia**: `ResilienceService` con `executeWithRetry`/`executeWithFallback`/`executeWithRollback`; `UnitOfWork` para el rollback transaccional SQL.
+- **Stack Docker completo**: `docker-compose.yml` levanta SQL Server, Redis, RabbitMQ, MongoDB, API, frontend y el worker `audit-worker`.
 
 ## Criterios de evaluación cumplidos
 
@@ -34,5 +36,5 @@ Este capítulo mapea cada ítem del desafío con el artefacto concreto dentro de
 ## Evidencias adicionales
 
 - **Documentación Swagger** en PT/EN (`/docs-pt`, `/docs`) con tema oscuro de la identidad Fleetcore, "Try it out" habilitado, ejemplos bilingües (PT/EN) en cada DTO y el cuerpo de `POST /auth/login` precargado con las credenciales seed (`aivacol` / `aivacol123!`).
-- **Archivo `.env` unificado** (`envexample.txt` copiado a `.env` en la raíz) para configurar backend y frontend.
+- **Archivo `.env` unificado** (`envexample.txt` copiado a `.env` en la raíz) para configurar backend y frontend. Incorpora las variables aditivas (nombres existentes preservados, sin renombrar): `REDIS_LOCK_TTL=30`, `WORKER_CONCURRENCY=2`, `RABBITMQ_RETRY_QUEUE=fleetcore.retry`, `RABBITMQ_DLQ=fleetcore.dead-letter`, `RATE_LIMIT_ENABLED=true`, `RATE_LIMIT_WINDOW_SECONDS=60`, `RATE_LIMIT_MAX_REQUESTS=100`, `RATE_LIMIT_AUTH_MAX_REQUESTS=10`, `RATE_LIMIT_AUTH_WINDOW_SECONDS=60`, `RETRY_MAX_ATTEMPTS=5` y `RETRY_INITIAL_DELAY=1000`.
 - **Esta instancia de GitPageDocs** resumiendo arquitectura y detalles de implementación para los revisores.

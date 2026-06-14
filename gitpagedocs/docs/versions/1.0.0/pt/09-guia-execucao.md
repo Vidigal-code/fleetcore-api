@@ -10,7 +10,9 @@ Ajuste, se necessário:
 
 - `SQLSERVER_*` (credenciais e base)
 - `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`
-- `RABBITMQ_URI`, `MONGO_URI`, `REDIS_*`
+- `RABBITMQ_URI`, `MONGO_URI`, `REDIS_*`, `REDIS_LOCK_TTL`
+- `WORKER_CONCURRENCY`, `RABBITMQ_RETRY_QUEUE`, `RABBITMQ_DLQ`, `RETRY_MAX_ATTEMPTS`, `RETRY_INITIAL_DELAY`
+- `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_AUTH_MAX_REQUESTS`, `RATE_LIMIT_AUTH_WINDOW_SECONDS`
 - `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME`
 
 ## 2. Subir stack com Docker
@@ -26,6 +28,8 @@ Serviços expostos:
 - Swagger PT-BR: `http://localhost:3000/docs-pt`
 - Frontend: `http://localhost:3001`
 - RabbitMQ UI: `http://localhost:15672`
+
+O serviço `audit-worker` sobe junto com a stack (mesma imagem do backend) e consome a fila `fleetcore.audit`; confirme no log do container a linha com a concurrency configurada (`WORKER_CONCURRENCY`).
 
 Usuário seed: `aivacol` / `aivacol123!`
 
@@ -57,8 +61,10 @@ Certifique-se de ter SQL Server, Redis, RabbitMQ e MongoDB rodando localmente ou
 | Sintoma | Ação sugerida |
 |---------|---------------|
 | Erro ao conectar no SQL Server | Verifique `SQLSERVER_*` no `.env` e se o container `sqlserver` está saudável (`docker compose ps`). |
-| `401 Unauthorized` nas rotas | Confirme se o token foi gerado via `/auth/login` e se a sessão Redis está ativa (`AUTH_SESSION_TTL_SECONDS`). |
-| Auditoria não aparece no Mongo | Verifique logs do `AuditService`; se RabbitMQ estiver indisponível, o fallback escreve diretamente no Mongo. |
+| `401 Unauthorized` nas rotas | Confirme se o token foi gerado via `/auth/login`, se a sessão Redis está ativa (TTL renovado a cada requisição) e se a sessão não foi **bloqueada** (`isLocked`). |
+| `429 Rate limit exceeded` | Esperado ao exceder os limites (`RATE_LIMIT_*`); aguarde `retryAfter` segundos ou ajuste os limites. `POST /auth/login` é mais restrito (10/60s). |
+| `409 Conflict` em mutações | Requisição duplicada com o mesmo header `Idempotency-Key`; reenvie sem repetir a chave já usada. |
+| Auditoria não aparece no Mongo | Verifique se o serviço `audit-worker` está de pé consumindo `fleetcore.audit`; se RabbitMQ estiver indisponível, o fallback do `ResilienceService` escreve diretamente no Mongo. |
 | Cache não invalida após edição | Cheque se a flag `repositoryCache` está habilitada (`FEATURE_FLAGS` no `.env`). |
 | Tema não inicia em dark | Use `NEXT_PUBLIC_START_THEME=dark` e limpe `localStorage` (`fleetcore.theme-preference`). |
 

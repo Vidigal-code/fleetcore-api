@@ -71,4 +71,59 @@ describe('ResilienceService', () => {
       }),
     ).rejects.toThrow('fatal');
   });
+
+  it('falls back to the controlled handler on failure', async () => {
+    const service = createService();
+    const task = jest.fn().mockRejectedValue(new Error('down'));
+    const fallback = jest.fn().mockResolvedValue('fallback-value');
+
+    const result = await service.executeWithFallback(task, fallback);
+
+    expect(result).toBe('fallback-value');
+    expect(fallback).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not invoke the fallback when the task succeeds', async () => {
+    const service = createService();
+    const task = jest.fn().mockResolvedValue('ok');
+    const fallback = jest.fn();
+
+    const result = await service.executeWithFallback(task, fallback);
+
+    expect(result).toBe('ok');
+    expect(fallback).not.toHaveBeenCalled();
+  });
+
+  it('runs all steps and returns their results', async () => {
+    const service = createService();
+
+    const results = await service.executeWithRollback([
+      { execute: () => Promise.resolve('a') },
+      { execute: () => Promise.resolve('b') },
+    ]);
+
+    expect(results).toEqual(['a', 'b']);
+  });
+
+  it('compensates completed steps in reverse order on failure', async () => {
+    const service = createService();
+    const order: string[] = [];
+
+    await expect(
+      service.executeWithRollback([
+        {
+          execute: () => Promise.resolve('first'),
+          compensate: () => {
+            order.push('undo-first');
+            return Promise.resolve();
+          },
+        },
+        {
+          execute: () => Promise.reject(new Error('boom')),
+        },
+      ]),
+    ).rejects.toThrow('boom');
+
+    expect(order).toEqual(['undo-first']);
+  });
 });
