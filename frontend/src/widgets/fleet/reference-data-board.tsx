@@ -1,12 +1,15 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import { PenLine, Trash2 } from 'lucide-react';
 
 import type { Brand } from '@/entities/brand/model/types';
 import type { Model } from '@/entities/model/model/types';
 import { BrandForm } from '@/features/brands/manage/ui/brand-form';
 import { ModelForm } from '@/features/models/manage/ui/model-form';
+import { FLEET_LIST_PAGE_SIZE } from '@/shared/config/pagination';
+import { useConfirmation } from '@/shared/hooks/use-confirmation';
+import { usePaginatedList } from '@/shared/hooks/use-paginated-list';
 import { Button } from '@/shared/ui/button';
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog';
 import { PageSection, ResponsiveGrid, Stack, Surface } from '@/shared/ui/layout-primitives';
@@ -93,26 +96,12 @@ interface SectionProps {
 
 const BrandSection = ({ state, actions }: SectionProps) => {
   const { brands, editingBrand, brandFeedback, brandSubmitting, isLoadingBrands } = state;
-  const [page, setPage] = useState(1);
-  const [pendingDelete, setPendingDelete] = useState<Brand | null>(null);
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.max(1, Math.ceil(brands.length / ITEMS_PER_PAGE));
-  const safePage = Math.min(page, totalPages);
-
-  const paginatedBrands = useMemo(() => {
-    const start = (safePage - 1) * ITEMS_PER_PAGE;
-    return brands.slice(start, start + ITEMS_PER_PAGE);
-  }, [brands, safePage]);
+  const pagination = usePaginatedList(brands, FLEET_LIST_PAGE_SIZE);
+  const deletion = useConfirmation<Brand>((brand) => actions.deleteBrand(brand.id));
 
   const closeEdit = () => {
     actions.selectBrand(null);
     actions.resetBrandFeedback();
-  };
-
-  const confirmDelete = async () => {
-    if (!pendingDelete) return;
-    await actions.deleteBrand(pendingDelete.id);
-    setPendingDelete(null);
   };
 
   return (
@@ -120,7 +109,7 @@ const BrandSection = ({ state, actions }: SectionProps) => {
       id="marcas"
       title="Marcas"
       description="Cadastre fabricantes e mantenha a referência auditável para toda a frota."
-      countLabel={`${brands.length} marca(s)`}
+      countLabel={`${pagination.total} marca(s)`}
       loading={isLoadingBrands}
       form={
         <BrandForm
@@ -132,7 +121,7 @@ const BrandSection = ({ state, actions }: SectionProps) => {
         />
       }
     >
-      {paginatedBrands.map((brand) => (
+      {pagination.items.map((brand) => (
         <ReferenceListItem
           key={brand.id}
           title={brand.name}
@@ -141,14 +130,14 @@ const BrandSection = ({ state, actions }: SectionProps) => {
             actions.selectBrand(brand);
             actions.resetBrandFeedback();
           }}
-          onDelete={() => setPendingDelete(brand)}
+          onDelete={() => deletion.request(brand)}
         />
       ))}
       <Pagination
-        page={safePage}
-        limit={ITEMS_PER_PAGE}
-        total={brands.length}
-        onPageChange={setPage}
+        page={pagination.page}
+        limit={pagination.pageSize}
+        total={pagination.total}
+        onPageChange={pagination.setPage}
         className="mt-4"
       />
 
@@ -170,14 +159,14 @@ const BrandSection = ({ state, actions }: SectionProps) => {
       </Modal>
 
       <ConfirmDialog
-        open={Boolean(pendingDelete)}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={confirmDelete}
+        open={deletion.isOpen}
+        onClose={deletion.cancel}
+        onConfirm={deletion.confirm}
         loading={brandSubmitting}
         title="Remover marca"
         description={
-          pendingDelete
-            ? `Remover a marca "${pendingDelete.name}"? Esta ação não pode ser desfeita.`
+          deletion.target
+            ? `Remover a marca "${deletion.target.name}"? Esta ação não pode ser desfeita.`
             : undefined
         }
         confirmLabel="Remover"
@@ -195,29 +184,14 @@ const ModelSection = ({ state, actions }: SectionProps) => {
     modelSubmitting,
     isLoadingModels,
   } = state;
-  const [page, setPage] = useState(1);
-  const ITEMS_PER_PAGE = 6;
-  const totalPages = Math.max(1, Math.ceil(models.length / ITEMS_PER_PAGE));
-  const safePage = Math.min(page, totalPages);
-
-  const [pendingDelete, setPendingDelete] = useState<Model | null>(null);
+  const pagination = usePaginatedList(models, FLEET_LIST_PAGE_SIZE);
+  const deletion = useConfirmation<Model>((model) => actions.deleteModel(model.id));
 
   const brandMap = useMemo(() => new Map(brands.map((brand) => [brand.id, brand])), [brands]);
-
-  const paginatedModels = useMemo(() => {
-    const start = (safePage - 1) * ITEMS_PER_PAGE;
-    return models.slice(start, start + ITEMS_PER_PAGE);
-  }, [models, safePage]);
 
   const closeEdit = () => {
     actions.selectModel(null);
     actions.resetModelFeedback();
-  };
-
-  const confirmDelete = async () => {
-    if (!pendingDelete) return;
-    await actions.deleteModel(pendingDelete.id);
-    setPendingDelete(null);
   };
 
   return (
@@ -225,7 +199,7 @@ const ModelSection = ({ state, actions }: SectionProps) => {
       id="modelos"
       title="Modelos"
       description="Relacione modelos às marcas garantindo consistência nos cadastros de veículos."
-      countLabel={`${models.length} modelo(s)`}
+      countLabel={`${pagination.total} modelo(s)`}
       loading={isLoadingModels}
       form={
         <ModelForm
@@ -238,7 +212,7 @@ const ModelSection = ({ state, actions }: SectionProps) => {
         />
       }
     >
-      {paginatedModels.map((model) => {
+      {pagination.items.map((model) => {
         const brand = model.brandId ? brandMap.get(model.brandId) : undefined;
         return (
           <ReferenceListItem
@@ -249,15 +223,15 @@ const ModelSection = ({ state, actions }: SectionProps) => {
               actions.selectModel(model);
               actions.resetModelFeedback();
             }}
-            onDelete={() => setPendingDelete(model)}
+            onDelete={() => deletion.request(model)}
           />
         );
       })}
       <Pagination
-        page={safePage}
-        limit={ITEMS_PER_PAGE}
-        total={models.length}
-        onPageChange={setPage}
+        page={pagination.page}
+        limit={pagination.pageSize}
+        total={pagination.total}
+        onPageChange={pagination.setPage}
         className="mt-4"
       />
 
@@ -280,14 +254,14 @@ const ModelSection = ({ state, actions }: SectionProps) => {
       </Modal>
 
       <ConfirmDialog
-        open={Boolean(pendingDelete)}
-        onClose={() => setPendingDelete(null)}
-        onConfirm={confirmDelete}
+        open={deletion.isOpen}
+        onClose={deletion.cancel}
+        onConfirm={deletion.confirm}
         loading={modelSubmitting}
         title="Remover modelo"
         description={
-          pendingDelete
-            ? `Remover o modelo "${pendingDelete.name}"? Esta ação não pode ser desfeita.`
+          deletion.target
+            ? `Remover o modelo "${deletion.target.name}"? Esta ação não pode ser desfeita.`
             : undefined
         }
         confirmLabel="Remover"

@@ -140,7 +140,7 @@ export const VehicleForm = ({
           radius="lg"
           align="center"
           glass="base"
-          className="mx-0 flex flex-col items-center gap-4 text-center md:flex-row md:items-start md:text-left"
+          className="flex flex-col items-center gap-4 text-center"
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent/15 text-accent">
             <Wrench className="h-5 w-5" />
