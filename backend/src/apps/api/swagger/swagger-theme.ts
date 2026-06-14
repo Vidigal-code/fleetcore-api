@@ -78,18 +78,22 @@ const toThemeVariables = (palette: SwaggerPalette): string =>
     .join('');
 
 // Regras estruturais — referenciam SOMENTE os tokens, então valem para os dois
-// temas sem repetição.
+// temas sem repetição. A cobertura é ampla para nenhum elemento "vazar" o
+// estilo padrão claro do Swagger e causar mistura de cores.
 const STRUCTURE_CSS = `
   body { background: var(--fc-bg); }
-  .swagger-ui { color: var(--fc-text); }
+  .swagger-ui, .swagger-ui .wrapper, .swagger-ui .information-container { color: var(--fc-text); }
   .swagger-ui .info .title,
+  .swagger-ui h1, .swagger-ui h2, .swagger-ui h3, .swagger-ui h4, .swagger-ui h5,
   .swagger-ui .opblock-tag,
   .swagger-ui .opblock .opblock-summary-operation-id,
   .swagger-ui .opblock .opblock-summary-description,
+  .swagger-ui .opblock-title,
   .swagger-ui table thead tr th,
   .swagger-ui .response-col_status,
   .swagger-ui label,
   .swagger-ui .parameter__name,
+  .swagger-ui .prop-type,
   .swagger-ui .model-title,
   .swagger-ui .model,
   .swagger-ui .models h4,
@@ -100,7 +104,9 @@ const STRUCTURE_CSS = `
   .swagger-ui .parameter__in,
   .swagger-ui .renderedMarkdown p,
   .swagger-ui .response-col_description,
+  .swagger-ui .response-col_description__inner div.markdown,
   .swagger-ui .info .base-url,
+  .swagger-ui .parameters-col_description,
   .swagger-ui .opblock-summary-path__deprecated { color: var(--fc-muted); }
   .swagger-ui .scheme-container,
   .swagger-ui section.models,
@@ -109,7 +115,10 @@ const STRUCTURE_CSS = `
     box-shadow: none;
     border: 1px solid var(--fc-border);
   }
-  .swagger-ui section.models .model-container { background: var(--fc-surface-alt); }
+  .swagger-ui .opblock-section-header label,
+  .swagger-ui .opblock-section-header h4 { color: var(--fc-text); }
+  .swagger-ui section.models .model-container,
+  .swagger-ui .model-box { background: var(--fc-surface-alt); }
   .swagger-ui .info { margin: 28px 0; }
   .swagger-ui .topbar {
     background: var(--fc-topbar);
@@ -121,6 +130,7 @@ const STRUCTURE_CSS = `
   .swagger-ui .info a,
   .swagger-ui a.nostyle,
   .swagger-ui .info .title small { color: var(--fc-accent-strong); }
+  .swagger-ui .btn { color: var(--fc-text); border-color: var(--fc-border); }
   .swagger-ui .btn.authorize { color: var(--fc-accent-strong); border-color: var(--fc-accent); }
   .swagger-ui .btn.authorize svg { fill: var(--fc-accent-strong); }
   .swagger-ui .btn.execute {
@@ -155,13 +165,29 @@ const STRUCTURE_CSS = `
     border-radius: 8px;
   }
   .swagger-ui .filter .operation-filter-input { border-radius: 10px; }
-  .swagger-ui .model-box,
   .swagger-ui .highlight-code,
   .swagger-ui .microlight,
-  .swagger-ui .responses-inner pre { background: var(--fc-code); color: var(--fc-code-text); }
-  .swagger-ui .opblock-body pre.microlight { color: var(--fc-code-text); }
+  .swagger-ui .responses-inner pre,
+  .swagger-ui .opblock-body pre.microlight { background: var(--fc-code); color: var(--fc-code-text); }
+  .swagger-ui .renderedMarkdown code,
+  .swagger-ui .markdown code { background: var(--fc-code); color: var(--fc-code-text); padding: 1px 6px; border-radius: 6px; }
   .swagger-ui table thead tr th,
   .swagger-ui table tbody tr td { border-color: var(--fc-border); }
+  .swagger-ui .response-control-media-type__accept-message { color: var(--fc-muted); }
+  .swagger-ui .tab li button.tablinks { color: var(--fc-muted); }
+  .swagger-ui .tab li button.tablinks.active { color: var(--fc-text); }
+  /* Modal de autorização (Authorize) — evita popup claro padrão sobre tema escuro. */
+  .swagger-ui .dialog-ux .modal-ux {
+    background: var(--fc-surface);
+    border: 1px solid var(--fc-border);
+  }
+  .swagger-ui .dialog-ux .modal-ux-header h3,
+  .swagger-ui .dialog-ux .modal-ux-content h4,
+  .swagger-ui .dialog-ux .modal-ux-content p,
+  .swagger-ui .dialog-ux .modal-ux-content label { color: var(--fc-text); }
+  .swagger-ui .dialog-ux .modal-ux-header { border-bottom: 1px solid var(--fc-border); }
+  .swagger-ui .auth-container { border-color: var(--fc-border); }
+  .swagger-ui .errors-wrapper { background: var(--fc-surface-alt); border-color: var(--fc-border); color: var(--fc-text); }
 `;
 
 /**
