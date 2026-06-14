@@ -31,6 +31,7 @@ import {
   ApiOk,
   ApiProtectedErrors,
   ApiResourceNotFound,
+  ApiTraceHeaders,
 } from '../../../../apps/api/swagger/api-docs.decorators';
 
 const MODEL_ID_PARAM = {
@@ -42,6 +43,7 @@ const MODEL_ID_PARAM = {
 @ApiTags('Fleet')
 @ApiBearerAuth()
 @ApiProtectedErrors()
+@ApiTraceHeaders()
 @Controller('models')
 export class ModelsController {
   constructor(private readonly modelsService: ModelsService) {}
