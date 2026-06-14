@@ -1,9 +1,12 @@
 /**
  * Tema do Swagger UI alinhado à identidade Fleetcore (amarelo #F8BE0E +
- * petróleo #1B2D35). A estrutura visual é definida UMA única vez usando tokens
- * `--fc-*`; apenas os valores dos tokens mudam entre claro e escuro. Assim não
- * há duplicação de regras nem cores "misturadas" entre os temas — trocar o
- * esquema apenas reatribui os tokens.
+ * petróleo #1B2D35). A estrutura visual é definida UMA única vez como uma lista
+ * de regras (dados); apenas os valores dos tokens `--fc-*` mudam entre claro e
+ * escuro. Assim não há duplicação nem cores "misturadas" entre os temas.
+ *
+ * Todas as regras são escopadas sob `body .swagger-ui` para vencer, por
+ * especificidade, o stylesheet padrão do Swagger (que é injetado depois do
+ * customCss e usa apenas seletores de classe).
  */
 
 export interface SwaggerPalette {
@@ -59,144 +62,265 @@ export const SWAGGER_DARK_PALETTE: SwaggerPalette = {
   codeText: '#e2e8f0',
 };
 
-const toThemeVariables = (palette: SwaggerPalette): string =>
-  [
-    `--fc-bg:${palette.bg}`,
-    `--fc-surface:${palette.surface}`,
-    `--fc-surface-alt:${palette.surfaceAlt}`,
-    `--fc-border:${palette.border}`,
-    `--fc-text:${palette.text}`,
-    `--fc-muted:${palette.muted}`,
-    `--fc-accent:${palette.accent}`,
-    `--fc-accent-strong:${palette.accentStrong}`,
-    `--fc-accent-contrast:${palette.accentContrast}`,
-    `--fc-topbar:${palette.topbar}`,
-    `--fc-code:${palette.code}`,
-    `--fc-code-text:${palette.codeText}`,
-  ]
-    .map((line) => `${line};`)
-    .join('');
+const ROOT = 'body .swagger-ui';
 
-// Regras estruturais — referenciam SOMENTE os tokens, então valem para os dois
-// temas sem repetição. A cobertura é ampla para nenhum elemento "vazar" o
-// estilo padrão claro do Swagger e causar mistura de cores.
-const STRUCTURE_CSS = `
-  body { background: var(--fc-bg); }
-  .swagger-ui, .swagger-ui .wrapper, .swagger-ui .information-container { color: var(--fc-text); }
-  .swagger-ui .info .title,
-  .swagger-ui h1, .swagger-ui h2, .swagger-ui h3, .swagger-ui h4, .swagger-ui h5,
-  .swagger-ui .opblock-tag,
-  .swagger-ui .opblock .opblock-summary-operation-id,
-  .swagger-ui .opblock .opblock-summary-description,
-  .swagger-ui .opblock-title,
-  .swagger-ui table thead tr th,
-  .swagger-ui .response-col_status,
-  .swagger-ui label,
-  .swagger-ui .parameter__name,
-  .swagger-ui .prop-type,
-  .swagger-ui .model-title,
-  .swagger-ui .model,
-  .swagger-ui .models h4,
-  .swagger-ui .tab li,
-  .swagger-ui .opblock-summary-path { color: var(--fc-text); }
-  .swagger-ui .opblock-description-wrapper p,
-  .swagger-ui .parameter__type,
-  .swagger-ui .parameter__in,
-  .swagger-ui .renderedMarkdown p,
-  .swagger-ui .response-col_description,
-  .swagger-ui .response-col_description__inner div.markdown,
-  .swagger-ui .info .base-url,
-  .swagger-ui .parameters-col_description,
-  .swagger-ui .opblock-summary-path__deprecated { color: var(--fc-muted); }
-  .swagger-ui .scheme-container,
-  .swagger-ui section.models,
-  .swagger-ui .opblock .opblock-section-header {
-    background: var(--fc-surface);
-    box-shadow: none;
-    border: 1px solid var(--fc-border);
-  }
-  .swagger-ui .opblock-section-header label,
-  .swagger-ui .opblock-section-header h4 { color: var(--fc-text); }
-  .swagger-ui section.models .model-container,
-  .swagger-ui .model-box { background: var(--fc-surface-alt); }
-  .swagger-ui .info { margin: 28px 0; }
-  .swagger-ui .topbar {
-    background: var(--fc-topbar);
-    border-bottom: 1px solid var(--fc-border);
-    padding: 14px 0;
-  }
-  .swagger-ui .topbar .download-url-wrapper { display: none; }
-  .swagger-ui .info .title small.version-stamp { background: var(--fc-accent); color: var(--fc-accent-contrast); }
-  .swagger-ui .info a,
-  .swagger-ui a.nostyle,
-  .swagger-ui .info .title small { color: var(--fc-accent-strong); }
-  .swagger-ui .btn { color: var(--fc-text); border-color: var(--fc-border); }
-  .swagger-ui .btn.authorize { color: var(--fc-accent-strong); border-color: var(--fc-accent); }
-  .swagger-ui .btn.authorize svg { fill: var(--fc-accent-strong); }
-  .swagger-ui .btn.execute {
-    background: var(--fc-accent);
-    border-color: var(--fc-accent);
-    color: var(--fc-accent-contrast);
-    font-weight: 700;
-  }
-  .swagger-ui .opblock {
-    border: 1px solid var(--fc-border);
-    border-radius: 14px;
-    background: var(--fc-surface);
-    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.18);
-    margin: 0 0 16px;
-  }
-  .swagger-ui .opblock .opblock-summary { border-color: var(--fc-border); }
-  .swagger-ui .opblock-tag { border-color: var(--fc-border); font-size: 18px; }
-  .swagger-ui .opblock.opblock-get .opblock-summary-method { background: ${METHOD_COLORS.get}; }
-  .swagger-ui .opblock.opblock-post .opblock-summary-method { background: ${METHOD_COLORS.post}; }
-  .swagger-ui .opblock.opblock-patch .opblock-summary-method { background: ${METHOD_COLORS.patch}; }
-  .swagger-ui .opblock.opblock-delete .opblock-summary-method { background: ${METHOD_COLORS.delete}; }
-  .swagger-ui .opblock-summary-method { border-radius: 8px; color: #fff; }
-  .swagger-ui input[type=text],
-  .swagger-ui input[type=password],
-  .swagger-ui input[type=email],
-  .swagger-ui input[type=number],
-  .swagger-ui textarea,
-  .swagger-ui select {
-    background: var(--fc-surface-alt);
-    color: var(--fc-text);
-    border: 1px solid var(--fc-border);
-    border-radius: 8px;
-  }
-  .swagger-ui .filter .operation-filter-input { border-radius: 10px; }
-  .swagger-ui .highlight-code,
-  .swagger-ui .microlight,
-  .swagger-ui .responses-inner pre,
-  .swagger-ui .opblock-body pre.microlight { background: var(--fc-code); color: var(--fc-code-text); }
-  .swagger-ui .renderedMarkdown code,
-  .swagger-ui .markdown code { background: var(--fc-code); color: var(--fc-code-text); padding: 1px 6px; border-radius: 6px; }
-  .swagger-ui table thead tr th,
-  .swagger-ui table tbody tr td { border-color: var(--fc-border); }
-  .swagger-ui .response-control-media-type__accept-message { color: var(--fc-muted); }
-  .swagger-ui .tab li button.tablinks { color: var(--fc-muted); }
-  .swagger-ui .tab li button.tablinks.active { color: var(--fc-text); }
-  /* Modal de autorização (Authorize) — evita popup claro padrão sobre tema escuro. */
-  .swagger-ui .dialog-ux .modal-ux {
-    background: var(--fc-surface);
-    border: 1px solid var(--fc-border);
-  }
-  .swagger-ui .dialog-ux .modal-ux-header h3,
-  .swagger-ui .dialog-ux .modal-ux-content h4,
-  .swagger-ui .dialog-ux .modal-ux-content p,
-  .swagger-ui .dialog-ux .modal-ux-content label { color: var(--fc-text); }
-  .swagger-ui .dialog-ux .modal-ux-header { border-bottom: 1px solid var(--fc-border); }
-  .swagger-ui .auth-container { border-color: var(--fc-border); }
-  .swagger-ui .errors-wrapper { background: var(--fc-surface-alt); border-color: var(--fc-border); color: var(--fc-text); }
-`;
+interface ThemeRule {
+  /** Seletores relativos ao ROOT ('' = o próprio ROOT). */
+  readonly selectors: string[];
+  readonly style: string;
+}
+
+const THEME_RULES: ThemeRule[] = [
+  // Texto base e títulos
+  {
+    selectors: ['', '.wrapper', '.information-container'],
+    style: 'color:var(--fc-text);',
+  },
+  {
+    selectors: [
+      '.info .title',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      '.opblock-tag',
+      '.opblock .opblock-summary-operation-id',
+      '.opblock .opblock-summary-description',
+      '.opblock-title',
+      'table thead tr th',
+      '.response-col_status',
+      'label',
+      '.parameter__name',
+      '.prop-type',
+      '.model-title',
+      '.model',
+      '.models h4',
+      '.opblock-section-header label',
+      '.opblock-section-header h4',
+      '.opblock-summary-path',
+    ],
+    style: 'color:var(--fc-text);',
+  },
+  // Texto secundário
+  {
+    selectors: [
+      '.opblock-description-wrapper p',
+      '.parameter__type',
+      '.parameter__in',
+      '.renderedMarkdown p',
+      '.response-col_description',
+      '.info .base-url',
+      '.parameters-col_description',
+      '.response-control-media-type__accept-message',
+      '.tab li button.tablinks',
+    ],
+    style: 'color:var(--fc-muted);',
+  },
+  {
+    selectors: ['.tab li button.tablinks.active'],
+    style: 'color:var(--fc-text);',
+  },
+  // Superfícies
+  {
+    selectors: [
+      '.scheme-container',
+      'section.models',
+      '.opblock .opblock-section-header',
+    ],
+    style:
+      'background:var(--fc-surface);box-shadow:none;border:1px solid var(--fc-border);',
+  },
+  {
+    selectors: ['section.models .model-container', '.model-box'],
+    style: 'background:var(--fc-surface-alt);',
+  },
+  { selectors: ['.info'], style: 'margin:28px 0;' },
+  // Topbar petróleo
+  {
+    selectors: ['.topbar'],
+    style:
+      'background:var(--fc-topbar);border-bottom:1px solid var(--fc-border);padding:14px 0;',
+  },
+  { selectors: ['.topbar .download-url-wrapper'], style: 'display:none;' },
+  // Links e versão
+  {
+    selectors: ['.info .title small.version-stamp'],
+    style: 'background:var(--fc-accent);color:var(--fc-accent-contrast);',
+  },
+  {
+    selectors: ['.info a', 'a.nostyle', '.info .title small'],
+    style: 'color:var(--fc-accent-strong);',
+  },
+  // Botões
+  {
+    selectors: ['.btn'],
+    style: 'color:var(--fc-text);border-color:var(--fc-border);',
+  },
+  {
+    selectors: ['.btn.authorize'],
+    style: 'color:var(--fc-accent-strong);border-color:var(--fc-accent);',
+  },
+  { selectors: ['.btn.authorize svg'], style: 'fill:var(--fc-accent-strong);' },
+  {
+    selectors: ['.btn.execute'],
+    style:
+      'background:var(--fc-accent);border-color:var(--fc-accent);color:var(--fc-accent-contrast);font-weight:700;',
+  },
+  // Operações
+  {
+    selectors: ['.opblock'],
+    style:
+      'border:1px solid var(--fc-border);border-radius:14px;background:var(--fc-surface);box-shadow:0 8px 24px rgba(2,6,23,0.18);margin:0 0 16px;',
+  },
+  {
+    selectors: ['.opblock .opblock-summary'],
+    style: 'border-color:var(--fc-border);',
+  },
+  {
+    selectors: ['.opblock-tag'],
+    style: 'border-color:var(--fc-border);font-size:18px;',
+  },
+  {
+    selectors: ['.opblock.opblock-get .opblock-summary-method'],
+    style: `background:${METHOD_COLORS.get};`,
+  },
+  {
+    selectors: ['.opblock.opblock-post .opblock-summary-method'],
+    style: `background:${METHOD_COLORS.post};`,
+  },
+  {
+    selectors: ['.opblock.opblock-patch .opblock-summary-method'],
+    style: `background:${METHOD_COLORS.patch};`,
+  },
+  {
+    selectors: ['.opblock.opblock-delete .opblock-summary-method'],
+    style: `background:${METHOD_COLORS.delete};`,
+  },
+  {
+    selectors: ['.opblock-summary-method'],
+    style: 'border-radius:8px;color:#fff;',
+  },
+  // Campos de formulário
+  {
+    selectors: [
+      'input[type=text]',
+      'input[type=password]',
+      'input[type=email]',
+      'input[type=number]',
+      'textarea',
+      'select',
+    ],
+    style:
+      'background:var(--fc-surface-alt);color:var(--fc-text);border:1px solid var(--fc-border);border-radius:8px;',
+  },
+  {
+    selectors: ['.filter .operation-filter-input'],
+    style: 'border-radius:10px;',
+  },
+  // Blocos de código
+  {
+    selectors: [
+      '.highlight-code',
+      '.microlight',
+      '.responses-inner pre',
+      '.opblock-body pre.microlight',
+    ],
+    style: 'background:var(--fc-code);color:var(--fc-code-text);',
+  },
+  {
+    selectors: ['.renderedMarkdown code', '.markdown code'],
+    style:
+      'background:var(--fc-code);color:var(--fc-code-text);padding:1px 6px;border-radius:6px;',
+  },
+  {
+    selectors: ['table thead tr th', 'table tbody tr td'],
+    style: 'border-color:var(--fc-border);',
+  },
+  // Modal de autorização
+  {
+    selectors: ['.dialog-ux .modal-ux'],
+    style: 'background:var(--fc-surface);border:1px solid var(--fc-border);',
+  },
+  {
+    selectors: [
+      '.dialog-ux .modal-ux-header h3',
+      '.dialog-ux .modal-ux-content h4',
+      '.dialog-ux .modal-ux-content p',
+      '.dialog-ux .modal-ux-content label',
+    ],
+    style: 'color:var(--fc-text);',
+  },
+  {
+    selectors: ['.dialog-ux .modal-ux-header'],
+    style: 'border-bottom:1px solid var(--fc-border);',
+  },
+  { selectors: ['.auth-container'], style: 'border-color:var(--fc-border);' },
+  {
+    selectors: ['.errors-wrapper'],
+    style:
+      'background:var(--fc-surface-alt);border-color:var(--fc-border);color:var(--fc-text);',
+  },
+];
+
+// Mapa token -> valor concreto da paleta. Usamos substituição em tempo de build
+// (sem custom properties no :root) porque o Swagger UI não resolve variáveis
+// definidas via customCss de forma confiável — o resultado seria var() vazio e
+// as regras seriam descartadas.
+const tokenMap = (palette: SwaggerPalette): Record<string, string> => ({
+  '--fc-bg': palette.bg,
+  '--fc-surface': palette.surface,
+  '--fc-surface-alt': palette.surfaceAlt,
+  '--fc-border': palette.border,
+  '--fc-text': palette.text,
+  '--fc-muted': palette.muted,
+  '--fc-accent': palette.accent,
+  '--fc-accent-strong': palette.accentStrong,
+  '--fc-accent-contrast': palette.accentContrast,
+  '--fc-topbar': palette.topbar,
+  '--fc-code': palette.code,
+  '--fc-code-text': palette.codeText,
+});
+
+const resolveTokens = (style: string, palette: SwaggerPalette): string => {
+  const map = tokenMap(palette);
+  return style.replace(
+    /var\((--fc-[a-z-]+)\)/g,
+    (_match, name: string) => map[name] ?? 'inherit',
+  );
+};
+
+// Marca cada declaração como !important para vencer o tema nativo (.dark-mode)
+// do Swagger UI v5 sem depender de adivinhar a especificidade do bundle.
+const withImportant = (style: string): string =>
+  style
+    .split(';')
+    .map((decl) => decl.trim())
+    .filter(Boolean)
+    .map((decl) => `${decl} !important`)
+    .join(';');
+
+const renderRule = (rule: ThemeRule, palette: SwaggerPalette): string => {
+  const selector = rule.selectors
+    .map((part) => (part ? `${ROOT} ${part}` : ROOT))
+    .join(',');
+  return `${selector}{${withImportant(resolveTokens(rule.style, palette))}}`;
+};
+
+const renderTheme = (palette: SwaggerPalette): string =>
+  [
+    `body{background:${palette.bg} !important;}`,
+    ...THEME_RULES.map((rule) => renderRule(rule, palette)),
+  ].join('\n');
 
 /**
- * Monta o CSS do Swagger UI: tokens claros por padrão e tokens escuros sob
- * `prefers-color-scheme: dark`, seguidos das regras estruturais compartilhadas.
+ * Monta o CSS do Swagger UI: regras com valores claros por padrão e o mesmo
+ * conjunto de regras com valores escuros sob `prefers-color-scheme: dark`.
+ * A lista de regras é única (DRY); só os valores da paleta mudam.
  */
 export const buildSwaggerCss = (): string =>
   [
-    `:root { color-scheme: light dark; ${toThemeVariables(SWAGGER_LIGHT_PALETTE)} }`,
-    `@media (prefers-color-scheme: dark) { :root { ${toThemeVariables(SWAGGER_DARK_PALETTE)} } }`,
-    STRUCTURE_CSS,
+    ':root { color-scheme: light dark; }',
+    renderTheme(SWAGGER_LIGHT_PALETTE),
+    `@media (prefers-color-scheme: dark) {\n${renderTheme(SWAGGER_DARK_PALETTE)}\n}`,
   ].join('\n');
