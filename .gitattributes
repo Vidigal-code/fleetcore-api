@@ -1,0 +1,17 @@
+# Normalize line endings so cross-platform checkouts stay consistent.
+# Without this, core.autocrlf=true on Windows rewrites LF files to CRLF on
+# checkout. Shell scripts copied into Linux images then carry a trailing CR,
+# making the shebang "#!/bin/sh\r" fail with exit 127 ("not found").
+
+# Default: let Git decide text vs binary, but always check out text as LF.
+* text=auto eol=lf
+
+# Files that MUST keep LF on every platform (executed inside Linux containers).
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.Dockerfile text eol=lf
+
+# Windows-only tooling keeps CRLF.
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.bat text eol=crlf

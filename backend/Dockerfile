@@ -19,8 +19,11 @@ RUN npm config set fetch-retries 5 \
   && npm config set fetch-timeout 600000 \
   && npm config set maxsockets 1
 # Wrapper reutilizavel de `npm ci` com retries (DRY) usado por todos os stages.
+# `sed` remove eventuais CR (CRLF do Windows) para que o shebang #!/bin/sh nao
+# vire "#!/bin/sh\r" e o dash reporte "not found" (exit 127).
 COPY scripts/npm-ci-retry.sh /usr/local/bin/npm-ci-retry
-RUN chmod +x /usr/local/bin/npm-ci-retry
+RUN sed -i 's/\r$//' /usr/local/bin/npm-ci-retry \
+  && chmod +x /usr/local/bin/npm-ci-retry
 
 FROM base AS deps
 COPY package*.json ./
