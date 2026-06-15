@@ -19,9 +19,12 @@ import { UnitOfWork } from '../../../src/shared/unit-of-work/unit-of-work';
 import { VehicleTypeOrmRepository } from '../../../src/modules/fleet/infrastructure/repositories/vehicle.typeorm.repository';
 import { EventBusService } from '../../../src/shared/domain/events';
 import { FeatureToggleService } from '../../../src/shared/features';
+import { NotFoundException } from '@nestjs/common';
+
 import {
   VEHICLE_EVENT_CREATED,
   VEHICLE_CACHE_NAMESPACE,
+  VEHICLE_DETAIL_CACHE_NAMESPACE,
 } from '../../../src/modules/fleet/fleet.constants';
 
 describe('VehiclesService', () => {
@@ -190,5 +193,60 @@ describe('VehiclesService', () => {
     expect(repositoryCache.fetch).toHaveBeenCalledTimes(1);
     expect(vehicleRepository.search).toHaveBeenCalledTimes(1);
     expect(firstCall.items[0].licensePlate).toBe('ABC1D23');
+  });
+
+  it('reads a single vehicle through the detail cache namespace', async () => {
+    const vehicle = Vehicle.create({
+      licensePlate: 'XYZ9Z99',
+      chassis: 'CHASSIS-DETAIL',
+      renavam: 'RENAVAM-DETAIL',
+      year: 2025,
+      modelId: 'model-3',
+      createdBy: 'tester',
+    });
+
+    repositoryCache.fetch.mockImplementation(async (options) =>
+      options.loader(),
+    );
+    vehicleRepository.findById.mockResolvedValue(vehicle);
+
+    const result = await service.findById(vehicle.id);
+
+    expect(repositoryCache.fetch).toHaveBeenCalledTimes(1);
+    expect(repositoryCache.fetch).toHaveBeenCalledWith(
+      expect.objectContaining({ namespace: VEHICLE_DETAIL_CACHE_NAMESPACE }),
+    );
+    expect(vehicleRepository.findById).toHaveBeenCalledWith(vehicle.id);
+    expect(result.licensePlate).toBe('XYZ9Z99');
+  });
+
+  it('does not cache a missing vehicle and throws NotFound', async () => {
+    repositoryCache.fetch.mockImplementation(async (options) =>
+      options.loader(),
+    );
+    vehicleRepository.findById.mockResolvedValue(null);
+
+    await expect(service.findById('missing-id')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
+  });
+
+  it('skips cache for findById when the toggle is disabled', async () => {
+    const vehicle = Vehicle.create({
+      licensePlate: 'NOC4C44',
+      chassis: 'CHASSIS-NO-CACHE',
+      renavam: 'RENAVAM-NO-CACHE',
+      year: 2020,
+      modelId: 'model-4',
+      createdBy: 'tester',
+    });
+
+    featureToggleService.isEnabled.mockReturnValue(false);
+    vehicleRepository.findById.mockResolvedValue(vehicle);
+
+    const result = await service.findById(vehicle.id);
+
+    expect(repositoryCache.fetch).not.toHaveBeenCalled();
+    expect(result.licensePlate).toBe('NOC4C44');
   });
 });

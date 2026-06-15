@@ -7,6 +7,7 @@ import { MessagingModule } from '../messaging/messaging.module';
 import { BrandsService } from './application/brands.service';
 import { ModelsService } from './application/models.service';
 import { VehiclesService } from './application/vehicles.service';
+import { FleetSeederService } from './application/fleet-seeder.service';
 import {
   BRAND_REPOSITORY,
   MODEL_REPOSITORY,
@@ -41,6 +42,7 @@ import { FleetDomainEventListener } from './application/listeners/fleet-domain-e
     BrandsService,
     ModelsService,
     VehiclesService,
+    FleetSeederService,
     FleetDomainEventListener,
     {
       provide: BRAND_REPOSITORY,
@@ -62,6 +64,6 @@ import { FleetDomainEventListener } from './application/listeners/fleet-domain-e
       inject: [getRepositoryToken(VehicleOrmEntity)],
     },
   ],
-  exports: [BrandsService, ModelsService, VehiclesService],
+  exports: [BrandsService, ModelsService, VehiclesService, FleetSeederService],
 })
 export class FleetModule {}

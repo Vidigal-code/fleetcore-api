@@ -69,7 +69,9 @@ shared/          # Configs, cache, unit-of-work, resiliência, métricas, valida
 
 ### Seeds
 - Usuário administrador: `aivacol / aivacol123!` via `UsersService.ensureAdminSeed()`.
-- Dataset opcional: `seeds/seed_vehicles.json`.
+- Dataset de veículos: `seeds/seed_vehicles.json`, carregado de forma idempotente
+  por `npm run seed:vehicles` (cria marcas/modelos/veículos ausentes; reaproveita
+  os existentes). Caminho configurável via `SEED_VEHICLES_FILE`.
 
 ### Testes
 ```bash
@@ -146,7 +148,9 @@ shared              # Config, cache, unit-of-work, resilience, metrics, validati
 
 ### Seeds
 - Admin user `aivacol / aivacol123!` created by `UsersService.ensureAdminSeed()`.
-- Optional dataset `seeds/seed_vehicles.json` for local development.
+- Vehicle dataset `seeds/seed_vehicles.json`, loaded idempotently with
+  `npm run seed:vehicles` (creates missing brands/models/vehicles, reuses
+  existing ones). Path configurable via `SEED_VEHICLES_FILE`.
 
 ### Tests
 ```bash

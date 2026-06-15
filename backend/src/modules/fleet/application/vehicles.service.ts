@@ -18,6 +18,7 @@ import {
   VEHICLE_EVENT_REMOVED,
   AUDIT_ENTITY_VEHICLE,
   VEHICLE_CACHE_NAMESPACE,
+  VEHICLE_DETAIL_CACHE_NAMESPACE,
 } from '../fleet.constants';
 import type { ModelRepository } from '../domain/model.repository';
 import { Vehicle } from '../domain/vehicle.aggregate';
@@ -99,7 +100,22 @@ export class VehiclesService {
     return this.repository.search(filters);
   }
 
-  async findById(id: string) {
+  async findById(id: string): Promise<Vehicle> {
+    if (!this.featureToggleService.isEnabled('repositoryCache', true)) {
+      return this.loadVehicleOrThrow(id);
+    }
+
+    return this.repositoryCache.fetch({
+      namespace: VEHICLE_DETAIL_CACHE_NAMESPACE,
+      key: id,
+      ttlSeconds: this.cacheTtl,
+      loader: () => this.loadVehicleOrThrow(id),
+      serializer: (vehicle) => JSON.stringify(this.serializeVehicle(vehicle)),
+      deserializer: (raw) => this.deserializeVehicle(raw),
+    });
+  }
+
+  private async loadVehicleOrThrow(id: string): Promise<Vehicle> {
     const vehicle = await this.repository.findById(id);
     if (!vehicle) {
       throw new NotFoundException('Vehicle not found');
@@ -289,9 +305,40 @@ export class VehiclesService {
   }
 
   private async invalidateCache() {
-    if (this.featureToggleService.isEnabled('repositoryCache', true)) {
-      await this.repositoryCache.invalidate(VEHICLE_CACHE_NAMESPACE);
+    if (!this.featureToggleService.isEnabled('repositoryCache', true)) {
+      return;
     }
+
+    await Promise.all([
+      this.repositoryCache.invalidate(VEHICLE_CACHE_NAMESPACE),
+      this.repositoryCache.invalidate(VEHICLE_DETAIL_CACHE_NAMESPACE),
+    ]);
+  }
+
+  private serializeVehicle(vehicle: Vehicle): SerializedVehicle {
+    return {
+      id: vehicle.id,
+      licensePlate: vehicle.licensePlate,
+      chassis: vehicle.chassis,
+      renavam: vehicle.renavam,
+      year: vehicle.year,
+      modelId: vehicle.modelId,
+      createdAt: vehicle.createdAt.toISOString(),
+      updatedAt: vehicle.updatedAt.toISOString(),
+      createdBy: vehicle.createdBy,
+    };
+  }
+
+  private deserializeVehicle(serialized: string): Vehicle {
+    return this.restoreVehicle(JSON.parse(serialized) as SerializedVehicle);
+  }
+
+  private restoreVehicle(item: SerializedVehicle): Vehicle {
+    return Vehicle.restore({
+      ...item,
+      createdAt: new Date(item.createdAt),
+      updatedAt: new Date(item.updatedAt),
+    });
   }
 
   private serializeSearchResult(
@@ -299,17 +346,7 @@ export class VehiclesService {
   ): SerializedVehicleSearchResult {
     return {
       ...result,
-      items: result.items.map((vehicle) => ({
-        id: vehicle.id,
-        licensePlate: vehicle.licensePlate,
-        chassis: vehicle.chassis,
-        renavam: vehicle.renavam,
-        year: vehicle.year,
-        modelId: vehicle.modelId,
-        createdAt: vehicle.createdAt.toISOString(),
-        updatedAt: vehicle.updatedAt.toISOString(),
-        createdBy: vehicle.createdBy,
-      })),
+      items: result.items.map((vehicle) => this.serializeVehicle(vehicle)),
     };
   }
 
@@ -318,13 +355,7 @@ export class VehiclesService {
 
     return {
       ...parsed,
-      items: parsed.items.map((item) =>
-        Vehicle.restore({
-          ...item,
-          createdAt: new Date(item.createdAt),
-          updatedAt: new Date(item.updatedAt),
-        }),
-      ),
+      items: parsed.items.map((item) => this.restoreVehicle(item)),
     };
   }
 }

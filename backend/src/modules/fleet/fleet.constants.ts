@@ -19,3 +19,4 @@ export const AUDIT_ENTITY_MODEL = 'model';
 export const AUDIT_ENTITY_BRAND = 'brand';
 
 export const VEHICLE_CACHE_NAMESPACE = 'vehicles.search';
+export const VEHICLE_DETAIL_CACHE_NAMESPACE = 'vehicles.detail';
