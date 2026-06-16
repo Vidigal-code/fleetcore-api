@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Source code - GitHub</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/typescript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/tsx.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/javascript.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/css.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/markdown.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.1/marked.min.js"></script>
+<style>
+/* GitHub dark theme - variables */
+:root{
+  --github-bg: #0d1117;
+  --github-bg-secondary: #161b22;
+  --github-bg-tertiary: #21262d;
+  --github-border: #30363d;
+  --github-border-muted: #21262d;
+  --github-fg: #e6edf3;
+  --github-fg-muted: #8b949e;
+  --github-accent: #58a6ff;
+  --github-accent-soft: #79c0ff;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;background:var(--github-bg);color:var(--github-fg);min-height:100vh;font-size:14px;line-height:1.5}
+
+/* Top bar - GitHub style */
+.top-bar{background:var(--github-bg-secondary);border-bottom:1px solid var(--github-border-muted);padding:8px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.top-bar .crumb{color:var(--github-fg-muted);text-decoration:none}
+.top-bar .crumb:hover{color:var(--github-accent)}
+.top-bar .crumb-sep{color:var(--github-fg-muted);user-select:none}
+.top-bar .file-name{color:var(--github-fg);font-weight:600}
+
+/* Layout */
+.layout{display:flex;height:calc(100vh - 45px)}
+
+/* Sidebar - GitHub file tree */
+.sidebar{width:260px;min-width:200px;background:var(--github-bg-secondary);border-right:1px solid var(--github-border-muted);overflow-y:auto;padding:8px 0;flex-shrink:0}
+.sidebar .folder,.sidebar .file{padding:4px 12px 4px 8px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;border-radius:6px;margin:0 8px}
+.sidebar .folder:hover,.sidebar .file:hover{background:var(--github-bg-tertiary)}
+.sidebar .file{color:var(--github-fg-muted)}
+.sidebar .file.active{color:var(--github-accent);background:var(--github-bg-tertiary)}
+.sidebar .icon{width:16px;text-align:center;flex-shrink:0}
+.sidebar .icon svg{vertical-align:middle}
+.sidebar .folder .icon{color:var(--github-accent-soft)}
+.sidebar .chevron{width:16px;transition:transform .15s;flex-shrink:0}
+.sidebar .folder.collapsed .chevron{transform:rotate(-90deg)}
+.sidebar .children{margin-left:4px}
+.sidebar .children.hidden{display:none}
+.sidebar .search-wrap{padding:8px;border-bottom:1px solid var(--github-border-muted)}
+.sidebar .search-input{width:100%;padding:6px 10px;font-size:12px;border:1px solid var(--github-border);border-radius:6px;background:var(--github-bg);color:var(--github-fg);outline:none}
+.sidebar .search-input:focus{border-color:var(--github-accent)}
+.sidebar .search-input::placeholder{color:var(--github-fg-muted)}
+.sidebar .tree-actions{display:flex;gap:4px;padding:4px 8px;border-bottom:1px solid var(--github-border-muted)}
+.sidebar .tree-btn{padding:4px 8px;font-size:11px;border:1px solid var(--github-border);border-radius:4px;background:var(--github-bg-tertiary);color:var(--github-fg-muted);cursor:pointer}
+.sidebar .tree-btn:hover{color:var(--github-fg);background:var(--github-border)}
+
+/* Content - GitHub file view */
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--github-bg)}
+.content .file-header{background:var(--github-bg-secondary);border-bottom:1px solid var(--github-border-muted);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.content .file-header .file-path{font-weight:600;color:var(--github-fg)}
+.content .file-header .copy-btn{padding:4px 12px;font-size:12px;border:1px solid var(--github-border);border-radius:6px;background:var(--github-bg-tertiary);color:var(--github-fg);cursor:pointer}
+.content .file-header .copy-btn:hover{background:var(--github-border);border-color:var(--github-fg-muted)}
+.content .code-wrap{flex:1;overflow:auto}
+.content .code-table{width:100%;border-collapse:collapse;font-family:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;font-size:12px;line-height:1.45}
+.content .code-table td{vertical-align:top;padding:0}
+.content .line-nums{padding:16px 0;text-align:right;user-select:none;color:var(--github-fg-muted);background:var(--github-bg-secondary);border-right:1px solid var(--github-border-muted);width:1%;min-width:50px}
+.content .line-nums span{display:block;padding:0 16px}
+.content .line-code{padding:16px 0;padding-left:16px}
+.content .line-code .line{display:block;min-height:1.45em;white-space:pre}
+.content .empty{color:var(--github-fg-muted);padding:24px;font-style:italic}
+.content .md-preview{padding:24px;line-height:1.6}
+.content .md-preview h1,.content .md-preview h2,.content .md-preview h3{margin-top:1em;margin-bottom:0.5em;font-weight:600}
+.content .md-preview code{background:var(--github-bg-tertiary);padding:2px 6px;border-radius:4px;font-size:0.9em}
+.content .md-preview pre{background:var(--github-bg-tertiary);padding:16px;overflow-x:auto;border-radius:6px;font-size:13px}
+.content .btn-group{display:flex;gap:8px;margin-bottom:16px}
+.content .btn{padding:6px 12px;border:1px solid var(--github-border);border-radius:6px;background:var(--github-bg-tertiary);color:var(--github-fg);cursor:pointer;font-size:12px}
+.content .btn.active{background:var(--github-accent);border-color:var(--github-accent);color:#fff}
+.content .btn:hover{background:var(--github-border)}
+
+@media(max-width:767px){
+  .layout{flex-direction:column;height:auto;min-height:100vh}
+  .sidebar{width:100%;max-height:200px;border-right:none;border-bottom:1px solid var(--github-border-muted)}
+  .content .code-wrap{min-height:400px}
+}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <span class="crumb">source</span>
+  <span class="crumb-sep">/</span>
+  <span class="file-name" id="breadcrumbFile">-</span>
+</div>
+<div class="layout">
+<aside class="sidebar">
+  <div class="search-wrap"><input type="text" class="search-input" id="searchInput" placeholder="Filter files..." autocomplete="off"/></div>
+  <div class="tree-actions"><button class="tree-btn" id="expandAll">Expand all</button><button class="tree-btn" id="collapseAll">Collapse all</button></div>
+  <div id="tree"></div>
+</aside>
+<main class="content">
+  <div class="file-header" id="fileHeader" style="display:none">
+    <span class="file-path" id="headerPath"></span>
+    <button class="copy-btn" id="copyBtn">Copy</button>
+  </div>
+  <div class="code-wrap">
+    <pre class="content-inner" id="viewer"><code class="empty">Select a file from the sidebar</code></pre>
+  </div>
+</main>
+</div>
+<script type="application/json" id="filesData">{"files":{"README.md":"# Fleetcore Fleet Management Platform\r\n\r\nPlataforma full-stack construída para o desafio técnico da Aivacol: um backend NestJS 11 (DDD + SQL Server + Redis + RabbitMQ + MongoDB) e um frontend Next.js 16 (Feature-Sliced Design + Redux Toolkit + React Query). O repositório inclui um site GitPageDocs trilíngue (PT/EN/ES), scripts de automação e stack Docker completa.\r\n\r\n## 🇧🇷 Descrição em Português\r\n<details>\r\n<summary><strong>Ver detalhes</strong></summary>\r\n\r\n### Visão geral\r\n- API NestJS 11 com autenticação JWT/RBAC, sessões em Redis (TTL deslizante + lock/unlock), cache Redis por repositório, auditoria em MongoDB e mensageria RabbitMQ.\r\n- Proteção do banco via Redis: cache, rate limit dedicado (por usuário/IP/endpoint), idempotência (`Idempotency-Key`) e lock distribuído; resiliência com retry, fallback e rollback.\r\n- Auditoria de todo o app via RabbitMQ → worker dedicado → MongoDB (`audit_events` com `eventId`, `userId`, `sessionId`, `method`, `route`, `statusCode`, `success`, `status`, `processedAt`).\r\n- Web app Next.js 16 (App Router) em Feature-Sliced Design, com Redux Toolkit (estado de autenticação) e React Query (dados da frota).\r\n- Swagger bilíngue com tema escuro, exemplos prontos e \"Try it out\" pré-preenchido (`/docs`, `/docs-pt`).\r\n- Docker Compose sobe toda a infraestrutura (SQL Server, Redis, RabbitMQ, MongoDB, API, Web e worker de auditoria).\r\n- Documentação trilíngue em `gitpagedocs/` (PT/EN/ES), publicada no GitHub Pages.\r\n\r\n### Estrutura do projeto\r\n```text\r\nbackend/     # API NestJS (auth, fleet, users, messaging, audit, shared)\r\nfrontend/    # App Next.js em FSD (app, processes, entities, features, widgets, shared)\r\ngitpagedocs/ # Documentação GitPageDocs 1.0.0 (PT/EN/ES)\r\ndocker/      # init.sql do SQL Server e assets de container\r\nscripts/     # Utilitários (ex.: correção de offload de NIC no WSL2)\r\ndocker-compose.yml\r\nenvexample.txt\r\n```\r\n\r\n### Como executar\r\n**Docker (recomendado)**\r\n```bash\r\ncp envexample.txt .env\r\ndocker compose up --build\r\n```\r\nServiços: API `http://localhost:${HTTP_PORT:-3000}/api`, Swagger (`/docs`, `/docs-pt`), Frontend `http://localhost:${FRONTEND_PORT:-3001}`, RabbitMQ UI `http://localhost:15672`.\r\n\r\n**Execução manual**\r\n```bash\r\n# API\r\ncd backend\r\nnpm install\r\nnpm run start:dev   # ou npm run start:prod\r\n\r\n# Frontend\r\ncd ../frontend\r\nnpm install\r\nnpm run dev\r\n```\r\n\r\n### Scripts úteis\r\n- `npm run generate:openapi` (backend) – gera as specs Swagger PT/EN.\r\n- `npm run export:schemas` (backend) – exporta schemas Zod consumidos pelo frontend.\r\n- A documentação GitPageDocs é publicada automaticamente no GitHub Pages pelo workflow `.github/workflows/gitpagedocs-pages.yml`.\r\n\r\n### Variáveis principais (`envexample.txt`)\r\n- `SQLSERVER_*`, `REDIS_*` (inclui `REDIS_LOCK_TTL`), `MONGO_URI`, `RABBITMQ_*` (inclui `RABBITMQ_RETRY_QUEUE`, `RABBITMQ_DLQ`)\r\n- `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`\r\n- `WORKER_CONCURRENCY` (padrão 2), `RETRY_MAX_ATTEMPTS`, `RETRY_INITIAL_DELAY`\r\n- `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_AUTH_MAX_REQUESTS`, `RATE_LIMIT_AUTH_WINDOW_SECONDS`\r\n- `ADMIN_NICKNAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`\r\n- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME`, `NEXT_PUBLIC_APP_NAME`\r\n\r\n### Testes\r\n- Backend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`.\r\n- Frontend: `npm run lint`, `npm test`, `npm run test:e2e`.\r\n\r\n### Credenciais seed\r\n- Usuário: `aivacol`\r\n- Senha: `aivacol123!`\r\n\r\nPara detalhes aprofundados consulte `gitpagedocs/docs/versions/1.0.0/pt`.\r\n\r\n</details>\r\n\r\n## 🇺🇸 English Description\r\n<details>\r\n<summary><strong>View details</strong></summary>\r\n\r\n### Overview\r\n- NestJS 11 API with JWT/RBAC, Redis sessions (sliding TTL + lock/unlock), per-repository Redis cache, MongoDB audit trail and RabbitMQ messaging.\r\n- Database protection via Redis: cache, a dedicated rate limit (per user/IP/endpoint), idempotency (`Idempotency-Key`) and distributed locking; resilience with retry, fallback and rollback.\r\n- App-wide auditing via RabbitMQ → dedicated worker → MongoDB (`audit_events` with `eventId`, `userId`, `sessionId`, `method`, `route`, `statusCode`, `success`, `status`, `processedAt`).\r\n- Next.js 16 web client (App Router + FSD) powered by Redux Toolkit (auth state) and React Query (fleet data).\r\n- Bilingual Swagger with a dark theme, ready-to-run examples and pre-filled \"Try it out\" (`/docs`, `/docs-pt`).\r\n- Docker Compose spins up SQL Server, Redis, RabbitMQ, MongoDB, API, web app and the audit worker.\r\n- Trilingual docs in `gitpagedocs/` (PT/EN/ES), published to GitHub Pages.\r\n\r\n### Project layout\r\n```text\r\nbackend/     # NestJS API (auth, fleet, users, messaging, audit, shared)\r\nfrontend/    # Next.js app in FSD (app, processes, entities, features, widgets, shared)\r\ngitpagedocs/ # GitPageDocs site version 1.0.0 (PT/EN/ES)\r\ndocker/      # SQL Server init.sql and container assets\r\nscripts/     # Utilities (e.g. WSL2 NIC offload fix)\r\ndocker-compose.yml\r\nenvexample.txt\r\n```\r\n\r\n### Getting started\r\n**Docker (recommended)**\r\n```bash\r\ncp envexample.txt .env\r\ndocker compose up --build\r\n```\r\nServices: API `http://localhost:${HTTP_PORT:-3000}/api`, Swagger (`/docs`, `/docs-pt`), frontend `http://localhost:${FRONTEND_PORT:-3001}`, RabbitMQ UI `http://localhost:15672`.\r\n\r\n**Manual run**\r\n```bash\r\n# API\r\ncd backend\r\nnpm install\r\nnpm run start:dev   # or npm run start:prod\r\n\r\n# Frontend\r\ncd ../frontend\r\nnpm install\r\nnpm run dev\r\n```\r\n\r\n### Handy scripts\r\n- `npm run generate:openapi` (backend) – rebuild Swagger PT/EN specs.\r\n- `npm run export:schemas` (backend) – sync validation schemas with the frontend.\r\n- The GitPageDocs site is published to GitHub Pages automatically by `.github/workflows/gitpagedocs-pages.yml`.\r\n\r\n### Key environment variables (`envexample.txt`)\r\n- `SQLSERVER_*`, `REDIS_*` (incl. `REDIS_LOCK_TTL`), `MONGO_URI`, `RABBITMQ_*` (incl. `RABBITMQ_RETRY_QUEUE`, `RABBITMQ_DLQ`)\r\n- `JWT_SECRET`, `JWT_EXPIRES_IN`, `AUTH_SESSION_TTL_SECONDS`\r\n- `WORKER_CONCURRENCY` (default 2), `RETRY_MAX_ATTEMPTS`, `RETRY_INITIAL_DELAY`\r\n- `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_AUTH_MAX_REQUESTS`, `RATE_LIMIT_AUTH_WINDOW_SECONDS`\r\n- `ADMIN_NICKNAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`\r\n- `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME`, `NEXT_PUBLIC_APP_NAME`\r\n\r\n### Tests\r\n- Backend: `npm run lint`, `npm test`, `npm run test:e2e`, `npm run test:cov`.\r\n- Frontend: `npm run lint`, `npm test`, `npm run test:e2e`.\r\n\r\n### Seed credentials\r\n- User: `aivacol`\r\n- Password: `aivacol123!`\r\n\r\nRefer to `gitpagedocs/docs/versions/1.0.0/en` for deeper architectural documentation.\r\n\r\n</details>\r\n\r\n## 📚 Documentação complementar\r\n- GitPageDocs (PT/EN/ES): `gitpagedocs/docs/versions/1.0.0` · publicado em https://vidigal-code.github.io/fleetcore-api/\r\n- Backend README: `backend/README.md`\r\n- Frontend README: `frontend/README.md`\r\n\r\nSinta-se à vontade para abrir issues ou PRs com melhorias. Boa avaliação! 🚀\r\n"},"fileKeys":["README.md"],"tree":{"README.md":{"path":"README.md"}}}</script>
+<script>
+(function(){
+var el=document.getElementById("filesData");
+var raw=el?el.textContent:"{}";
+var data=JSON.parse(raw);
+var files=data.files||{}, keys=data.fileKeys||[], treeData=data.tree||{};
+function esc(s){var d=document.createElement("div");d.textContent=s;return d.innerHTML}
+function getLang(p){
+  if(p.endsWith(".ts")||p.endsWith(".tsx"))return"typescript";
+  if(p.endsWith(".js")||p.endsWith(".mjs")||p.endsWith(".cjs"))return"javascript";
+  if(p.endsWith(".json"))return"json";
+  if(p.endsWith(".css"))return"css";
+  if(p.endsWith(".md"))return"markdown";
+  return"";
+}
+var viewMode="code";
+function setViewMode(mode){viewMode=mode}
+function selectFile(path){
+  document.querySelectorAll(".sidebar .file.active").forEach(function(n){n.classList.remove("active")});
+  document.querySelectorAll(".sidebar .folder.active").forEach(function(n){n.classList.remove("active")});
+  var node=document.querySelector('.sidebar .file[data-path="'+path.replace(/"/g,'\"')+'"]');
+  if(node){node.classList.add("active");node.scrollIntoView({block:"nearest"})}
+  document.getElementById("breadcrumbFile").textContent=path;
+  document.getElementById("fileHeader").style.display="block";
+  document.getElementById("headerPath").textContent=path;
+  var content=files[path]||"";
+  var isReadme=path.toLowerCase()==="readme.md";
+  var viewer=document.getElementById("viewer");
+  if(isReadme){
+    var btnHtml='<div class="btn-group"><button class="btn'+(viewMode==='preview'?' active':'')+'" data-mode="preview">Preview</button><button class="btn'+(viewMode==='code'?' active':'')+'" data-mode="code">Code</button></div>';
+    if(viewMode==="preview"&&typeof marked!=="undefined"){
+      viewer.innerHTML=btnHtml+'<div class="md-preview">'+marked.parse(content||"")+'</div>';
+    }else{
+      var lines=(content||"").split("\n");
+      var lineHtml="";
+      lines.forEach(function(line,i){lineHtml+="<span class=\"line-num\">"+(i+1)+"</span><span class=\"line\">"+esc(line)+"\n</span>"});
+      viewer.innerHTML=btnHtml+"<code>"+lineHtml+"</code>";
+      if(typeof hljs!=="undefined"){var c=viewer.querySelector("code");if(c){c.className="language-markdown";hljs.highlightElement(c)}}
+    }
+    viewer.classList.remove("empty");
+    viewer.querySelectorAll(".btn").forEach(function(btn){
+      btn.onclick=function(){setViewMode(btn.dataset.mode);selectFile(path)};
+    });
+  }else{
+    var lines=content.split("\n");
+    var nums="",code="";
+    lines.forEach(function(line,i){nums+="<span>"+(i+1)+"</span>";code+="<span class=\"line\">"+esc(line)+"\n</span>"});
+    viewer.innerHTML='<table class="code-table"><tr><td class="line-nums">'+nums+'</td><td class="line-code"><code>'+code+'</code></td></tr></table>';
+    viewer.classList.remove("empty");
+    var c=viewer.querySelector("code");if(c&&typeof hljs!=="undefined"){c.className="language-"+getLang(path);hljs.highlightElement(c)}
+  }
+  window._currentPath=path;window._currentContent=content;
+}
+document.getElementById("copyBtn").onclick=function(){
+  var p=window._currentPath,c=window._currentContent;
+  if(!c)return;
+  navigator.clipboard&&navigator.clipboard.writeText(c).then(function(){var b=document.getElementById("copyBtn");var t=b.textContent;b.textContent="Copied!";setTimeout(function(){b.textContent=t},1500)});
+};
+function folderIcon(){return'<svg width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M.513 1.513A1.75 1.75 0 0 1 1.75 1h3.5c.58 0 1.165.224 1.587.624l.357.364A.75.75 0 0 0 8 2h5.25A1.75 1.75 0 0 1 15 3.75v8.5A1.75 1.75 0 0 1 13.25 14H1.75A1.75 1.75 0 0 1 0 12.25v-9.5C0 2.178.78 1.408 1.513 1.513Z"/></svg>'}
+function fileIcon(){return'<svg width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Z"/></svg>'}
+function chevronDown(){return'<svg width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M6.22 3.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 0 1 0-1.06Z"/></svg>'}
+function renderTree(node, parentEl, indent){
+  indent=indent||0;
+  var keys=Object.keys(node).sort();
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i];
+    var v=node[k];
+    if(k==="path")continue;
+    if(v&&typeof v==="object"&&v.path){
+      var div=document.createElement("div");
+      div.className="file";
+      div.dataset.path=v.path;
+      div.style.marginLeft=(indent*12)+"px";
+      div.innerHTML='<span class="icon">'+fileIcon()+'</span>'+esc(k);
+      div.onclick=function(p){return function(){selectFile(p)}}(v.path);
+      parentEl.appendChild(div);
+    }else if(v&&typeof v==="object"){
+      var folderDiv=document.createElement("div");
+      folderDiv.className="folder";
+      folderDiv.style.marginLeft=(indent*12)+"px";
+      folderDiv.innerHTML='<span class="chevron">'+chevronDown()+'</span><span class="icon">'+folderIcon()+'</span>'+esc(k);
+      var children=document.createElement("div");
+      children.className="children";
+      folderDiv.onclick=function(e){
+        if(e.target.closest(".file"))return;
+        var self=e.currentTarget;
+        self.classList.toggle("collapsed");
+        children.classList.toggle("hidden",self.classList.contains("collapsed"));
+      };
+      parentEl.appendChild(folderDiv);
+      parentEl.appendChild(children);
+      renderTree(v,children,indent+1);
+    }
+  }
+}
+function buildTreeFromKeys(keys){
+  var root={};
+  keys.forEach(function(key){
+    var parts=key.split("/");
+    var curr=root;
+    for(var i=0;i<parts.length;i++){
+      var part=parts[i];
+      var isLast=i===parts.length-1;
+      if(!curr[part])curr[part]=isLast?{path:key}:{};
+      if(isLast)curr[part].path=key;
+      else curr=curr[part];
+    }
+  });
+  return root;
+}
+function buildTree(filterQuery){
+  var treeEl=document.getElementById("tree");
+  treeEl.innerHTML="";
+  var filteredKeys=filterQuery?keys.filter(function(k){return k.toLowerCase().indexOf(filterQuery.toLowerCase())>=0;}):keys;
+  var data=filteredKeys.length?buildTreeFromKeys(filteredKeys):{};
+  if(Object.keys(data).length>0){
+    renderTree(data,treeEl,0);
+  }else{
+    filteredKeys.sort();
+    filteredKeys.forEach(function(k){
+      var div=document.createElement("div");
+      div.className="file";
+      div.dataset.path=k;
+      div.innerHTML='<span class="icon">'+fileIcon()+'</span>'+esc(k.split("/").pop());
+      div.onclick=function(){selectFile(k)};
+      treeEl.appendChild(div);
+    });
+  }
+}
+document.getElementById("searchInput").oninput=function(){
+  var q=this.value.trim();
+  buildTree(q);
+};
+document.getElementById("expandAll").onclick=function(){
+  document.querySelectorAll(".sidebar .folder.collapsed").forEach(function(f){f.classList.remove("collapsed")});
+  document.querySelectorAll(".sidebar .children.hidden").forEach(function(c){c.classList.remove("hidden")});
+};
+document.getElementById("collapseAll").onclick=function(){
+  document.querySelectorAll(".sidebar .folder").forEach(function(f){f.classList.add("collapsed")});
+  document.querySelectorAll(".sidebar .children").forEach(function(c){c.classList.add("hidden")});
+};
+buildTree();
+})();
+</script>
+</body>
+</html>

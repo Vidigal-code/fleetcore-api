@@ -24,4 +24,4 @@ Git Page Docs is a **pnpm + turborepo monorepo** that turns a repository's `gitp
 - In-docs **AI chat drawer** plus a dedicated **`/ai` console**
 - 36-theme layout system; local and GitHub Pages execution modes
 
-> Version: 1.0.0
+> Version: 1.1.1
