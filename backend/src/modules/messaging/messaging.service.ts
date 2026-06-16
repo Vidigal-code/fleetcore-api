@@ -33,6 +33,7 @@ export class MessagingService {
       );
     } catch (error) {
       this.logger.error(`Failed to publish event ${event}`, error as Error);
+      throw error;
     }
   }
 }
