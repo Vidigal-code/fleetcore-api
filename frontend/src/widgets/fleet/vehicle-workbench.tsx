@@ -85,20 +85,18 @@ export const VehicleWorkbench = () => {
         </Surface>
 
         <Surface tone="base" radius="xl" className="mx-auto w-full max-w-5xl space-y-6">
-          <div className="w-full overflow-x-auto">
-            <VehicleTable
-              vehicles={collection.items}
-              brands={brands}
-              models={models}
-              loading={isLoading}
-              page={collection.page}
-              limit={collection.limit}
-              total={collection.total}
-              onPageChange={actions.changePage}
-              onEdit={actions.setEditingVehicle}
-              onDelete={deletion.request}
-            />
-          </div>
+          <VehicleTable
+            vehicles={collection.items}
+            brands={brands}
+            models={models}
+            loading={isLoading}
+            page={collection.page}
+            limit={collection.limit}
+            total={collection.total}
+            onPageChange={actions.changePage}
+            onEdit={actions.setEditingVehicle}
+            onDelete={deletion.request}
+          />
         </Surface>
       </PageSection>
 

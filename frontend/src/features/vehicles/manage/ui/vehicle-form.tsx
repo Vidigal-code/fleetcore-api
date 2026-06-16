@@ -155,7 +155,10 @@ export const VehicleForm = ({
           </div>
         </Surface>
       ) : null}
-      <form className="grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
+      <form
+        className="mx-auto grid w-full max-w-md grid-cols-1 gap-4 lg:max-w-none lg:grid-cols-2"
+        onSubmit={handleSubmit}
+      >
         <InputField
           label="Placa Mercosul"
           placeholder="AAA1B23"
@@ -198,17 +201,17 @@ export const VehicleForm = ({
         />
 
         {errorMessage ? (
-          <InlineMessage className="md:col-span-2" variant="error">
+          <InlineMessage className="lg:col-span-2" variant="error">
             {errorMessage}
           </InlineMessage>
         ) : null}
         {successMessage ? (
-          <InlineMessage className="md:col-span-2" variant="success">
+          <InlineMessage className="lg:col-span-2" variant="success">
             {successMessage}
           </InlineMessage>
         ) : null}
 
-        <div className="mt-1 flex flex-wrap items-center justify-center gap-3 md:col-span-2 md:justify-end">
+        <div className="mt-1 flex flex-wrap items-center justify-center gap-3 lg:col-span-2 lg:justify-end">
           {mode === 'edit' ? (
             <Button
               type="button"
