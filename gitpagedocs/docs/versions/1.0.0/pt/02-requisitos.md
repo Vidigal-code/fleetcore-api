@@ -50,6 +50,11 @@ Os nomes existentes foram **preservados** (sem renomear). Foram acrescentadas, d
 | `RATE_LIMIT_AUTH_WINDOW_SECONDS` | `60` | Janela do `POST /auth/login`. |
 | `RETRY_MAX_ATTEMPTS` | `5` | Tentativas máximas no `ResilienceService`. |
 | `RETRY_INITIAL_DELAY` | `1000` | Delay inicial (ms) do backoff. |
+| `RABBITMQ_RETRY_DELAY_MS` | `10000` | TTL (ms) da fila `fleetcore.retry` antes de reentregar à `fleetcore.audit`. |
+| `RABBITMQ_AUDIT_MAX_ATTEMPTS` | `5` | Tentativas do consumer antes de parquear o evento na DLQ. |
+| `AUDIT_OUTBOX_RELAY_INTERVAL_MS` | `5000` | Intervalo (ms) de varredura do `AuditOutboxRelayService`. |
+| `AUDIT_OUTBOX_BATCH_SIZE` | `20` | Máximo de entradas do outbox processadas por ciclo. |
+| `AUDIT_OUTBOX_MAX_ATTEMPTS` | `10` | Tentativas antes de marcar a entrada do outbox como `failed`. |
 
 ## Evidências complementares
 

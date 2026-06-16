@@ -38,9 +38,18 @@ RABBITMQ_QUEUE=fleetcore.vehicles
 RABBITMQ_AUDIT_QUEUE=fleetcore.audit
 RABBITMQ_RETRY_QUEUE=fleetcore.retry
 RABBITMQ_DLQ=fleetcore.dead-letter
+# Delay (ms) a failed audit message waits in the retry queue before redelivery
+RABBITMQ_RETRY_DELAY_MS=10000
+# Delivery attempts before an audit message is parked in the dead-letter queue
+RABBITMQ_AUDIT_MAX_ATTEMPTS=5
 
 # Workers (RabbitMQ prefetch / concurrency). Default 2 when unset.
 WORKER_CONCURRENCY=2
+
+# Audit outbox relay (republishes pending audit events when RabbitMQ recovers)
+AUDIT_OUTBOX_RELAY_INTERVAL_MS=5000
+AUDIT_OUTBOX_BATCH_SIZE=20
+AUDIT_OUTBOX_MAX_ATTEMPTS=10
 
 # Security (Helmet/CORS + base throttler)
 SECURITY_CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001

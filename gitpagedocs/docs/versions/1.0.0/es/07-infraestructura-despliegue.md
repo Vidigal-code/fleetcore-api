@@ -22,7 +22,8 @@ El proyecto puede ejecutarse sin fricciones dentro de Docker o directamente en l
 - Novedades de sesión/tema: `AUTH_SESSION_TTL_SECONDS` (sesiones Redis con TTL deslizante) y `NEXT_PUBLIC_START_THEME` (tema por defecto).
 - Variables aditivas de resiliencia, worker, lock y rate limit (nombres existentes preservados):
   - Lock distribuido: `REDIS_LOCK_TTL=30`.
-  - Worker de auditoría: `WORKER_CONCURRENCY=2`, `RABBITMQ_RETRY_QUEUE=fleetcore.retry`, `RABBITMQ_DLQ=fleetcore.dead-letter`.
+  - Worker de auditoría: `WORKER_CONCURRENCY=2`, `RABBITMQ_RETRY_QUEUE=fleetcore.retry`, `RABBITMQ_DLQ=fleetcore.dead-letter`, `RABBITMQ_RETRY_DELAY_MS=10000`, `RABBITMQ_AUDIT_MAX_ATTEMPTS=5`.
+  - Outbox de auditoría: `AUDIT_OUTBOX_RELAY_INTERVAL_MS=5000`, `AUDIT_OUTBOX_BATCH_SIZE=20`, `AUDIT_OUTBOX_MAX_ATTEMPTS=10`.
   - Rate limit Redis: `RATE_LIMIT_ENABLED=true`, `RATE_LIMIT_WINDOW_SECONDS=60`, `RATE_LIMIT_MAX_REQUESTS=100`, `RATE_LIMIT_AUTH_MAX_REQUESTS=10`, `RATE_LIMIT_AUTH_WINDOW_SECONDS=60`.
   - Reintentos: `RETRY_MAX_ATTEMPTS=5`, `RETRY_INITIAL_DELAY=1000`.
 
@@ -45,7 +46,7 @@ El proyecto puede ejecutarse sin fricciones dentro de Docker o directamente en l
 ## Observabilidad
 
 - Los logs de NestJS resaltan reintentos, aperturas del circuit breaker y fallbacks de auditoría.
-- Los datos de auditoría viven en MongoDB (enriquecidos con `correlationId`/`requestId`/`sessionId`/`statusCode` y metadatos del worker como `status`, `retries`, `processedAt`); RabbitMQ ofrece una traza completa de eventos a través de la cola `fleetcore.audit` y las colas auxiliares `fleetcore.retry` y `fleetcore.dead-letter`.
+- Los datos de auditoría viven en MongoDB (enriquecidos con `correlationId`/`requestId`/`sessionId`/`statusCode` y metadatos del worker como `status`, `retries`, `processedAt`); RabbitMQ ofrece una traza completa de eventos a través de la cola `fleetcore.audit` y las colas de resiliencia `fleetcore.retry` (retry con retardo) y `fleetcore.dead-letter` (DLQ tras agotar los intentos).
 - Las métricas de dominio permiten integrar fácilmente Prometheus/Grafana.
 
 ## Flujo de despliegue recomendado

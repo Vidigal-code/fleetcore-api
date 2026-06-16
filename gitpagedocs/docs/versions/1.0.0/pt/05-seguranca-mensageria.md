@@ -81,7 +81,7 @@ Enquanto o outbox protege o lado da **publicação**, o consumer protege o lado 
 - `FleetDomainEventListener` encaminha os eventos para o `MessagingService`, que publica no exchange `fleetcore.events` (routing keys `vehicle.*`, `brand.*`, `model.*`).
 - `VehicleEventsConsumer` mostra como consumir e processar mensagens, servindo de base para integrações futuras.
 - `ResilienceService` aplica retries, timeout e circuit breaker nas operações com RabbitMQ para evitar falhas em cascata. Além disso oferece `executeWithRetry`, `executeWithFallback` (erro controlado → caminho alternativo) e `executeWithRollback` (executa etapas e, em falha, roda as compensações na ordem inversa). O `UnitOfWork` continua responsável pelo rollback transacional no banco.
-- O `WORKER_CONCURRENCY` (padrão 2) define o `prefetchCount` do RabbitMQ consumido pelo `audit-worker`, que loga a concurrency no boot. Filas auxiliares: `RABBITMQ_RETRY_QUEUE=fleetcore.retry` e `RABBITMQ_DLQ=fleetcore.dead-letter`.
+- O `WORKER_CONCURRENCY` (padrão 2) define o `prefetchCount` do RabbitMQ consumido pelo `audit-worker`, que loga a concurrency no boot. As filas de resiliência `RABBITMQ_RETRY_QUEUE=fleetcore.retry` e `RABBITMQ_DLQ=fleetcore.dead-letter` estão **ativas** (ver "Retry e dead-letter no consumer" acima): a `fleetcore.audit` faz dead-letter para a de retry (com `x-message-ttl=RABBITMQ_RETRY_DELAY_MS`) e, após `RABBITMQ_AUDIT_MAX_ATTEMPTS`, o evento é parqueado na dead-letter.
 
 ## Observabilidade e feature toggles
 

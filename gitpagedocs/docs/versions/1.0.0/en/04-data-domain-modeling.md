@@ -10,7 +10,8 @@ The backend uses TypeORM on SQL Server with a pure DDD layer. Persistence is set
 | `brands` | `id`, `name` | Unique constraint on `name`; optional parent for models. |
 | `models` | `id`, `name`, `brand_id` | Foreign key to `brands` (SET NULL on delete) enabling orphan models. |
 | `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `model_id` | Unique constraints on identifiers; cascade delete keeps referential integrity. |
-| `audit_events` (Mongo) | `eventId`, `eventType`, `correlationId`, `requestId`, `userId`, `sessionId`, `method`, `route`, `statusCode`, `success`, `action`, `entity`, `entityId`, `actor`, `payload`, `metadata`, `occurredAt` + worker fields (`status='processed'`, `retries`, `sourceQueue`, `processedAt`) | Persisted by the async `audit-worker` from the `fleetcore.audit` queue, or via `AuditWriterService` on fallback. |
+| `audit_events` (Mongo) | `eventId`, `eventType`, `correlationId`, `requestId`, `userId`, `sessionId`, `method`, `route`, `statusCode`, `success`, `action`, `entity`, `entityId`, `actor`, `payload`, `metadata`, `occurredAt` + worker fields (`status='processed'`, `retries`, `sourceQueue`, `processedAt`) | Persisted by the async `audit-worker` from the `fleetcore.audit` queue; failed deliveries retry via `fleetcore.retry` and park in `fleetcore.dead-letter`. |
+| `audit_outbox` (Mongo) | `routingKey`, `message`, `status` (`pending`/`processing`/`failed`), `attempts`, `lastError` | Publish-side fallback: when RabbitMQ is down `AuditService` stores events here; `AuditOutboxRelayService` (audit-worker) republishes them once the broker recovers. |
 
 `backend/seeds/seed_vehicles.json` contains sample fleet data for local development.
 

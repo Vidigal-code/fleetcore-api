@@ -20,7 +20,7 @@ Este capítulo mapea cada ítem del desafío con el artefacto concreto dentro de
 - **Modelado estandarizado**: migraciones TypeORM (`backend/src/migrations/1717845600000-InitSchema.ts`) con columnas y metadatos de SQL Server.
 - **Caché Redis**: `RepositoryCacheService` almacenando resultados de búsqueda de vehículos (namespace `vehicles.search`) con TTL configurable (`REDIS_TTL_SECONDS`).
 - **Mensajería RabbitMQ** (bonus): módulo dedicado + `FleetDomainEventListener` retransmitiendo eventos de dominio.
-- **Traza de auditoría en MongoDB** (bonus): el `AuditInterceptor` publica eventos enriquecidos (`eventId`, `correlationId`, `requestId`, `sessionId`, `statusCode`…) en la cola `fleetcore.audit` y la app `audit-worker` los persiste vía Mongoose con metadatos de procesamiento (`status`, `retries`, `processedAt`).
+- **Traza de auditoría en MongoDB** (bonus): el `AuditInterceptor` publica eventos enriquecidos (`eventId`, `correlationId`, `requestId`, `sessionId`, `statusCode`…) en la cola `fleetcore.audit` cuando el toggle `auditAsyncWorker` está activo (si está apagado, escribe síncrono en Mongo); la app `audit-worker` los persiste vía Mongoose con metadatos de procesamiento (`status`, `retries`, `processedAt`). Si RabbitMQ cae, el evento se guarda en `audit_outbox` y se republica al recuperarse el broker.
 - **Resiliencia**: `ResilienceService` con `executeWithRetry`/`executeWithFallback`/`executeWithRollback`; `UnitOfWork` para el rollback transaccional SQL.
 - **Stack Docker completo**: `docker-compose.yml` levanta SQL Server, Redis, RabbitMQ, MongoDB, API, frontend y el worker `audit-worker`.
 

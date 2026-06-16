@@ -25,7 +25,9 @@ A trilha de auditoria não fica no SQL Server: é persistida na coleção `audit
 | Entidade | `entity`, `entityId`, `payload`, `metadata`, `occurredAt` |
 | Processamento | `status` (`processed`), `retries`, `sourceQueue`, `processedAt` |
 
-Os campos enriquecidos são opcionais (compatível com documentos antigos), e a escrita usa `ResilienceService` (retry/fallback).
+Os campos enriquecidos são opcionais (compatível com documentos antigos), e a escrita usa `ResilienceService` (retry/circuit breaker).
+
+Há ainda uma segunda coleção, `audit_outbox` (`backend/src/modules/audit/schemas/audit-outbox.schema.ts`), usada como **outbox transacional**: quando a publicação no RabbitMQ falha (broker fora), o evento é gravado ali com `routingKey`, `message`, `status` (`pending`/`processing`/`failed`), `attempts` e `lastError`. O `AuditOutboxRelayService` (no `audit-worker`) republica essas entradas no RabbitMQ quando o broker volta, e o fluxo normal (consumer → `audit_events`) assume a partir daí.
 
 ## Agregados e repositórios
 

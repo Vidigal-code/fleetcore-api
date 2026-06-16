@@ -24,7 +24,8 @@ The repository ships with everything needed to run the platform locally or in CI
   - `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_START_THEME` configure the frontend runtime.
   - `AUDIT_MONGO_URI`, `RABBITMQ_URI` wire audit/messaging.
   - **Rate limit**: `RATE_LIMIT_ENABLED=true`, `RATE_LIMIT_WINDOW_SECONDS=60`, `RATE_LIMIT_MAX_REQUESTS=100`, `RATE_LIMIT_AUTH_MAX_REQUESTS=10`, `RATE_LIMIT_AUTH_WINDOW_SECONDS=60`.
-  - **Locking / worker / messaging**: `REDIS_LOCK_TTL=30`, `WORKER_CONCURRENCY=2`, `RABBITMQ_RETRY_QUEUE=fleetcore.retry`, `RABBITMQ_DLQ=fleetcore.dead-letter`.
+  - **Locking / worker / messaging**: `REDIS_LOCK_TTL=30`, `WORKER_CONCURRENCY=2`, `RABBITMQ_RETRY_QUEUE=fleetcore.retry`, `RABBITMQ_DLQ=fleetcore.dead-letter`, `RABBITMQ_RETRY_DELAY_MS=10000`, `RABBITMQ_AUDIT_MAX_ATTEMPTS=5`.
+  - **Audit outbox**: `AUDIT_OUTBOX_RELAY_INTERVAL_MS=5000`, `AUDIT_OUTBOX_BATCH_SIZE=20`, `AUDIT_OUTBOX_MAX_ATTEMPTS=10`.
   - **Resilience**: `RETRY_MAX_ATTEMPTS=5`, `RETRY_INITIAL_DELAY=1000`.
   - These variables are additive — existing names were preserved (no renames).
 
