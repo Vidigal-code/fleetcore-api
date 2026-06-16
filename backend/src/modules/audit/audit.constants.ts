@@ -24,3 +24,11 @@ export const AUDIT_OUTBOX_BATCH_SIZE = 20;
 
 /** Attempts before an entry is parked as failed. */
 export const AUDIT_OUTBOX_MAX_ATTEMPTS = 10;
+
+// --- Consumer dead-letter / retry (MongoDB unavailable while persisting) ---
+
+/**
+ * Delivery attempts before an audit message stops being retried and is parked
+ * in the dead-letter queue. Overridable via RABBITMQ_AUDIT_MAX_ATTEMPTS.
+ */
+export const AUDIT_MAX_DELIVERY_ATTEMPTS = 5;

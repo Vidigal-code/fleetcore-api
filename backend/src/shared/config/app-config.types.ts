@@ -49,6 +49,7 @@ export interface MessagingConfig {
   readonly auditQueue: string;
   readonly retryQueue: string;
   readonly deadLetterQueue: string;
+  readonly retryDelayMs: number;
   readonly workerConcurrency: number;
   readonly connection: MessagingConnectionConfig;
 }

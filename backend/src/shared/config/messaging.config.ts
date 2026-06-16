@@ -15,6 +15,7 @@ export default registerAs('messaging', () => ({
   auditQueue: process.env.RABBITMQ_AUDIT_QUEUE ?? 'fleetcore.audit',
   retryQueue: process.env.RABBITMQ_RETRY_QUEUE ?? 'fleetcore.retry',
   deadLetterQueue: process.env.RABBITMQ_DLQ ?? 'fleetcore.dead-letter',
+  retryDelayMs: parseInteger(process.env.RABBITMQ_RETRY_DELAY_MS, 10_000),
   workerConcurrency: parseInteger(process.env.WORKER_CONCURRENCY, 2),
   connection: {
     timeoutMs: parseInteger(process.env.RABBITMQ_CONNECT_TIMEOUT_MS, 15_000),

@@ -15,8 +15,16 @@ import { SharedModule } from '../../shared/shared.module';
     RabbitMQModule.forRootAsync({
       inject: [AppConfigService],
       useFactory: (configService: AppConfigService): RabbitMQConfig => {
-        const { uri, exchange, connection, workerConcurrency } =
-          configService.messaging;
+        const {
+          uri,
+          exchange,
+          connection,
+          workerConcurrency,
+          auditQueue,
+          retryQueue,
+          deadLetterQueue,
+          retryDelayMs,
+        } = configService.messaging;
 
         return {
           uri,
@@ -25,6 +33,30 @@ import { SharedModule } from '../../shared/shared.module';
             {
               name: exchange,
               type: 'topic',
+            },
+          ],
+          // Retry/dead-letter topology for failed audit deliveries. A message
+          // that cannot be persisted is dead-lettered to the retry queue, held
+          // for `retryDelayMs`, then routed back to the audit queue for another
+          // attempt. After the consumer exhausts its attempts it parks the
+          // message in the dead-letter queue for manual inspection.
+          queues: [
+            {
+              name: deadLetterQueue,
+              createQueueIfNotExists: true,
+              options: { durable: true },
+            },
+            {
+              name: retryQueue,
+              createQueueIfNotExists: true,
+              options: {
+                durable: true,
+                arguments: {
+                  'x-message-ttl': retryDelayMs,
+                  'x-dead-letter-exchange': '',
+                  'x-dead-letter-routing-key': auditQueue,
+                },
+              },
             },
           ],
           connectionInitOptions: {

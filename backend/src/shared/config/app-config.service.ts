@@ -111,6 +111,10 @@ export class AppConfigService {
         'messaging.deadLetterQueue',
         'fleetcore.dead-letter',
       ),
+      retryDelayMs: this.configService.get<number>(
+        'messaging.retryDelayMs',
+        10_000,
+      ),
       workerConcurrency: this.configService.get<number>(
         'messaging.workerConcurrency',
         2,

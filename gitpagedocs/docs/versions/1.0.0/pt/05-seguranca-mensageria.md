@@ -66,6 +66,15 @@ Para não perder eventos quando o broker está indisponível, a API usa o padrã
 - Como **última rede de segurança** (ex.: MongoDB também fora no momento do `enqueue`), o `AuditService` ainda cai num write síncrono direto, garantindo que o evento nunca seja descartado em silêncio.
 - Tunável por env: `AUDIT_OUTBOX_RELAY_INTERVAL_MS` (padrão `5000`), `AUDIT_OUTBOX_BATCH_SIZE` (padrão `20`), `AUDIT_OUTBOX_MAX_ATTEMPTS` (padrão `10`).
 
+### Retry e dead-letter no consumer (MongoDB fora durante o consumo)
+
+Enquanto o outbox protege o lado da **publicação**, o consumer protege o lado do **consumo**: se o MongoDB cair enquanto o worker grava, a mensagem não é mais perdida com um `ack` silencioso.
+
+- A fila `fleetcore.audit` é declarada com dead-letter para `fleetcore.retry`. Quando o `AuditWriterService.persist` falha, o `AuditEventsConsumer` **relança** o erro com `errorBehavior: NACK` (nack sem requeue), e a mensagem é dead-letterada para a fila de retry.
+- `fleetcore.retry` tem `x-message-ttl` (`RABBITMQ_RETRY_DELAY_MS`, padrão `10000`) e dead-letter de volta para `fleetcore.audit` — ou seja, **retry com atraso** (backoff), evitando reprocessar em loop apertado enquanto o Mongo não volta.
+- O número de tentativas é lido do header `x-death`. Ao atingir `RABBITMQ_AUDIT_MAX_ATTEMPTS` (padrão `5`), o consumer publica a mensagem na DLQ `fleetcore.dead-letter` e dá `ack`, parando o ciclo e preservando o evento para inspeção manual.
+- ⚠️ **Nota operacional**: a fila `fleetcore.audit` passou a ter argumentos de dead-letter. Se ela já existir no broker com argumentos diferentes, o `assertQueue` falha com `PRECONDITION_FAILED`; em dev, basta apagar a fila para que seja recriada com a nova configuração.
+
 ## Mensageria RabbitMQ
 
 - Eventos de domínio (`VehicleCreatedEvent`, `VehicleUpdatedEvent`, etc.) são emitidos pelos agregados da frota.
