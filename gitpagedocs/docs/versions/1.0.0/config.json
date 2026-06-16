@@ -1,31 +1,13 @@
 {
   "auth": {
     "accessKeys": {
-      "docs-key": "open-gitpagedocs-docs",
-      "source-viewer-key": "open-source-viewer"
+      "docs-key": "open-aivacol-docs"
     },
     "rolesStorageKey": "git-page-docs:route-auth:roles",
     "providers": [
       {
-        "type": "authjs",
-        "enabled": true,
-        "sessionEndpoint": "/api/auth/session",
-        "rolesClaimPath": "user.roles"
-      },
-      {
-        "type": "clerk",
-        "enabled": true,
-        "rolesClaimPath": "claims.publicMetadata.roles"
-      },
-      {
-        "type": "firebase",
-        "enabled": true,
-        "tokenStorageKey": "git-page-docs:firebase-token",
-        "rolesClaimPath": "roles"
-      },
-      {
         "type": "jwt",
-        "enabled": true,
+        "enabled": false,
         "tokenStorageKey": "git-page-docs:jwt-token",
         "rolesClaimPath": "roles"
       }
@@ -35,14 +17,14 @@
     {
       "id": 1,
       "title": {
-        "pt": "Primeiros passos",
-        "en": "Getting Started",
-        "es": "Primeros pasos"
+        "pt": "Início",
+        "en": "Home",
+        "es": "Inicio"
       },
       "description": {
-        "pt": "Configure o repositório do zero",
-        "en": "Configure repository from zero",
-        "es": "Configura el repositorio desde cero"
+        "pt": "Resumo do desafio e links rápidos",
+        "en": "Challenge summary and quick links",
+        "es": "Resumen del desafío y enlaces rápidos"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -55,9 +37,9 @@
       "descriptionPosition": "center",
       "descriptionIsVisible": true,
       "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/pt/getting-started.md",
-        "en": "gitpagedocs/docs/versions/1.0.0/en/getting-started.md",
-        "es": "gitpagedocs/docs/versions/1.0.0/es/getting-started.md"
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/index.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/index.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/index.md"
       },
       "fullscreenEnabled": true,
       "marginTop": "",
@@ -72,14 +54,14 @@
     {
       "id": 2,
       "title": {
-        "pt": "Visão geral do projeto",
+        "pt": "Visão geral",
         "en": "Project overview",
-        "es": "Visión general del proyecto"
+        "es": "Visión general"
       },
       "description": {
-        "pt": "Stack, objetivo e estrutura do Git Page Docs",
-        "en": "Stack, goals and structure of Git Page Docs",
-        "es": "Stack, objetivos y estructura de Git Page Docs"
+        "pt": "Contexto, objetivos e pilares entregues",
+        "en": "Context, goals, and delivered pillars",
+        "es": "Contexto, objetivos y pilares entregados"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -92,9 +74,9 @@
       "descriptionPosition": "center",
       "descriptionIsVisible": true,
       "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/pt/project-overview.md",
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/visao-geral.md",
         "en": "gitpagedocs/docs/versions/1.0.0/en/project-overview.md",
-        "es": "gitpagedocs/docs/versions/1.0.0/es/project-overview.md"
+        "es": "gitpagedocs/docs/versions/1.0.0/es/vision-general.md"
       },
       "fullscreenEnabled": true,
       "marginTop": "",
@@ -104,35 +86,19 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false,
-      "audio": {
-        "enabled": true,
-        "autoPlayOnLoad": true,
-        "loopEnabled": false,
-        "tracks": [
-          {
-            "url": "https://www.youtube.com/watch?v=0w80F8FffQ4",
-            "type": "youtube",
-            "title": {
-              "pt": "Música página 2",
-              "en": "Page 2 music",
-              "es": "Música página 2"
-            }
-          }
-        ]
-      }
+      "RouteguideBrandContainerTop": false
     },
     {
       "id": 3,
       "title": {
-        "pt": "Funcionalidades",
-        "en": "Functionalities",
-        "es": "Funcionalidades"
+        "pt": "Arquitetura",
+        "en": "Architecture",
+        "es": "Arquitectura"
       },
       "description": {
-        "pt": "CLI, opções, configuração e recursos",
-        "en": "CLI, options, configuration and features",
-        "es": "CLI, opciones, configuración y funciones"
+        "pt": "Componentes backend, domínio e integrações",
+        "en": "Backend components, domain modeling, integrations",
+        "es": "Componentes backend, modelado de dominio e integraciones"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -145,9 +111,9 @@
       "descriptionPosition": "center",
       "descriptionIsVisible": true,
       "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/pt/functionalities.md",
-        "en": "gitpagedocs/docs/versions/1.0.0/en/functionalities.md",
-        "es": "gitpagedocs/docs/versions/1.0.0/es/functionalities.md"
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/arquitetura.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/architecture.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/arquitectura.md"
       },
       "fullscreenEnabled": true,
       "marginTop": "",
@@ -157,24 +123,19 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false,
-      "authorization": {
-        "requiredRoles": [
-          "maintainer"
-        ]
-      }
+      "RouteguideBrandContainerTop": false
     },
     {
       "id": 4,
       "title": {
-        "pt": "GitHub Issues e Projects",
-        "en": "GitHub issues and projects",
-        "es": "GitHub issues y projects"
+        "pt": "Back-end",
+        "en": "Back-end",
+        "es": "Back-end"
       },
       "description": {
-        "pt": "Como usar Issues e Projects no GitHub",
-        "en": "How to use GitHub Issues and Projects",
-        "es": "Cómo usar GitHub Issues y Projects"
+        "pt": "APIs, regras de negócio e automações",
+        "en": "APIs, business rules, automations",
+        "es": "APIs, reglas de negocio y automatizaciones"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -187,9 +148,9 @@
       "descriptionPosition": "center",
       "descriptionIsVisible": true,
       "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/pt/github-issues-projects.md",
-        "en": "gitpagedocs/docs/versions/1.0.0/en/github-issues-projects.md",
-        "es": "gitpagedocs/docs/versions/1.0.0/es/github-issues-projects.md"
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/backend.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/backend.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/backend.md"
       },
       "fullscreenEnabled": true,
       "marginTop": "",
@@ -204,14 +165,14 @@
     {
       "id": 5,
       "title": {
-        "pt": "Introdução ao Git",
-        "en": "Introduction to Git",
-        "es": "Introducción a Git"
+        "pt": "Front-end",
+        "en": "Front-end",
+        "es": "Front-end"
       },
       "description": {
-        "pt": "Conceitos básicos de Git para iniciantes",
-        "en": "Basic Git concepts for beginners",
-        "es": "Conceptos básicos de Git para principiantes"
+        "pt": "Experiência Next.js, FSD e dados",
+        "en": "Next.js experience, FSD layers, data flows",
+        "es": "Experiencia Next.js, capas FSD y flujos de datos"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -224,9 +185,9 @@
       "descriptionPosition": "center",
       "descriptionIsVisible": true,
       "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/pt/git-introduction.md",
-        "en": "gitpagedocs/docs/versions/1.0.0/en/git-introduction.md",
-        "es": "gitpagedocs/docs/versions/1.0.0/es/git-introduction.md"
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/frontend.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/frontend.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/frontend.md"
       },
       "fullscreenEnabled": true,
       "marginTop": "",
@@ -241,14 +202,14 @@
     {
       "id": 6,
       "title": {
-        "pt": "Rotas autorizadas",
-        "en": "Authorized routes",
-        "es": "Rutas autorizadas"
+        "pt": "Qualidade",
+        "en": "Quality & ops",
+        "es": "Calidad"
       },
       "description": {
-        "pt": "Controle acesso por chave, roles e provedores externos",
-        "en": "Control access by key, roles and external providers",
-        "es": "Controla acceso por clave, roles y proveedores externos"
+        "pt": "Testes, observabilidade e operação diária",
+        "en": "Testing, observability, daily operations",
+        "es": "Pruebas, observabilidad y operación diaria"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -261,9 +222,9 @@
       "descriptionPosition": "center",
       "descriptionIsVisible": true,
       "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/pt/authorized-routes.md",
-        "en": "gitpagedocs/docs/versions/1.0.0/en/authorized-routes.md",
-        "es": "gitpagedocs/docs/versions/1.0.0/es/authorized-routes.md"
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/qualidade-operacoes.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/quality-ops.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/calidad-operaciones.md"
       },
       "fullscreenEnabled": true,
       "marginTop": "",
@@ -273,34 +234,19 @@
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false,
-      "authorization": {
-        "accessKeyId": "docs-key",
-        "requiredRoles": [
-          "maintainer"
-        ],
-        "requireExternalAuth": true,
-        "allowedProviders": [
-          "authjs",
-          "clerk",
-          "firebase",
-          "jwt"
-        ]
-      }
-    }
-  ],
-  "routes-html": [
+      "RouteguideBrandContainerTop": false
+    },
     {
-      "id": 1,
+      "id": 7,
       "title": {
-        "pt": "Código fonte",
-        "en": "Source code",
-        "es": "Código fuente"
+        "pt": "Perguntas",
+        "en": "Conceptual answers",
+        "es": "Preguntas"
       },
       "description": {
-        "pt": "Visualizar código-fonte do projeto",
-        "en": "View project source code",
-        "es": "Ver código fuente del proyecto"
+        "pt": "Respostas para a etapa conceitual",
+        "en": "Answers for the conceptual stage",
+        "es": "Respuestas para la etapa conceptual"
       },
       "titleCss": "font-size: 1.85rem; font-weight: 700;",
       "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
@@ -313,404 +259,610 @@
       "descriptionPosition": "center",
       "descriptionIsVisible": true,
       "path": {
-        "pt": "gitpagedocs/docs/versions/1.0.0/pt/source-viewer",
-        "en": "gitpagedocs/docs/versions/1.0.0/en/source-viewer",
-        "es": "gitpagedocs/docs/versions/1.0.0/es/source-viewer"
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/perguntas-conceituais.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/conceptual-answers.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/preguntas-conceptuales.md"
       },
       "fullscreenEnabled": true,
       "marginTop": "",
       "marginBottom": "",
       "blockLink": true,
-      "container": "full",
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 8,
+      "title": {
+        "pt": "Introdução ao Desafio",
+        "en": "Challenge Overview",
+        "es": "Introducción al Desafío"
+      },
+      "description": {
+        "pt": "Escopo geral, artefatos entregues e visão macro da plataforma de gestão de frota.",
+        "en": "High-level scope, delivered artefacts and the overall fleet-management vision.",
+        "es": "Alcance general, artefactos entregados y visión macro de la plataforma de gestión de flotas."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/01-introducao.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/01-introduction.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/01-introduccion.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
       "browseAll": false,
       "RouteguideBrand": true,
       "RouteGuideSpeciFicbrand": [],
       "RouteguideBrandPosition": "center",
-      "RouteguideBrandContainerTop": false,
-      "authorization": {
-        "accessKeyId": "source-viewer-key"
-      }
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 9,
+      "title": {
+        "pt": "Requisitos e Critérios",
+        "en": "Requirements and Criteria",
+        "es": "Requisitos y Criterios"
+      },
+      "description": {
+        "pt": "Mapeamento dos requisitos funcionais, técnicos e critérios de avaliação do teste.",
+        "en": "Mapping of functional and technical requirements plus the evaluation checklist.",
+        "es": "Mapeo de los requisitos funcionales y técnicos junto con la lista de verificación de evaluación."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/02-requisitos.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/02-requirements.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/02-requisitos.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 10,
+      "title": {
+        "pt": "Arquitetura Backend",
+        "en": "Backend Architecture",
+        "es": "Arquitectura Backend"
+      },
+      "description": {
+        "pt": "Módulos NestJS, camadas DDD, resiliência e uso do TypeORM/Unit of Work.",
+        "en": "NestJS modules, DDD layering, resilience policies and TypeORM/Unit of Work usage.",
+        "es": "Módulos NestJS, capas DDD, políticas de resiliencia y uso de TypeORM/Unit of Work."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/03-arquitetura-backend.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/03-backend-architecture.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/03-arquitectura-backend.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 11,
+      "title": {
+        "pt": "Modelagem de Dados e Domínio",
+        "en": "Data and Domain Modeling",
+        "es": "Modelado de Datos y Dominio"
+      },
+      "description": {
+        "pt": "Entidades, agregados, migrations e relacionamento entre models, vehicles, brands e users.",
+        "en": "Entities, aggregates, migrations and the relationships across models, vehicles, brands and users.",
+        "es": "Entidades, agregados, migraciones y relaciones entre modelos, vehículos, marcas y usuarios."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/04-modelagem-dominio.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/04-data-domain-modeling.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/04-modelado-dominio.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 12,
+      "title": {
+        "pt": "Segurança, Auditoria e Mensageria",
+        "en": "Security, Audit and Messaging",
+        "es": "Seguridad, Auditoría y Mensajería"
+      },
+      "description": {
+        "pt": "JWT com RBAC, sessões em Redis, interceptores de auditoria e eventos RabbitMQ/Mongo.",
+        "en": "JWT with RBAC, Redis-backed sessions, audit interceptors and RabbitMQ/Mongo event flows.",
+        "es": "JWT con RBAC, sesiones respaldadas en Redis, interceptores de auditoría y flujos de eventos RabbitMQ/Mongo."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/05-seguranca-mensageria.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/05-security-audit-messaging.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/05-seguridad-auditoria-mensajeria.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 13,
+      "title": {
+        "pt": "Frontend e Experiência",
+        "en": "Frontend and Experience",
+        "es": "Frontend y Experiencia"
+      },
+      "description": {
+        "pt": "Next.js App Router, padrão FSD, Redux, React Query, temas laranja e responsividade.",
+        "en": "Next.js App Router, FSD pattern, Redux, React Query, orange theming and responsiveness.",
+        "es": "Next.js App Router, patrón FSD, Redux, React Query, temas naranjas y adaptabilidad."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/06-frontend.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/06-frontend.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/06-frontend.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 14,
+      "title": {
+        "pt": "Infraestrutura e Deployment",
+        "en": "Infrastructure and Deployment",
+        "es": "Infraestructura y Despliegue"
+      },
+      "description": {
+        "pt": "Docker Compose completo, variáveis de ambiente, scripts npm e documentação gerada.",
+        "en": "Full Docker Compose stack, environment variables, npm scripts and generated documentation.",
+        "es": "Stack completo con Docker Compose, variables de entorno, scripts npm y documentación generada."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/07-infraestrutura.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/07-infrastructure.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/07-infraestructura-despliegue.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 15,
+      "title": {
+        "pt": "Qualidade e Testes",
+        "en": "Quality and Testing",
+        "es": "Calidad y Pruebas"
+      },
+      "description": {
+        "pt": "Cobertura de testes unitários, integrações, e2e, linting e monitoramento de qualidade.",
+        "en": "Unit, integration and e2e coverage, linting and the quality monitoring checklist.",
+        "es": "Cobertura de pruebas unitarias, de integración y e2e, linting y lista de control de calidad."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/08-testes-observabilidade.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/08-quality-testing.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/08-calidad-pruebas.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
+    },
+    {
+      "id": 16,
+      "title": {
+        "pt": "Guia de Execução e Troubleshooting",
+        "en": "Runbook and Troubleshooting",
+        "es": "Runbook y Resolución de Problemas"
+      },
+      "description": {
+        "pt": "Passo a passo para subir ambientes, comandos úteis, credenciais seed e resolução de falhas.",
+        "en": "Step-by-step to boot environments, useful commands, seed credentials and failure recovery tips.",
+        "es": "Paso a paso para iniciar entornos, comandos útiles, credenciales seed y consejos para la recuperación de fallas."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/09-guia-execucao.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/09-runbook.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/09-runbook-resolucion.md"
+      },
+      "fullscreenEnabled": true,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": true,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false
     }
   ],
-  "routes-video": [
-    {
-      "id": 1,
-      "title": {
-        "pt": "Interactive vs non-interactive modes | Copilot CLI for beginners",
-        "en": "Interactive vs non-interactive modes | Copilot CLI for beginners",
-        "es": "Interactive vs non-interactive modes | Copilot CLI for beginners"
-      },
-      "description": {
-        "pt": "Quer saber a forma mais rápida de usar o GitHub Copilot no terminal? Neste tutorial, exploramos os dois modos principais do Copilot CLI.",
-        "en": "Want to know the fastest way to prompt GitHub Copilot from your terminal? In this beginner tutorial, we explore the two main modes of the Copilot CLI. Discover how to use the interactive mode to have GitHub Copilot run your project locally or use the non-interactive mode with the -p flag for quick summaries without leaving your shell context.",
-        "es": "¿Quieres conocer la forma más rápida de usar GitHub Copilot desde tu terminal? En este tutorial exploramos los dos modos principales del Copilot CLI."
-      },
-      "titleCss": "font-size: 1.85rem; font-weight: 700;",
-      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titlePosition": "center",
-      "titleIsVisible": true,
-      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
-      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionPosition": "center",
-      "descriptionIsVisible": true,
-      "fullscreenEnabled": true,
-      "marginTop": "",
-      "marginBottom": "",
-      "blockLink": true,
-      "browseAll": false,
-      "video": {
-        "videoType": {
-          "pt": "youtube",
-          "en": "youtube",
-          "es": "youtube"
-        },
-        "pathVideo": {
-          "pt": "bdIJkGr2NV0",
-          "en": "bdIJkGr2NV0",
-          "es": "bdIJkGr2NV0"
-        }
-      },
-      "authorization": {
-        "requireExternalAuth": true,
-        "allowedProviders": [
-          "authjs",
-          "clerk",
-          "firebase",
-          "jwt"
-        ]
-      }
-    },
-    {
-      "id": 2,
-      "title": {
-        "pt": "How to use GitHub issues and projects | GitHub for Beginners",
-        "en": "How to use GitHub issues and projects | GitHub for Beginners",
-        "es": "How to use GitHub issues and projects | GitHub for Beginners"
-      },
-      "description": {
-        "pt": "Aprenda a usar GitHub Issues e Projects para gerenciar seu trabalho.",
-        "en": "Learn how to use GitHub Issues and Projects to manage your work effectively.",
-        "es": "Aprende a usar GitHub Issues y Projects para gestionar tu trabajo."
-      },
-      "titleCss": "font-size: 1.85rem; font-weight: 700;",
-      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titlePosition": "center",
-      "titleIsVisible": true,
-      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
-      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionPosition": "center",
-      "descriptionIsVisible": true,
-      "fullscreenEnabled": true,
-      "marginTop": "",
-      "marginBottom": "",
-      "blockLink": true,
-      "browseAll": false,
-      "video": {
-        "videoType": {
-          "pt": "youtube",
-          "en": "youtube",
-          "es": "youtube"
-        },
-        "pathVideo": {
-          "pt": "c67GaAkf1BE",
-          "en": "c67GaAkf1BE",
-          "es": "c67GaAkf1BE"
-        }
-      },
-      "authorization": {
-        "requireExternalAuth": true,
-        "allowedProviders": [
-          "authjs",
-          "clerk",
-          "firebase",
-          "jwt"
-        ]
-      }
-    },
-    {
-      "id": 3,
-      "title": {
-        "pt": "How I built an AI Python tutor with the GitHub Copilot SDK",
-        "en": "How I built an AI Python tutor with the GitHub Copilot SDK",
-        "es": "How I built an AI Python tutor with the GitHub Copilot SDK"
-      },
-      "description": {
-        "pt": "Construindo um tutor de Python com IA usando o GitHub Copilot SDK.",
-        "en": "Building an AI Python tutor using the GitHub Copilot SDK.",
-        "es": "Construyendo un tutor de Python con IA usando el GitHub Copilot SDK."
-      },
-      "titleCss": "font-size: 1.85rem; font-weight: 700;",
-      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titlePosition": "center",
-      "titleIsVisible": true,
-      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
-      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionPosition": "center",
-      "descriptionIsVisible": true,
-      "fullscreenEnabled": true,
-      "marginTop": "",
-      "marginBottom": "",
-      "blockLink": true,
-      "browseAll": false,
-      "video": {
-        "videoType": {
-          "pt": "youtube",
-          "en": "youtube",
-          "es": "youtube"
-        },
-        "pathVideo": {
-          "pt": "N3my6W_Rdwg",
-          "en": "N3my6W_Rdwg",
-          "es": "N3my6W_Rdwg"
-        }
-      },
-      "authorization": {
-        "requireExternalAuth": true,
-        "allowedProviders": [
-          "authjs",
-          "clerk",
-          "firebase",
-          "jwt"
-        ]
-      }
-    },
-    {
-      "id": 4,
-      "title": {
-        "pt": "A brief introduction to Git for beginners | GitHub",
-        "en": "A brief introduction to Git for beginners | GitHub",
-        "es": "A brief introduction to Git for beginners | GitHub"
-      },
-      "description": {
-        "pt": "Introdução ao Git para iniciantes.",
-        "en": "A brief introduction to Git for beginners.",
-        "es": "Una breve introducción a Git para principiantes."
-      },
-      "titleCss": "font-size: 1.85rem; font-weight: 700;",
-      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
-      "titlePosition": "center",
-      "titleIsVisible": true,
-      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
-      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
-      "descriptionPosition": "center",
-      "descriptionIsVisible": true,
-      "fullscreenEnabled": true,
-      "marginTop": "",
-      "marginBottom": "",
-      "blockLink": true,
-      "browseAll": false,
-      "video": {
-        "videoType": {
-          "pt": "youtube",
-          "en": "youtube",
-          "es": "youtube"
-        },
-        "pathVideo": {
-          "pt": "r8jQ9hVA2qs",
-          "en": "r8jQ9hVA2qs",
-          "es": "r8jQ9hVA2qs"
-        }
-      },
-      "authorization": {
-        "requireExternalAuth": true,
-        "allowedProviders": [
-          "authjs",
-          "clerk",
-          "firebase",
-          "jwt"
-        ]
-      }
-    }
-  ],
+  "routes-html": [],
+  "routes-video": [],
   "menus-header-md": [
     {
       "id": 1,
       "pt": {
-        "title": "Primeiros passos",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/getting-started.md"
+        "title": "Início",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/index.md"
       },
       "en": {
-        "title": "Getting Started",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/en/getting-started.md"
+        "title": "Home",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/index.md"
       },
       "es": {
-        "title": "Primeros pasos",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/es/getting-started.md"
+        "title": "Inicio",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/index.md"
       }
     },
     {
       "id": 2,
       "pt": {
-        "title": "Visão geral do projeto",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/project-overview.md"
+        "title": "Visão geral",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/visao-geral.md"
       },
       "en": {
         "title": "Project overview",
         "path-click": "gitpagedocs/docs/versions/1.0.0/en/project-overview.md"
       },
       "es": {
-        "title": "Visión general del proyecto",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/es/project-overview.md"
+        "title": "Visión general",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/vision-general.md"
       }
     },
     {
       "id": 3,
       "pt": {
-        "title": "Funcionalidades",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/functionalities.md"
+        "title": "Arquitetura",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/arquitetura.md"
       },
       "en": {
-        "title": "Functionalities",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/en/functionalities.md"
+        "title": "Architecture",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/architecture.md"
       },
       "es": {
-        "title": "Funcionalidades",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/es/functionalities.md"
+        "title": "Arquitectura",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/arquitectura.md"
       }
     },
     {
       "id": 4,
       "pt": {
-        "title": "GitHub Issues e Projects",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/github-issues-projects.md"
+        "title": "Back-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/backend.md"
       },
       "en": {
-        "title": "GitHub issues and projects",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/en/github-issues-projects.md"
+        "title": "Back-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/backend.md"
       },
       "es": {
-        "title": "GitHub issues y projects",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/es/github-issues-projects.md"
+        "title": "Back-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/backend.md"
       }
     },
     {
       "id": 5,
       "pt": {
-        "title": "Introdução ao Git",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/git-introduction.md"
+        "title": "Front-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/frontend.md"
       },
       "en": {
-        "title": "Introduction to Git",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/en/git-introduction.md"
+        "title": "Front-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/frontend.md"
       },
       "es": {
-        "title": "Introducción a Git",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/es/git-introduction.md"
+        "title": "Front-end",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/frontend.md"
       }
     },
     {
       "id": 6,
       "pt": {
-        "title": "Rotas autorizadas",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/authorized-routes.md"
+        "title": "Qualidade",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/qualidade-operacoes.md"
       },
       "en": {
-        "title": "Authorized routes",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/en/authorized-routes.md"
+        "title": "Quality & ops",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/quality-ops.md"
       },
       "es": {
-        "title": "Rutas autorizadas",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/es/authorized-routes.md"
-      }
-    }
-  ],
-  "menus-header-html": [
-    {
-      "id": 1,
-      "pt": {
-        "title": "Código fonte",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/source-viewer"
-      },
-      "en": {
-        "title": "Source code",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/en/source-viewer"
-      },
-      "es": {
-        "title": "Código fuente",
-        "path-click": "gitpagedocs/docs/versions/1.0.0/es/source-viewer"
-      }
-    }
-  ],
-  "menus-header-video": [
-    {
-      "id": 1,
-      "pt": {
-        "title": "Interactive vs non-interactive modes | C...",
-        "path-click": "page:1"
-      },
-      "en": {
-        "title": "Interactive vs non-interactive modes | C...",
-        "path-click": "page:1"
-      },
-      "es": {
-        "title": "Interactive vs non-interactive modes | C...",
-        "path-click": "page:1"
+        "title": "Calidad",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/calidad-operaciones.md"
       }
     },
     {
-      "id": 2,
+      "id": 7,
       "pt": {
-        "title": "How to use GitHub issues and projects | ...",
-        "path-click": "page:2"
+        "title": "Perguntas",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/perguntas-conceituais.md"
       },
       "en": {
-        "title": "How to use GitHub issues and projects | ...",
-        "path-click": "page:2"
+        "title": "Conceptual answers",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/conceptual-answers.md"
       },
       "es": {
-        "title": "How to use GitHub issues and projects | ...",
-        "path-click": "page:2"
+        "title": "Preguntas",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/preguntas-conceptuales.md"
       }
     },
     {
-      "id": 3,
+      "id": 8,
       "pt": {
-        "title": "How I built an AI Python tutor with the ...",
-        "path-click": "page:3"
+        "title": "Introdução ao Desafio",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/01-introducao.md"
       },
       "en": {
-        "title": "How I built an AI Python tutor with the ...",
-        "path-click": "page:3"
+        "title": "Challenge Overview",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/01-introduction.md"
       },
       "es": {
-        "title": "How I built an AI Python tutor with the ...",
-        "path-click": "page:3"
+        "title": "Introducción al Desafío",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/01-introduccion.md"
       }
     },
     {
-      "id": 4,
+      "id": 9,
       "pt": {
-        "title": "A brief introduction to Git for beginner...",
-        "path-click": "page:4"
+        "title": "Requisitos e Critérios",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/02-requisitos.md"
       },
       "en": {
-        "title": "A brief introduction to Git for beginner...",
-        "path-click": "page:4"
+        "title": "Requirements and Criteria",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/02-requirements.md"
       },
       "es": {
-        "title": "A brief introduction to Git for beginner...",
-        "path-click": "page:4"
+        "title": "Requisitos y Criterios",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/02-requisitos.md"
+      }
+    },
+    {
+      "id": 10,
+      "pt": {
+        "title": "Arquitetura Backend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/03-arquitetura-backend.md"
+      },
+      "en": {
+        "title": "Backend Architecture",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/03-backend-architecture.md"
+      },
+      "es": {
+        "title": "Arquitectura Backend",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/03-arquitectura-backend.md"
+      }
+    },
+    {
+      "id": 11,
+      "pt": {
+        "title": "Modelagem de Dados",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/04-modelagem-dominio.md"
+      },
+      "en": {
+        "title": "Data and Domain Modeling",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/04-data-domain-modeling.md"
+      },
+      "es": {
+        "title": "Modelado de Datos",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/04-modelado-dominio.md"
+      }
+    },
+    {
+      "id": 12,
+      "pt": {
+        "title": "Segurança & Mensageria",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/05-seguranca-mensageria.md"
+      },
+      "en": {
+        "title": "Security, Audit and Messaging",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/05-security-audit-messaging.md"
+      },
+      "es": {
+        "title": "Seguridad, Auditoría y Mensajería",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/05-seguridad-auditoria-mensajeria.md"
+      }
+    },
+    {
+      "id": 13,
+      "pt": {
+        "title": "Frontend e Experiência",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/06-frontend.md"
+      },
+      "en": {
+        "title": "Frontend and Experience",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/06-frontend.md"
+      },
+      "es": {
+        "title": "Frontend y Experiencia",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/06-frontend.md"
+      }
+    },
+    {
+      "id": 14,
+      "pt": {
+        "title": "Infraestrutura",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/07-infraestrutura.md"
+      },
+      "en": {
+        "title": "Infrastructure and Deployment",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/07-infrastructure.md"
+      },
+      "es": {
+        "title": "Infraestructura y Despliegue",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/07-infraestructura-despliegue.md"
+      }
+    },
+    {
+      "id": 15,
+      "pt": {
+        "title": "Qualidade e Testes",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/08-testes-observabilidade.md"
+      },
+      "en": {
+        "title": "Quality and Testing",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/08-quality-testing.md"
+      },
+      "es": {
+        "title": "Calidad y Pruebas",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/08-calidad-pruebas.md"
+      }
+    },
+    {
+      "id": 16,
+      "pt": {
+        "title": "Guia de Execução",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/09-guia-execucao.md"
+      },
+      "en": {
+        "title": "Runbook",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/09-runbook.md"
+      },
+      "es": {
+        "title": "Runbook",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/09-runbook-resolucion.md"
       }
     }
   ],
+  "menus-header-html": [],
+  "menus-header-video": [],
   "hierarchyPage": {
-    "md": 0,
-    "html": 1,
-    "video": 2,
+    "video": 0,
+    "md": 1,
+    "html": 2,
     "audio": 3
   },
   "hierarchyMenu": {
-    "md": 0,
-    "html": 1,
-    "video": 2,
+    "video": 0,
+    "md": 1,
+    "html": 2,
     "audio": 3
   }
 }

@@ -1,27 +1,23 @@
 # Project Overview
 
-Git Page Docs is a **pnpm + turborepo monorepo** that turns a repository's `gitpagedocs/` folder into a multilingual, versioned documentation site — with an integrated AI assistant and a Model Context Protocol (MCP) server.
+This page provides a quick tour of the fleet-management solution before diving into the detailed chapters.
 
-## Monorepo packages
+## Mission
 
-- **frontend/** — Next.js 15 (App Router, React 19) documentation viewer, static-exported for GitHub Pages.
-- **cli/** — the published `gitpagedocs` npm package (`npm install -g gitpagedocs`): scaffolds the docs contract, generates docs with AI, configures Pages, and runs the MCP server.
-- **tools/** — `@gitpagedocs/tools`, the shared business-logic core: the 14-provider AI system, the encrypted credential vault, the config loader, caches, and the logger.
-- **mcp/** — `@gitpagedocs/mcp`, a Model Context Protocol server (20 tools + 7 resources).
-- **gitpagedocs/** — the user contract: `config.json`, versioned docs, and layouts.
+Deliver a production-ready stack that satisfies every requirement from the Aivacol challenge across backend, frontend, infrastructure and documentation.
 
-## Stack
+## Pillars
 
-- Next.js 15 (App Router) + React 19 + TypeScript; static export for GitHub Pages
-- gray-matter + marked for Markdown; react-icons
-- pnpm workspaces + turborepo; Vitest + Playwright; ESLint
+- **Architecture** — modules, layers and entities covered in the Backend Architecture and Data and Domain Modeling sections.
+- **Security & observability** — RBAC, Redis sessions (sliding TTL + lock), distributed lock, idempotency, a dedicated rate-limit guard, enriched audit logs and RabbitMQ flows summarized in the Security, Audit and Messaging chapter. These are additive: the existing structure and flow were preserved.
+- **User experience** — FSD structure, theming and data flow documented under Frontend and Experience.
+- **Quality & operations** — QA and support routines detailed in the Quality and Testing and Runbook sections.
 
-## Highlights
+## Outcomes
 
-- Multilingual (`en`, `pt`, `es`) and version-aware routing (`/v/:version`)
-- 14-provider AI system (OpenAI, Anthropic, Gemini, Ollama, Mistral, DeepSeek, Cohere, Groq, xAI, and more) with streaming
-- AI API keys stored **encrypted at rest** (AES-256-GCM) behind a local password gate — never plaintext
-- In-docs **AI chat drawer** plus a dedicated **`/ai` console**
-- 36-theme layout system; local and GitHub Pages execution modes
+- NestJS APIs with DDD, Redis cache and RabbitMQ events.
+- Responsive Next.js client sharing Zod schemas with the backend.
+- Docker Compose stack bundling SQL Server, Redis, RabbitMQ and MongoDB.
+- Bilingual GitPageDocs site aligned with the assessment.
 
-> Version: 1.0.0
+Use the navigation menu to open the sections most relevant to your review.
