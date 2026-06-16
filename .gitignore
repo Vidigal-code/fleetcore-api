@@ -32,5 +32,4 @@ frontend/test-results/
 # docker
 *.pid
 
-# documentação de estudo local (não versionada)
-fluxo-projeto/
+
