@@ -74,6 +74,7 @@ describe('VehiclesController (e2e)', () => {
           useValue: {
             get: jest.fn().mockResolvedValue(null),
             set: jest.fn(),
+            delete: jest.fn(),
             deleteByPattern: jest.fn(),
           },
         },

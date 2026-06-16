@@ -71,6 +71,7 @@ describe('VehiclesService', () => {
     repositoryCache = {
       fetch: jest.fn(),
       invalidate: jest.fn(),
+      invalidateKey: jest.fn(),
     } as unknown as jest.Mocked<RepositoryCacheService>;
 
     configService = {
@@ -149,6 +150,13 @@ describe('VehiclesService', () => {
     expect(scopedRepository.save).toHaveBeenCalled();
     expect(repositoryCache.invalidate).toHaveBeenCalledWith(
       VEHICLE_CACHE_NAMESPACE,
+    );
+    expect(repositoryCache.invalidate).not.toHaveBeenCalledWith(
+      VEHICLE_DETAIL_CACHE_NAMESPACE,
+    );
+    expect(repositoryCache.invalidateKey).toHaveBeenCalledWith(
+      VEHICLE_DETAIL_CACHE_NAMESPACE,
+      result.id,
     );
     expect(auditService.record).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -43,8 +43,14 @@ export class RepositoryCacheService {
     return value;
   }
 
+  /** Invalidate every entry in a namespace (use for list/search caches). */
   async invalidate(namespace: string): Promise<void> {
     await this.redis.deleteByPattern(`${namespace}:*`);
+  }
+
+  /** Invalidate a single entry (use when only one record changed). */
+  async invalidateKey(namespace: string, key: unknown): Promise<void> {
+    await this.redis.delete(this.buildKey(namespace, key));
   }
 
   private buildKey(namespace: string, key: unknown): string {

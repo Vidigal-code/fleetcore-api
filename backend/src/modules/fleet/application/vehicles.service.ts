@@ -141,7 +141,7 @@ export class VehiclesService {
       this.scopedRepository(manager).save(vehicle),
     );
 
-    await this.invalidateCache();
+    await this.invalidateCache(created.id);
     await this.auditService.record({
       action: VEHICLE_EVENT_CREATED,
       entity: AUDIT_ENTITY_VEHICLE,
@@ -214,7 +214,7 @@ export class VehiclesService {
       this.scopedRepository(manager).save(vehicle),
     );
 
-    await this.invalidateCache();
+    await this.invalidateCache(updated.id);
     await this.auditService.record({
       action: VEHICLE_EVENT_UPDATED,
       entity: AUDIT_ENTITY_VEHICLE,
@@ -249,7 +249,7 @@ export class VehiclesService {
       await this.scopedRepository(manager).remove(vehicle);
     });
 
-    await this.invalidateCache();
+    await this.invalidateCache(vehicle.id);
     await this.auditService.record({
       action: VEHICLE_EVENT_REMOVED,
       entity: AUDIT_ENTITY_VEHICLE,
@@ -304,14 +304,20 @@ export class VehiclesService {
     );
   }
 
-  private async invalidateCache() {
+  private async invalidateCache(vehicleId: string) {
     if (!this.featureToggleService.isEnabled('repositoryCache', true)) {
       return;
     }
 
+    // Any mutation can change which vehicles a paginated/filtered search
+    // returns, so the whole search namespace is invalidated. The detail cache
+    // is keyed by id, so only the affected vehicle's entry is dropped.
     await Promise.all([
       this.repositoryCache.invalidate(VEHICLE_CACHE_NAMESPACE),
-      this.repositoryCache.invalidate(VEHICLE_DETAIL_CACHE_NAMESPACE),
+      this.repositoryCache.invalidateKey(
+        VEHICLE_DETAIL_CACHE_NAMESPACE,
+        vehicleId,
+      ),
     ]);
   }
 

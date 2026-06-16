@@ -79,6 +79,7 @@ describe('VehiclesService (integration)', () => {
           useValue: {
             fetch: ({ loader }: { loader: () => Promise<unknown> }) => loader(),
             invalidate: jest.fn(),
+            invalidateKey: jest.fn(),
           },
         },
         { provide: EventBusService, useValue: { publish: jest.fn() } },
