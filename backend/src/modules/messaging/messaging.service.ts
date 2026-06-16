@@ -36,4 +36,24 @@ export class MessagingService {
       throw error;
     }
   }
+
+  /** Publish straight to a named queue via the default exchange. */
+  async sendToQueue(queue: string, payload: Record<string, unknown>) {
+    try {
+      await this.resilience.execute(
+        () => this.amqp.publish('', queue, payload),
+        {
+          name: `messaging:queue:${queue}`,
+          retry: this.resiliencePolicy.retry,
+          circuitBreaker: this.resiliencePolicy.circuitBreaker,
+        },
+      );
+    } catch (error) {
+      this.logger.error(
+        `Failed to send message to queue ${queue}`,
+        error as Error,
+      );
+      throw error;
+    }
+  }
 }

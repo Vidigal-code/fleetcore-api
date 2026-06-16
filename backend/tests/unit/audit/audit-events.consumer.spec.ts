@@ -1,7 +1,6 @@
-import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
-
 import { AuditEventsConsumer } from '../../../src/modules/audit/consumers/audit-events.consumer';
 import { AuditWriterService } from '../../../src/modules/audit/audit-writer.service';
+import { MessagingService } from '../../../src/modules/messaging/messaging.service';
 import { AppConfigService } from '../../../src/shared/config/app-config.service';
 
 const AUDIT_QUEUE = 'fleetcore.audit';
@@ -9,7 +8,7 @@ const DLQ = 'fleetcore.dead-letter';
 
 describe('AuditEventsConsumer', () => {
   let writer: jest.Mocked<AuditWriterService>;
-  let amqp: jest.Mocked<AmqpConnection>;
+  let messaging: jest.Mocked<MessagingService>;
   let consumer: AuditEventsConsumer;
 
   const message = {
@@ -34,15 +33,15 @@ describe('AuditEventsConsumer', () => {
         .mockResolvedValue(undefined),
     } as unknown as jest.Mocked<AuditWriterService>;
 
-    amqp = {
-      publish: jest.fn().mockResolvedValue(undefined),
-    } as unknown as jest.Mocked<AmqpConnection>;
+    messaging = {
+      sendToQueue: jest.fn().mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<MessagingService>;
 
     const appConfig = {
       messaging: { auditQueue: AUDIT_QUEUE, deadLetterQueue: DLQ },
     } as unknown as AppConfigService;
 
-    consumer = new AuditEventsConsumer(writer, amqp, appConfig);
+    consumer = new AuditEventsConsumer(writer, messaging, appConfig);
   });
 
   it('persists the event and does not touch the dead-letter queue on success', async () => {
@@ -51,7 +50,7 @@ describe('AuditEventsConsumer', () => {
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(writer.persist).toHaveBeenCalledTimes(1);
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(amqp.publish).not.toHaveBeenCalled();
+    expect(messaging.sendToQueue).not.toHaveBeenCalled();
   });
 
   it('rethrows below the attempt limit so the broker schedules a retry', async () => {
@@ -62,7 +61,7 @@ describe('AuditEventsConsumer', () => {
     ).rejects.toThrow('mongo down');
 
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(amqp.publish).not.toHaveBeenCalled();
+    expect(messaging.sendToQueue).not.toHaveBeenCalled();
   });
 
   it('parks the event in the dead-letter queue once attempts are exhausted', async () => {
@@ -72,11 +71,10 @@ describe('AuditEventsConsumer', () => {
       consumer.handleAuditEvent(message, envelopeWithAttempts(5)),
     ).resolves.toBeUndefined();
 
-    const publishCalls = amqp.publish.mock.calls as Array<
-      [string, string, unknown]
+    const sendCalls = messaging.sendToQueue.mock.calls as Array<
+      [string, unknown]
     >;
-    const [exchange, routingKey] = publishCalls[0];
-    expect(exchange).toBe('');
-    expect(routingKey).toBe(DLQ);
+    const [queue] = sendCalls[0];
+    expect(queue).toBe(DLQ);
   });
 });

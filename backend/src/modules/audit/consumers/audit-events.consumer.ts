@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
-  AmqpConnection,
   MessageHandlerErrorBehavior,
   RabbitSubscribe,
 } from '@golevelup/nestjs-rabbitmq';
 
 import { AppConfigService } from '../../../shared/config/app-config.service';
 import { AuditWriterService } from '../audit-writer.service';
+import { MessagingService } from '../../messaging/messaging.service';
 import {
   AUDIT_MAX_DELIVERY_ATTEMPTS,
   AUDIT_ROUTING_KEY,
@@ -56,7 +56,7 @@ export class AuditEventsConsumer {
 
   constructor(
     private readonly writer: AuditWriterService,
-    private readonly amqp: AmqpConnection,
+    private readonly messaging: MessagingService,
     appConfigService: AppConfigService,
   ) {
     this.sourceQueue = appConfigService.messaging.auditQueue;
@@ -120,7 +120,10 @@ export class AuditEventsConsumer {
         `Parking audit event for entity ${message.entity} in dead-letter queue after ${attempts} attempts`,
         error as Error,
       );
-      await this.amqp.publish('', this.deadLetterQueue, message);
+      await this.messaging.sendToQueue(
+        this.deadLetterQueue,
+        message as unknown as Record<string, unknown>,
+      );
       return;
     }
 
