@@ -3,6 +3,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { MessagingService } from '../messaging/messaging.service';
 import { FeatureToggleService } from '../../shared/features';
 import { AuditWriterService } from './audit-writer.service';
+import { AuditOutboxService } from './audit-outbox.service';
 import { AUDIT_ROUTING_KEY, AUDIT_SOURCE_INLINE } from './audit.constants';
 
 export interface AuditRecordInput {
@@ -33,6 +34,7 @@ export class AuditService {
     private readonly messaging: MessagingService,
     private readonly featureToggles: FeatureToggleService,
     private readonly writer: AuditWriterService,
+    private readonly outbox: AuditOutboxService,
   ) {}
 
   async record(entry: AuditRecordInput): Promise<void> {
@@ -60,7 +62,25 @@ export class AuditService {
       await this.messaging.publish(AUDIT_ROUTING_KEY, this.toMessage(event));
     } catch (error) {
       this.logger.error(
-        'Failed to enqueue audit entry, persisting synchronously',
+        'Failed to enqueue audit entry, storing in outbox for later relay',
+        error as Error,
+      );
+      await this.storeInOutbox(event);
+    }
+  }
+
+  /**
+   * Persist the event in the transactional outbox so the relay can republish
+   * it once RabbitMQ recovers. As a last resort (e.g. Mongo also unreachable),
+   * fall back to a direct synchronous write so the event is never silently
+   * dropped.
+   */
+  private async storeInOutbox(event: AuditRecordInput): Promise<void> {
+    try {
+      await this.outbox.enqueue(AUDIT_ROUTING_KEY, this.toMessage(event));
+    } catch (error) {
+      this.logger.error(
+        'Failed to store audit entry in outbox, persisting synchronously',
         error as Error,
       );
       await this.persistInline(event);

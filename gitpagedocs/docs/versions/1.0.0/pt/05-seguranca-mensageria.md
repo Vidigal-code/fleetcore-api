@@ -53,8 +53,18 @@ Além do `@nestjs/throttler` (mantido como base), há um guard Redis dedicado: `
 - `AuditInterceptor` audita **toda rota não-pública**, registra request/response, identifica o ator autenticado e gera `correlationId`, publicando o evento em `audit.event` (exchange `fleetcore.events`, fila `fleetcore.audit`, routing key `audit.event`).
 - O evento agora carrega: `eventId`, `eventType`, `correlationId`, `requestId`, `userId`, `sessionId`, `method`, `route`, `statusCode`, `success` (além de `action`, `entity`, `entityId`, `actor`, `payload`, `metadata`, `occurredAt`).
 - O schema Mongo `audit_events` incorpora esses campos e ainda registra metadados de processamento gravados pelo worker: `status='processed'`, `retries`, `sourceQueue`, `processedAt`.
-- A persistência usa o `ResilienceService` (retry/fallback); se RabbitMQ estiver indisponível, o caminho de fallback grava diretamente em MongoDB.
+- A persistência usa o `ResilienceService` (retry/circuit breaker).
 - O worker dedicado (`backend/src/apps/audit-worker`) consome `fleetcore.audit` e grava no MongoDB.
+
+### Outbox transacional (fallback quando o RabbitMQ cai)
+
+Para não perder eventos quando o broker está indisponível, a API usa o padrão **transactional outbox** em vez de gravar direto no destino final:
+
+- Se o `MessagingService.publish` falhar (mesmo após retries/circuit breaker), o `AuditService` grava o evento na coleção `audit_outbox` com `status='pending'` (`AuditOutboxService.enqueue`) — uma escrita leve, fora do caminho da request.
+- O `AuditOutboxRelayService` (roda **apenas no `audit-worker`**) varre a coleção em intervalos (`setInterval`), reclama um pendente por vez de forma atômica (`findOneAndUpdate` → `processing`) e **republica no RabbitMQ**. No sucesso, remove a entrada; na falha, devolve para `pending` (ou marca `failed` após `AUDIT_OUTBOX_MAX_ATTEMPTS`).
+- Quando o broker volta, os pendentes voltam ao fluxo normal (consumer → MongoDB). Entradas presas em `processing` (ex.: relay reiniciado) são reenfileiradas no boot do relay.
+- Como **última rede de segurança** (ex.: MongoDB também fora no momento do `enqueue`), o `AuditService` ainda cai num write síncrono direto, garantindo que o evento nunca seja descartado em silêncio.
+- Tunável por env: `AUDIT_OUTBOX_RELAY_INTERVAL_MS` (padrão `5000`), `AUDIT_OUTBOX_BATCH_SIZE` (padrão `20`), `AUDIT_OUTBOX_MAX_ATTEMPTS` (padrão `10`).
 
 ## Mensageria RabbitMQ
 

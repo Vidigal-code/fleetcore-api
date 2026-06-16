@@ -6,11 +6,13 @@ import { VEHICLE_EVENT_CREATED } from '../../../src/modules/fleet/fleet.constant
 import { MessagingService } from '../../../src/modules/messaging/messaging.service';
 import { FeatureToggleService } from '../../../src/shared/features';
 import { AuditWriterService } from '../../../src/modules/audit/audit-writer.service';
+import { AuditOutboxService } from '../../../src/modules/audit/audit-outbox.service';
 
 describe('AuditService', () => {
   let messaging: jest.Mocked<MessagingService>;
   let featureToggles: jest.Mocked<FeatureToggleService>;
   let writer: jest.Mocked<AuditWriterService>;
+  let outbox: jest.Mocked<AuditOutboxService>;
   let service: AuditService;
 
   const entry: AuditRecordInput = {
@@ -52,7 +54,16 @@ describe('AuditService', () => {
         .mockResolvedValue(undefined),
     } as unknown as jest.Mocked<AuditWriterService>;
 
-    service = new AuditService(messaging, featureToggles, writer);
+    outbox = {
+      enqueue: jest
+        .fn<
+          ReturnType<AuditOutboxService['enqueue']>,
+          Parameters<AuditOutboxService['enqueue']>
+        >()
+        .mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<AuditOutboxService>;
+
+    service = new AuditService(messaging, featureToggles, writer, outbox);
   });
 
   it('publishes to queue when async worker enabled', async () => {
@@ -83,8 +94,26 @@ describe('AuditService', () => {
     expect(messaging.publish).not.toHaveBeenCalled();
   });
 
-  it('falls back to persistence when queue publishing fails', async () => {
+  it('stores in the outbox when queue publishing fails', async () => {
     messaging.publish.mockRejectedValueOnce(new Error('queue down'));
+
+    await service.record(entry);
+
+    const enqueueCalls = outbox.enqueue.mock.calls as Array<
+      [string, Record<string, unknown>]
+    >;
+    const [routingKey, message] = enqueueCalls[0];
+
+    expect(routingKey).toBe('audit.event');
+    expect(message.action).toBe(VEHICLE_EVENT_CREATED);
+    // The synchronous final write is reserved for a last-resort failure.
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    expect(writer.persist).not.toHaveBeenCalled();
+  });
+
+  it('persists synchronously when both queue and outbox fail', async () => {
+    messaging.publish.mockRejectedValueOnce(new Error('queue down'));
+    outbox.enqueue.mockRejectedValueOnce(new Error('outbox down'));
 
     await service.record(entry);
 

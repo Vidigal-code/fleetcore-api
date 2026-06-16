@@ -18,6 +18,7 @@ import { SharedModule } from '../../shared/shared.module';
 import { AuditModule } from '../../modules/audit/audit.module';
 import { MessagingModule } from '../../modules/messaging/messaging.module';
 import { AuditEventsConsumer } from '../../modules/audit/consumers/audit-events.consumer';
+import { AuditOutboxRelayService } from '../../modules/audit/relays/audit-outbox-relay.service';
 
 @Module({
   imports: [
@@ -43,6 +44,6 @@ import { AuditEventsConsumer } from '../../modules/audit/consumers/audit-events.
     MessagingModule,
     AuditModule,
   ],
-  providers: [AuditEventsConsumer],
+  providers: [AuditEventsConsumer, AuditOutboxRelayService],
 })
 export class AuditWorkerModule {}
