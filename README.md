@@ -1,3 +1,4 @@
+
 # Fleetcore Fleet Management Platform
 
 Plataforma full-stack construída para o desafio técnico da Aivacol: um backend NestJS 11 (DDD + SQL Server + Redis + RabbitMQ + MongoDB) e um frontend Next.js 16 (Feature-Sliced Design + Redux Toolkit + React Query). O repositório inclui um site GitPageDocs trilíngue (PT/EN/ES), scripts de automação e stack Docker completa.
