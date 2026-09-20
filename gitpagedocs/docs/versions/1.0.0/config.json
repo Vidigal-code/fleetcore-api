@@ -607,8 +607,45 @@
       "RouteguideBrandContainerTop": false
     }
   ],
+  "routes-source-viewer": [
+    {
+      "id": 17,
+      "title": {
+        "pt": "Codigo fonte",
+        "en": "Source code",
+        "es": "Codigo fuente"
+      },
+      "description": {
+        "pt": "Explore a arvore do repositorio, navegue por pastas e visualize arquivos diretamente na documentacao.",
+        "en": "Explore the repository tree, browse folders, and preview files directly inside the documentation.",
+        "es": "Explora el arbol del repositorio, navega por carpetas y previsualiza archivos directamente en la documentacion."
+      },
+      "titleCss": "font-size: 1.85rem; font-weight: 700;",
+      "titleDarkCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titleLightCss": "font-size: 1.85rem; font-weight: 700; color: var(--text);",
+      "titlePosition": "center",
+      "titleIsVisible": true,
+      "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
+      "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionLightCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
+      "descriptionPosition": "center",
+      "descriptionIsVisible": true,
+      "fullscreenEnabled": false,
+      "marginTop": "",
+      "marginBottom": "",
+      "blockLink": true,
+      "browseAll": false,
+      "RouteguideBrand": false,
+      "RouteGuideSpeciFicbrand": [],
+      "RouteguideBrandPosition": "center",
+      "RouteguideBrandContainerTop": false,
+      "source-viewer": true,
+      "source-viewer-path": "https://github.com/Vidigal-code/fleetcore-api/tree/HEAD"
+    }
+  ],
   "routes-html": [],
   "routes-video": [],
+  "routes-audio": [],
   "menus-header-md": [
     {
       "id": 1,
@@ -851,18 +888,38 @@
       }
     }
   ],
+  "menus-header-source-viewer": [
+    {
+      "id": 17,
+      "pt": {
+        "title": "Codigo fonte",
+        "path-click": "page:17"
+      },
+      "en": {
+        "title": "Source code",
+        "path-click": "page:17"
+      },
+      "es": {
+        "title": "Codigo fuente",
+        "path-click": "page:17"
+      }
+    }
+  ],
   "menus-header-html": [],
   "menus-header-video": [],
+  "menus-header-audio": [],
   "hierarchyPage": {
     "video": 0,
     "md": 1,
     "html": 2,
-    "audio": 3
+    "audio": 3,
+    "source-viewer": 4
   },
   "hierarchyMenu": {
     "video": 0,
     "md": 1,
     "html": 2,
-    "audio": 3
+    "audio": 3,
+    "source-viewer": 4
   }
 }
