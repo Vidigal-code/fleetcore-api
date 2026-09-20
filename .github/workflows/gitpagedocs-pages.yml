@@ -101,6 +101,15 @@ jobs:
           mkdir -p .gitpagedocs-runtime/out/source-viewer
           printf '%s' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=../"><title>Redirecting</title><a href="../">Documentation</a>' > .gitpagedocs-runtime/out/source-viewer/index.html
 
+      # Links shared before this site moved to the root still end in /docs/.
+      # Send them to the documentation instead of answering 404.
+      - name: Send legacy /docs/ links to the documentation
+        run: |
+          if [ ! -e .gitpagedocs-runtime/out/docs/index.html ]; then
+            mkdir -p .gitpagedocs-runtime/out/docs
+            printf '%s' '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=../"><title>Redirecting</title><a href="../">Documentation</a>' > .gitpagedocs-runtime/out/docs/index.html
+          fi
+
       - name: Add .nojekyll
         run: touch .gitpagedocs-runtime/out/.nojekyll 2>/dev/null || mkdir -p .gitpagedocs-runtime/out && touch .gitpagedocs-runtime/out/.nojekyll
 
