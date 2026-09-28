@@ -7,6 +7,11 @@
       "en",
       "es"
     ],
+    "languages": {
+      "pt": true,
+      "en": true,
+      "es": true
+    },
     "HideThemeSelector": true,
     "ThemeDefault": "slate-dark",
     "ThemeModeDefault": "dark",
@@ -20,6 +25,136 @@
     "ProjectLink": "https://github.com/Vidigal-code/fleetcore-api",
     "SiteIconPath": "/icon.svg",
     "SiteHeaderName": "Aivacol Fleet Management Docs",
+    "icons": {
+      "defaults": {
+        "reactIcon": true,
+        "colorDark": "White",
+        "colorLight": "black",
+        "size": "25px",
+        "imgDark": "",
+        "imgLight": "",
+        "imgWidth": 20,
+        "imgHeight": 20
+      },
+      "ImageMenuHeader": {
+        "tag": "FaGithubAlt"
+      },
+      "ProjectLink": {
+        "tag": "FaGithubAlt",
+        "size": null
+      },
+      "VersionLinks": {
+        "tag": "FaCodeBranch"
+      },
+      "InfoHeaderMenu": {
+        "tag": "BsInfoSquareFill"
+      },
+      "PreviewProjectLink": {
+        "tag": "CiGlobe"
+      },
+      "NavMenuOpen": {
+        "tag": "FaBars"
+      },
+      "NavMenuClose": {
+        "tag": "IoMdClose"
+      },
+      "NavMenuMobileOpen": {
+        "tag": "FaBars"
+      },
+      "NavMenuMobileClose": {
+        "tag": "IoMdClose"
+      },
+      "NavMenuBlockActive": {
+        "tag": "FiLock"
+      },
+      "NavMenuBlockInactive": {
+        "tag": "FiUnlock"
+      },
+      "DocsLock": {
+        "tag": "FiLock",
+        "size": "22px"
+      },
+      "AudioPlay": {
+        "tag": "CiPlay1",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "AudioPause": {
+        "tag": "FaPause",
+        "imgDark": null,
+        "imgLight": null,
+        "imgWidth": null,
+        "imgHeight": null
+      },
+      "AudioPlayerPopoverClose": {
+        "tag": "IoClose"
+      },
+      "AudioPlayerPopoverPlay": {
+        "tag": "CiPlay1"
+      },
+      "AudioPlayerPopoverPause": {
+        "tag": "FaPause"
+      },
+      "AudioPlayerPopoverRestart": {
+        "tag": "FiRefreshCw"
+      },
+      "AudioPlayerPopoverLoopOn": {
+        "tag": "FiRepeat"
+      },
+      "AudioPlayerPopoverLoopOff": {
+        "tag": "FiRepeat"
+      },
+      "AiChatOpen": {
+        "tag": "BsChatDots",
+        "size": "22px"
+      },
+      "AiChatClose": {
+        "tag": "IoMdClose",
+        "size": "22px"
+      },
+      "AiChatSettings": {
+        "tag": "FiSettings",
+        "size": "20px"
+      },
+      "AiChatSend": {
+        "tag": "FiSend",
+        "size": "20px"
+      },
+      "AiChatCancel": {
+        "tag": "FiXCircle",
+        "size": "20px"
+      },
+      "AiChatTrash": {
+        "tag": "FiTrash2",
+        "size": "20px"
+      },
+      "AiChatClearChat": {
+        "tag": "FiMessageSquare",
+        "size": "20px"
+      },
+      "AiChatClearData": {
+        "tag": "FiDatabase",
+        "size": "20px"
+      },
+      "AiChatExpand": {
+        "tag": "FiMaximize2",
+        "size": "20px"
+      },
+      "AiChatCollapse": {
+        "tag": "FiMinimize2",
+        "size": "20px"
+      },
+      "SidebarCollapse": {
+        "tag": "FiChevronsLeft",
+        "size": "22px"
+      },
+      "SidebarExpand": {
+        "tag": "FiChevronsRight",
+        "size": "22px"
+      }
+    },
     "IconImageMenuHeaderImgWidth": 20,
     "IconImageMenuHeaderImgHeight": 20,
     "IconImageMenuHeaderLightImg": "",
@@ -313,9 +448,12 @@
     "layoutsConfigPathOficial": true,
     "layoutsConfigPathTemplatesOficial": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagedocs/layouts/templates",
     "layoutsConfigPathOficialUrl": "https://github.com/Vidigal-code/git-page-docs/blob/main/gitpagedocs/layouts/layoutsConfig.json",
+    "layoutsConfigPath": "",
+    "layoutsConfigPathTemplates": "",
     "repositorySearchHome": false,
     "rendering": "https://Vidigal-code.github.io/fleetcore-api/",
     "AiChatEnabled": true,
+    "AiChatAutoLockSeconds": 30,
     "docsAccess": {
       "enabled": false,
       "publicKey": ""
