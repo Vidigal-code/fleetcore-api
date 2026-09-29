@@ -270,6 +270,7 @@
     "audioSequentialPlayback": false,
     "audioPopoverHideSource": false,
     "audioPopoverShowMinutes": false,
+    "mediaExclusivePlayback": true,
     "audioTracks": [],
     "IconAudioPlayReactIcones": true,
     "IconAudioPlayReactIconesTag": "CiPlay1",
