@@ -1,44 +1,27 @@
 # Requirements and Criteria
 
-The tables below map the challenge checklist to concrete artefacts in the repository. Each item links back to the module or script that satisfies the requirement so reviewers can verify the implementation quickly.
+Fleet management for brands, models, vehicles, users, sessions and audit. The frontend browses/manages records according to permissions. SQL Server stores relational domain data, MongoDB stores audit, while Redis/RabbitMQ provide caching, operational controls and messaging.
 
-## Functional scope
+## Workflow and failure cases
 
-| Requirement | Implementation | Notes |
-|-------------|----------------|-------|
-| CRUD for **brands** | `backend/src/modules/fleet/interfaces/http/brands.controller.ts`, `brands.service.ts` | Ensures name uniqueness, publishes domain events. |
-| CRUD for **models** | `models.controller.ts`, `models.service.ts` | Associates models with optional brands, validates payload with Zod-generated DTOs. |
-| CRUD for **vehicles** | `vehicles.controller.ts`, `vehicles.service.ts` | Applies Redis-backed caching (`RepositoryCacheService`) and raises domain events on mutations. |
-| Vehicle ↔ model ↔ brand relationship | Aggregates in `backend/src/modules/fleet/domain` | Repositories enforce referential integrity before persisting. |
-| Seed administrator `aivacol` | `backend/src/apps/api/app-bootstrap.service.ts` + `UsersService.ensureAdminSeed()` | Creates admin on boot with roles from `backend/src/modules/users`. |
-| Authentication endpoints | `backend/src/modules/auth/interfaces/http/auth.controller.ts` | `login`, `register`, `logout`, `me` with session tracking in Redis. |
-| Audit trail | `backend/src/modules/audit/interceptors/audit.interceptor.ts`, `audit-writer.service.ts` | Captures HTTP interactions and persists to Mongo when the queue is unavailable. |
-| Messaging integration | `backend/src/modules/messaging/messaging.service.ts`, `FleetDomainEventListener` | Publishes vehicle events to RabbitMQ and consumes them for observability. |
-| Frontend dashboard | `frontend/src/app/(protected)/dashboard/page.tsx`, widgets under `frontend/src/widgets` | Displays fleet information, CRUD forms and filters backed by React Query. |
+1. /api/auth/register creates users; /api/auth/login validates credentials and issues a JWT with session context. /api/auth/me reads the profile; update/profile and update/password mutate it; logout invalidates sessionId. JWT signature is not the only validity check: the session is also verified. The source reference links endpoints and permission decorators.
 
-## Technical criteria
+2. Brand → associated model → vehicle. VehiclesService checks model existence and uniqueness before persistence and uppercases plates. The aggregate stores plate, chassis, renavam, year, modelId, actor and dates. Search filters plate/model/brand with pagination (page 1, limit 20 defaults). Detailed format rules reside in DTOs/value objects, not only the entity.
 
-| Criterion | Implementation detail |
-|-----------|----------------------|
-| Clean architecture / DDD | Separate Nest modules for `auth`, `fleet`, `users`, `messaging`, `audit`; shared layer (`backend/src/shared`) provides config, unit of work, cache and resilience services. |
-| SQL Server persistence | Single migration `backend/src/migrations/1717845600000-InitSchema.ts` provisions tables; repositories under `backend/src/modules/fleet/infrastructure`. |
-| Redis cache | `backend/src/shared/cache/repository-cache.service.ts` caches vehicle queries (`vehicles.search`) with TTL from `REDIS_TTL_SECONDS`. |
-| JWT + RBAC | `JwtStrategy`, `JwtAuthGuard`, `RolesGuard` inside `backend/src/modules/auth`; sessions stored by `AuthSessionService` in Redis with sliding TTL plus `lock`/`unlock`/`isLocked`. |
-| Input sanitisation & rate limiting | `SanitizeInputPipe` + dedicated Redis `RateLimitService`/`RateLimitGuard` under `backend/src/apps/api/security/` (per user/IP/endpoint; `100/60s` default, `10/60s` on login via `@AuthRateLimit()`); base `@nestjs/throttler` retained. |
-| Database protection (Redis) | Read cache (`RepositoryCacheService`), idempotency (`IdempotencyService` + `IdempotencyInterceptor`, `Idempotency-Key` header, `409` on duplicates), distributed lock (`RedisLockService`) and rate limiting guard critical operations. |
-| Resilience helpers | `ResilienceService.executeWithRetry`/`executeWithFallback`/`executeWithRollback` plus `UnitOfWork` DB transactions in `backend/src/shared`. |
-| RabbitMQ messaging | Exchange configuration and publisher in `backend/src/modules/messaging`; vehicle consumer in `consumers/vehicle-events.consumer.ts`. |
-| Mongo audit fallback | Interceptor pipes payloads through `AuditService`; on RabbitMQ failure events land in the `audit_outbox` collection and `AuditOutboxRelayService` republishes them once the broker recovers, while the consumer retries via `fleetcore.retry`/`fleetcore.dead-letter` when Mongo is down. |
-| Schema sharing | `backend/package.json` exposes `npm run export:schemas`; generated files consumed at `frontend/src/shared/schemas`. |
-| Frontend state & data | Redux store in `frontend/src/processes/app/store`, React Query hooks in `frontend/src/entities/*/api`. |
-| Documentation | Swagger builders (`backend/src/apps/api/swagger/swagger.factory.ts`), GitPagedocs site (`gitpagedocs/`). |
+3. Reads use RepositoryCacheService when repositoryCache is enabled; writes use UnitOfWork and invalidate list/detail caches. They then record audit and publish domain events. SQL commit and external-system delivery are separate steps, not one transaction spanning SQL, Mongo and the broker.
 
-## Validation evidence
+4. AuditService publishes to the broker with auditAsyncWorker enabled. Publication failure queues a Mongo outbox entry; failure there falls back to direct persistence. With the toggle off it persists directly. The relay runs only in audit-worker, recovers abandoned PROCESSING entries and republishes batches with an attempt limit. Monitor terminal states/logs; fallback cannot eliminate failure of every dependency.
 
-- **API documentation**: `/docs` (en-US) and `/docs-pt` (pt-BR) generated by the Swagger factory. Both UIs ship a branded dark theme (Fleetcore slate + indigo) via `customCss`, a custom favicon, Try-it-out enabled and obsidian syntax highlighting. Every DTO carries bilingual `@ApiProperty` descriptions with realistic examples, operation summaries are bilingual, each doc opens with a bilingual quickstart (login → Authorize → run), and the `POST /auth/login` body is pre-filled with the seed credentials (`aivacol` / `aivacol123!`).
-- **Automated tests**: backend unit/integration (vehicle search/ordering)/e2e suites in `backend/tests`; new unit specs cover the session service (`auth/auth-session.service.spec.ts`), distributed lock (`shared/redis-lock.service.spec.ts`), idempotency (`shared/idempotency.service.spec.ts`), rate limit (`shared/rate-limit.service.spec.ts`) and resilience fallback/rollback (`shared/resilience.service.spec.ts`); frontend unit (auth slice, ConfirmDialog, SelectField) + Playwright login spec in `frontend/tests`.
-- **Resilience**: retry/circuit breaker policies (cockatiel) from `backend/src/shared/resilience/resilience.service.ts` wrap messaging and audit operations, with `executeWithRetry`/`executeWithFallback`/`executeWithRollback` helpers.
-- **New environment variables** (additive, no renames): `REDIS_LOCK_TTL`, `WORKER_CONCURRENCY`, `RABBITMQ_RETRY_QUEUE`, `RABBITMQ_DLQ`, `RABBITMQ_RETRY_DELAY_MS`, `RABBITMQ_AUDIT_MAX_ATTEMPTS`, `AUDIT_OUTBOX_RELAY_INTERVAL_MS`, `AUDIT_OUTBOX_BATCH_SIZE`, `AUDIT_OUTBOX_MAX_ATTEMPTS`, `RATE_LIMIT_ENABLED`, `RATE_LIMIT_WINDOW_SECONDS`, `RATE_LIMIT_MAX_REQUESTS`, `RATE_LIMIT_AUTH_MAX_REQUESTS`, `RATE_LIMIT_AUTH_WINDOW_SECONDS`, `RETRY_MAX_ATTEMPTS`, `RETRY_INITIAL_DELAY`.
-- **Operational scripts**: `docker-compose.yml`, the single root `envexample.txt`, `npm run export:schemas`, `npm run generate:openapi` ensure reproducible environments.
+## Related files
 
-All requirements, including the optional messaging/audit enhancements and bilingual documentation, are therefore covered by explicit code artefacts in the repository.
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
+
+## Navigation
+
+- [Project guide](?menu=en&lang=en&id=18)
+- [Source reference](?menu=en&lang=en&id=19)

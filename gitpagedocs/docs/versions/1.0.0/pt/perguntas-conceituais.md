@@ -1,23 +1,27 @@
-# Perguntas Conceituais
+# Perguntas
 
-Esta página antecipa respostas curtas para questionamentos comuns durante a avaliação técnica.
+Gestão de frota com marcas, modelos, veículos, usuários, sessão e auditoria. O frontend permite consultar e administrar os registros conforme permissões. SQL Server mantém o domínio relacional; MongoDB mantém auditoria; Redis e RabbitMQ atendem cache, controles operacionais e mensageria.
 
-## Por que DDD e módulos isolados?
+## Fluxo e casos de falha
 
-Para manter dependências claras, facilitar testes unitários e permitir evolução independente dos contextos de frota, usuários, auditoria e mensageria. Detalhes adicionais estão na seção Arquitetura Backend.
+1. /api/auth/register cria usuário; /api/auth/login valida credenciais e emite JWT com contexto de sessão. /api/auth/me consulta perfil; update/profile e update/password modificam dados; logout invalida sessionId. O JWT não é a única fonte de validade: a sessão também é verificada. Endpoints e decorators de permissão estão na referência do código.
 
-## Como a segurança garante revogação de sessão?
+2. Marca → modelo vinculado → veículo. VehiclesService valida existência do modelo e unicidade antes de persistir; normaliza placa para maiúsculas. O agregado registra placa, chassi, renavam, ano, modelId e autoria/datas. Busca filtra placa/modelo/marca com paginação (padrão página 1, limite 20). Regras detalhadas de formato estão nos DTOs/value objects, não apenas na entidade.
 
-`AuthSessionService` mantém a sessão **somente no Redis** com TTL deslizante (renovado a cada requisição via `refresh`) e remove sessões no logout, permitindo revogar acessos específicos sem derrubar todos os tokens. Há ainda `lock`/`unlock`/`isLocked` para bloquear uma sessão (a `JwtStrategy` recusa sessões bloqueadas com 401). Consulte a seção Segurança, Auditoria e Mensageria.
+3. Leitura usa RepositoryCacheService quando repositoryCache está ativo; gravação usa UnitOfWork e invalida caches de lista/detalhe. Depois registra auditoria e publica eventos de domínio. O commit SQL e o envio a sistemas externos são etapas distintas: não descreva o fluxo como uma transação única envolvendo SQL, Mongo e broker.
 
-## Como o banco é protegido contra carga e concorrência?
+4. AuditService publica no broker quando auditAsyncWorker está ativo. Se a publicação falha, enfileira outbox no Mongo; se isso também falha, tenta persistência direta. Com o toggle desligado, persiste diretamente. O relay roda somente no audit-worker, recupera entradas PROCESSING abandonadas e republica pendências em lotes com limite de tentativas. Monitore estados terminais e logs; fallback não elimina a possibilidade de falha de todas as dependências.
 
-Por uma camada Redis: cache de leitura (`RepositoryCacheService`), idempotência via header `Idempotency-Key` (409 em duplicidade), lock distribuído (`RedisLockService`) e rate limit dedicado (`RateLimitGuard`, 429 ao exceder). Falhas externas usam retry/fallback/rollback do `ResilienceService`, com o `UnitOfWork` cuidando do rollback transacional.
+## Arquivos relacionados
 
-## Como o frontend compartilha regras de validação?
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
 
-Esquemas Zod são exportados do backend (`npm run export:schemas`) e importados no FSD, garantindo mensagens consistentes. Veja a seção Frontend e Experiência.
+## Navegação
 
-## Qual é o plano de observabilidade?
-
-Logs estruturados, auditoria em MongoDB, eventos RabbitMQ e métricas permitem rastrear incidentes e levantar alertas. Referência disponível na seção Qualidade e Testes.
+- [Project guide](?menu=pt&lang=pt&id=18)
+- [Source reference](?menu=pt&lang=pt&id=19)

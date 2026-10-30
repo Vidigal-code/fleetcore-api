@@ -1,51 +1,66 @@
 # Modelagem de Dados e Domínio
 
-O backend usa TypeORM com SQL Server e um modelo orientado a agregados. A migração única `backend/src/migrations/1717845600000-InitSchema.ts` provisiona tabelas, índices, chaves estrangeiras e metadados (`created_at`, `updated_at`, `created_by`).
+Gestão de frota com marcas, modelos, veículos, usuários, sessão e auditoria. O frontend permite consultar e administrar os registros conforme permissões. SQL Server mantém o domínio relacional; MongoDB mantém auditoria; Redis e RabbitMQ atendem cache, controles operacionais e mensageria.
 
-## Esquema relacional
+## Contratos de dados
 
-| Tabela | Campos principais | Relacionamentos |
-|--------|-------------------|-----------------|
-| `users` | `id`, `nickname`, `email`, `password_hash`, `roles` | Usuário admin `aivacol` semeado no bootstrap; roles armazenadas como CSV. |
-| `brands` | `id`, `name` | Nome único; opcionalmente referenciada por modelos. |
-| `models` | `id`, `name`, `brand_id` | FK com `SET NULL` permitindo modelos sem marca. |
-| `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `model_id` | Restrições únicas para identificadores; FK com `CASCADE` em deleções. |
+Autenticação, roles, rate limiting, idempotência, locks e cache têm módulos próprios. Ative e configure controles conforme AppConfig/feature toggles, sem pressupor que instalar Redis habilita tudo. Auditoria e logs devem ser consultados por correlationId/requestId quando presentes. Frontend usa contratos OpenAPI e schemas; o backend aplica validação e autorização. Tipos gerados não devem ser editados como fonte principal.
 
-O arquivo `backend/seeds/seed_vehicles.json` oferece dados simulados para inicialização local.
+### brand.orm-entity
 
-## Coleção de auditoria (MongoDB)
+[backend/src/modules/fleet/infrastructure/entities/brand.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/brand.orm-entity.ts)
 
-A trilha de auditoria não fica no SQL Server: é persistida na coleção `audit_events` do MongoDB (`backend/src/modules/audit/schemas/audit-event.schema.ts`). O documento é gravado pelo worker de auditoria com os campos enriquecidos do evento mais metadados de processamento:
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `models` | `ModelOrmEntity[]` |
 
-| Grupo | Campos |
-|-------|--------|
-| Identidade do evento | `eventId`, `eventType`, `correlationId`, `requestId` |
-| Ator/sessão | `actor`, `userId`, `sessionId` |
-| Requisição | `method`, `route`, `action`, `statusCode`, `success` |
-| Entidade | `entity`, `entityId`, `payload`, `metadata`, `occurredAt` |
-| Processamento | `status` (`processed`), `retries`, `sourceQueue`, `processedAt` |
+### model.orm-entity
 
-Os campos enriquecidos são opcionais (compatível com documentos antigos), e a escrita usa `ResilienceService` (retry/circuit breaker).
+[backend/src/modules/fleet/infrastructure/entities/model.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/model.orm-entity.ts)
 
-Há ainda uma segunda coleção, `audit_outbox` (`backend/src/modules/audit/schemas/audit-outbox.schema.ts`), usada como **outbox transacional**: quando a publicação no RabbitMQ falha (broker fora), o evento é gravado ali com `routingKey`, `message`, `status` (`pending`/`processing`/`failed`), `attempts` e `lastError`. O `AuditOutboxRelayService` (no `audit-worker`) republica essas entradas no RabbitMQ quando o broker volta, e o fluxo normal (consumer → `audit_events`) assume a partir daí.
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `brand` | `BrandOrmEntity \| null` |
+| `brandId` | `string \| null` |
+| `vehicles` | `VehicleOrmEntity[]` |
 
-## Agregados e repositórios
+### vehicle.orm-entity
 
-- Agregados `Brand`, `Model`, `Vehicle` e `User` (pasta `backend/src/modules/**/domain`) garantem invariantes como unicidade, validação de placa e composição de roles.
-- Repositórios TypeORM (`backend/src/modules/fleet/infrastructure/repositories`) implementam contratos definidos na camada de domínio.
-- `UnitOfWork` (`backend/src/shared/unit-of-work/unit-of-work.ts`) administra transações do `EntityManager`, mantendo operações atômicas.
-- Eventos de domínio em `backend/src/modules/fleet/domain/events` alimentam cache, auditoria e mensageria.
+[backend/src/modules/fleet/infrastructure/entities/vehicle.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/vehicle.orm-entity.ts)
 
-## Validação compartilhada
+| Field | Type |
+| --- | --- |
+| `licensePlate` | `string` |
+| `chassis` | `string` |
+| `renavam` | `string` |
+| `year` | `number` |
+| `model` | `ModelOrmEntity` |
+| `modelId` | `string` |
 
-- DTOs combinam `class-validator` com esquemas Zod definidos em `backend/src/shared/validation/fleet.schema.ts`.
-- `npm run export:schemas` gera versões consumidas pelo frontend em `frontend/src/shared/schemas`, garantindo mensagens idênticas nas duas camadas.
-- Regras como regex Mercosul, tamanho do chassi, estrutura do RENAVAM e faixa de anos vivem nesses esquemas reutilizáveis.
+### user.orm-entity
 
-## Fluxo típico
+[backend/src/modules/users/infrastructure/entities/user.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/users/infrastructure/entities/user.orm-entity.ts)
 
-1. Controllers recebem DTOs e encaminham para os services.
-2. Services carregam agregados via repositórios dentro de um `UnitOfWork`, aplicam regras e persistem mudanças.
-3. Agregados emitem eventos (`VehicleCreatedEvent`, `ModelUpdatedEvent`, etc.) que disparam cache, auditoria e mensageria.
+| Field | Type |
+| --- | --- |
+| `nickname` | `string` |
+| `name` | `string` |
+| `email` | `string` |
+| `passwordHash` | `string` |
+| `roles` | `UserRole[]` |
 
-Essa abordagem mantém regras de negócio próximas ao domínio, reduz duplicidade entre camadas e possibilita que backend e frontend compartilhem a mesma lógica de validação.
+## Arquivos relacionados
+
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
+
+## Navegação
+
+- [Project guide](?menu=pt&lang=pt&id=18)
+- [Source reference](?menu=pt&lang=pt&id=19)

@@ -31,6 +31,34 @@
   },
   "routes-md": [
     {
+      "id": 18,
+      "title": {
+        "pt": "Contexto e fluxos do projeto",
+        "en": "Project context and workflows",
+        "es": "Contexto y flujos del proyecto"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
+      "id": 19,
+      "title": {
+        "pt": "Referência do código",
+        "en": "Source reference",
+        "es": "Referencia del código"
+      },
+      "path": {
+        "pt": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md",
+        "en": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md",
+        "es": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      },
+      "fullscreenEnabled": true
+    },
+    {
       "id": 1,
       "title": {
         "pt": "Início",
@@ -38,9 +66,9 @@
         "es": "Inicio"
       },
       "description": {
-        "pt": "Resumo do desafio e links rápidos",
-        "en": "Challenge summary and quick links",
-        "es": "Resumen del desafío y enlaces rápidos"
+        "pt": "Início",
+        "en": "Home",
+        "es": "Inicio"
       },
       "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
@@ -61,9 +89,9 @@
         "es": "Visión general"
       },
       "description": {
-        "pt": "Contexto, objetivos e pilares entregues",
-        "en": "Context, goals, and delivered pillars",
-        "es": "Contexto, objetivos y pilares entregados"
+        "pt": "Visão geral",
+        "en": "Project overview",
+        "es": "Visión general"
       },
       "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
@@ -84,9 +112,9 @@
         "es": "Arquitectura"
       },
       "description": {
-        "pt": "Componentes backend, domínio e integrações",
-        "en": "Backend components, domain modeling, integrations",
-        "es": "Componentes backend, modelado de dominio e integraciones"
+        "pt": "Arquitetura",
+        "en": "Architecture",
+        "es": "Arquitectura"
       },
       "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
@@ -107,9 +135,9 @@
         "es": "Back-end"
       },
       "description": {
-        "pt": "APIs, regras de negócio e automações",
-        "en": "APIs, business rules, automations",
-        "es": "APIs, reglas de negocio y automatizaciones"
+        "pt": "Back-end",
+        "en": "Back-end",
+        "es": "Back-end"
       },
       "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
@@ -130,9 +158,9 @@
         "es": "Front-end"
       },
       "description": {
-        "pt": "Experiência Next.js, FSD e dados",
-        "en": "Next.js experience, FSD layers, data flows",
-        "es": "Experiencia Next.js, capas FSD y flujos de datos"
+        "pt": "Front-end",
+        "en": "Front-end",
+        "es": "Front-end"
       },
       "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
@@ -153,9 +181,9 @@
         "es": "Calidad"
       },
       "description": {
-        "pt": "Testes, observabilidade e operação diária",
-        "en": "Testing, observability, daily operations",
-        "es": "Pruebas, observabilidad y operación diaria"
+        "pt": "Qualidade",
+        "en": "Quality & ops",
+        "es": "Calidad"
       },
       "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
@@ -176,9 +204,9 @@
         "es": "Preguntas"
       },
       "description": {
-        "pt": "Respostas para a etapa conceitual",
-        "en": "Answers for the conceptual stage",
-        "es": "Respuestas para la etapa conceptual"
+        "pt": "Perguntas",
+        "en": "Conceptual answers",
+        "es": "Preguntas"
       },
       "descriptionCss": "font-size: 1.2rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.2rem; font-weight: 500; color: var(--text-secondary);",
@@ -199,9 +227,9 @@
         "es": "Introducción al Desafío"
       },
       "description": {
-        "pt": "Escopo geral, artefatos entregues e visão macro da plataforma de gestão de frota.",
-        "en": "High-level scope, delivered artefacts and the overall fleet-management vision.",
-        "es": "Alcance general, artefactos entregados y visión macro de la plataforma de gestión de flotas."
+        "pt": "Introdução ao Desafio",
+        "en": "Challenge Overview",
+        "es": "Introducción al Desafío"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -222,9 +250,9 @@
         "es": "Requisitos y Criterios"
       },
       "description": {
-        "pt": "Mapeamento dos requisitos funcionais, técnicos e critérios de avaliação do teste.",
-        "en": "Mapping of functional and technical requirements plus the evaluation checklist.",
-        "es": "Mapeo de los requisitos funcionales y técnicos junto con la lista de verificación de evaluación."
+        "pt": "Requisitos e Critérios",
+        "en": "Requirements and Criteria",
+        "es": "Requisitos y Criterios"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -245,9 +273,9 @@
         "es": "Arquitectura Backend"
       },
       "description": {
-        "pt": "Módulos NestJS, camadas DDD, resiliência e uso do TypeORM/Unit of Work.",
-        "en": "NestJS modules, DDD layering, resilience policies and TypeORM/Unit of Work usage.",
-        "es": "Módulos NestJS, capas DDD, políticas de resiliencia y uso de TypeORM/Unit of Work."
+        "pt": "Arquitetura Backend",
+        "en": "Backend Architecture",
+        "es": "Arquitectura Backend"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -268,9 +296,9 @@
         "es": "Modelado de Datos y Dominio"
       },
       "description": {
-        "pt": "Entidades, agregados, migrations e relacionamento entre models, vehicles, brands e users.",
-        "en": "Entities, aggregates, migrations and the relationships across models, vehicles, brands and users.",
-        "es": "Entidades, agregados, migraciones y relaciones entre modelos, vehículos, marcas y usuarios."
+        "pt": "Modelagem de Dados e Domínio",
+        "en": "Data and Domain Modeling",
+        "es": "Modelado de Datos y Dominio"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -291,9 +319,9 @@
         "es": "Seguridad, Auditoría y Mensajería"
       },
       "description": {
-        "pt": "JWT com RBAC, sessões em Redis, interceptores de auditoria e eventos RabbitMQ/Mongo.",
-        "en": "JWT with RBAC, Redis-backed sessions, audit interceptors and RabbitMQ/Mongo event flows.",
-        "es": "JWT con RBAC, sesiones respaldadas en Redis, interceptores de auditoría y flujos de eventos RabbitMQ/Mongo."
+        "pt": "Segurança, Auditoria e Mensageria",
+        "en": "Security, Audit and Messaging",
+        "es": "Seguridad, Auditoría y Mensajería"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -314,9 +342,9 @@
         "es": "Frontend y Experiencia"
       },
       "description": {
-        "pt": "Next.js App Router, padrão FSD, Redux, React Query, temas laranja e responsividade.",
-        "en": "Next.js App Router, FSD pattern, Redux, React Query, orange theming and responsiveness.",
-        "es": "Next.js App Router, patrón FSD, Redux, React Query, temas naranjas y adaptabilidad."
+        "pt": "Frontend e Experiência",
+        "en": "Frontend and Experience",
+        "es": "Frontend y Experiencia"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -337,9 +365,9 @@
         "es": "Infraestructura y Despliegue"
       },
       "description": {
-        "pt": "Docker Compose completo, variáveis de ambiente, scripts npm e documentação gerada.",
-        "en": "Full Docker Compose stack, environment variables, npm scripts and generated documentation.",
-        "es": "Stack completo con Docker Compose, variables de entorno, scripts npm y documentación generada."
+        "pt": "Infraestrutura e Deployment",
+        "en": "Infrastructure and Deployment",
+        "es": "Infraestructura y Despliegue"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -360,9 +388,9 @@
         "es": "Calidad y Pruebas"
       },
       "description": {
-        "pt": "Cobertura de testes unitários, integrações, e2e, linting e monitoramento de qualidade.",
-        "en": "Unit, integration and e2e coverage, linting and the quality monitoring checklist.",
-        "es": "Cobertura de pruebas unitarias, de integración y e2e, linting y lista de control de calidad."
+        "pt": "Qualidade e Testes",
+        "en": "Quality and Testing",
+        "es": "Calidad y Pruebas"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -383,9 +411,9 @@
         "es": "Runbook y Resolución de Problemas"
       },
       "description": {
-        "pt": "Passo a passo para subir ambientes, comandos úteis, credenciais seed e resolução de falhas.",
-        "en": "Step-by-step to boot environments, useful commands, seed credentials and failure recovery tips.",
-        "es": "Paso a paso para iniciar entornos, comandos útiles, credenciales seed y consejos para la recuperación de fallas."
+        "pt": "Guia de Execução e Troubleshooting",
+        "en": "Runbook and Troubleshooting",
+        "es": "Runbook y Resolución de Problemas"
       },
       "descriptionCss": "font-size: 1.1rem; font-weight: 500;",
       "descriptionDarkCss": "font-size: 1.1rem; font-weight: 500; color: var(--text-secondary);",
@@ -418,13 +446,43 @@
       "fullscreenEnabled": false,
       "RouteguideBrand": false,
       "source-viewer": true,
-      "source-viewer-path": "https://github.com/Vidigal-code/fleetcore-api/tree/HEAD"
+      "source-viewer-path": "https://github.com/Vidigal-code/fleetcore-api/tree/main"
     }
   ],
   "routes-html": [],
   "routes-video": [],
   "routes-audio": [],
   "menus-header-md": [
+    {
+      "id": 18,
+      "pt": {
+        "title": "Contexto e fluxos do projeto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/project-guide.md"
+      },
+      "en": {
+        "title": "Project context and workflows",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md"
+      },
+      "es": {
+        "title": "Contexto y flujos del proyecto",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
+      }
+    },
+    {
+      "id": 19,
+      "pt": {
+        "title": "Referência do código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/pt/source-reference.md"
+      },
+      "en": {
+        "title": "Source reference",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md"
+      },
+      "es": {
+        "title": "Referencia del código",
+        "path-click": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
+      }
+    },
     {
       "id": 1,
       "pt": {

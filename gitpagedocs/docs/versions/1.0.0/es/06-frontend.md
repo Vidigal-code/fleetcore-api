@@ -1,51 +1,48 @@
 # Frontend y Experiencia
 
-El cliente web usa **Next.js 16 (App Router)** con **React 19** y el patrón **Feature-Sliced Design (FSD)** para mantener preocupaciones modulares y reutilizables.
+Gestión de flota con marcas, modelos, vehículos, usuarios, sesión y auditoría. El frontend consulta/administra según permisos. SQL Server conserva dominio relacional, MongoDB auditoría y Redis/RabbitMQ caché, controles operativos y mensajería.
 
-## Estructura FSD
+## Interfaz y estado
 
-- `app/` — routing, layout global y estilos.
-- `entities/` — contratos de dominio (Vehicle, Brand, Model), UI compartida (por ejemplo, `vehicle-table`) y hooks de API.
-- `features/` — funcionalidades aisladas como formularios de vehículos, flujos de gestión y barras de filtros.
-- `processes/` — lógica transversal (flujos de autenticación, store de Redux, `ThemeProvider`).
-- `shared/` — kit de UI, utilidades, cliente Axios, almacenamiento de tokens y esquemas Zod exportados desde el backend.
-- `widgets/` — bloques de UI compuestos (AppShell, paneles de dashboard, tableros de referencia).
+Backend NestJS 11, TypeScript 5.7, TypeORM 0.3, Mongoose 8, Redis, RabbitMQ y Cockatiel; frontend Next.js 16.2.7/React 19.2.4, TanStack Query 5, Redux Toolkit y Zod. Módulos separan application, domain, infrastructure e interfaces. API y audit-worker tienen entradas distintas. Puertos/repositorios, UnitOfWork y eventos estructuran la aplicación; adaptadores/toggles determinan comportamiento.
 
-## Manejo de estado y datos
+Autenticación, roles, rate limiting, idempotencia, locks y caché tienen módulos propios. Configure controles mediante AppConfig/toggles; instalar Redis no activa todo. Correlacione logs/auditoría por correlationId/requestId cuando existan. Frontend usa OpenAPI/schemas; backend valida y autoriza. Los tipos generados no son fuente principal editable.
 
-- **Redux Toolkit** guarda **solo** el estado de autenticación (un único reducer `auth`) y expone hooks tipados. El tema NO vive en Redux.
-- **React Query** gestiona el fetching/mutaciones del CRUD de flota (`entities/*/api`) con query keys e invalidación en cada mutación, a través de Axios.
-- El **cliente HTTP** Axios (`shared/api/http-client.ts`) adjunta automáticamente el JWT desde el token-storage y reinicia la sesión en respuestas 401.
+/api/auth/register crea usuarios; /api/auth/login valida credenciales y emite JWT con sesión. /api/auth/me consulta perfil; update/profile y update/password modifican; logout invalida sessionId. La firma JWT no es la única comprobación: también se verifica sesión. La referencia enlaza rutas y permisos.
 
-## Validación compartida
+## Fuentes verificadas
 
-- Los esquemas Zod se generan en el backend y se importan en el frontend (`frontend/src/shared/schemas`).
-- Helpers en `shared/lib/zod-helpers` garantizan mensajes de error consistentes.
+- [frontend/src/app/(auth)/login/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/(auth)/login/page.tsx)
+- [frontend/src/app/(auth)/recover/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/(auth)/recover/page.tsx)
+- [frontend/src/app/(auth)/register/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/(auth)/register/page.tsx)
+- [frontend/src/app/(protected)/brands/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/(protected)/brands/page.tsx)
+- [frontend/src/app/(protected)/dashboard/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/(protected)/dashboard/page.tsx)
+- [frontend/src/app/(protected)/models/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/(protected)/models/page.tsx)
+- [frontend/src/app/(protected)/profile/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/(protected)/profile/page.tsx)
+- [frontend/src/app/(protected)/vehicles/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/(protected)/vehicles/page.tsx)
+- [frontend/src/app/page.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/app/page.tsx)
+- [frontend/src/entities/brand/api/brand-api.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/entities/brand/api/brand-api.ts)
+- [frontend/src/entities/model/api/model-api.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/entities/model/api/model-api.ts)
+- [frontend/src/entities/vehicle/api/vehicle-api.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/entities/vehicle/api/vehicle-api.ts)
+- [frontend/src/processes/app/store/hooks.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/processes/app/store/hooks.ts)
+- [frontend/src/processes/app/store/store.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/processes/app/store/store.ts)
+- [frontend/src/processes/auth/model/auth-slice.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/processes/auth/model/auth-slice.ts)
+- [frontend/src/shared/api/auth-client.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/shared/api/auth-client.ts)
+- [frontend/src/shared/api/fleet-client.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/shared/api/fleet-client.ts)
+- [frontend/src/shared/api/http-client.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/shared/api/http-client.ts)
+- [frontend/src/shared/api/http-error.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/shared/api/http-error.ts)
+- [frontend/src/shared/constants/routes.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/src/shared/constants/routes.ts)
 
-## Tema amarillo y responsividad
+## Archivos relacionados
 
-- Paletas duales **amarillas** claro/oscuro definidas en `globals.css` como **única fuente de verdad** (no se inyectan vía JS ni viven en Redux).
-- El tema se aplica alternando la clase `light`/`dark` mediante `ThemeProvider` + un script anti-FOUC; la preferencia se guarda en `localStorage` (`fleetcore.theme-preference`).
-- `NEXT_PUBLIC_START_THEME` define el tema por defecto (claro u oscuro) sin recompilar.
-- Los componentes fueron refactorizados para layouts mobile-first: el contenido se centra en pantallas pequeñas y se alinea en columnas en viewports mayores.
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
 
-## Páginas
+## Navegación
 
-- `(auth)`: login, register y recover.
-- `(protected)`: dashboard, vehicles, brands, models y profile.
-
-## UX de CRUD y accesibilidad
-
-- **CRUD estandarizado**: un `ConfirmDialog` reutilizable (`shared/ui`) reemplaza `window.confirm` en las eliminaciones, y la edición se realiza en un `Modal` (`vehicle-workbench` y `reference-data-board`).
-- **`SelectField` personalizado**: dropdown con portal y navegación por teclado montado sobre un `<select>` nativo oculto, para mantener la integración con react-hook-form, el valor controlado y el reset.
-- Botones, tablas y formularios usan marcado semántico y proporcionan feedback (`InlineMessage`, estados deshabilitados).
-- La navegación mobile replica las acciones de escritorio, preservando las mismas rutas y opciones.
-- Los inputs fuerzan placas en mayúsculas, ofrecen pistas enmascaradas y mensajes de error descriptivos.
-
-## Pruebas y linting
-
-- Pruebas unitarias con Jest + React Testing Library (`frontend/tests/unit`): slice de `auth`, `ConfirmDialog` y `SelectField`. El `testMatch` de Jest acepta `.spec.ts` y `.spec.tsx`.
-- Escenarios e2e con Playwright en `frontend/tests/e2e` validan la página de login.
-- ESLint (preset Next.js + reglas personalizadas) corre mediante `npm run lint`.
-
-El resultado es una interfaz responsiva y consciente del tema que consume las mismas reglas de validación que el backend, brindando una experiencia pulida para operadores.
+- [Project guide](?menu=es&lang=es&id=18)
+- [Source reference](?menu=es&lang=es&id=19)

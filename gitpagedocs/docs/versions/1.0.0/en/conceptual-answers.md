@@ -1,23 +1,27 @@
-# Conceptual Answers
+# Conceptual answers
 
-Frequently asked questions captured during reviews and interviews.
+Fleet management for brands, models, vehicles, users, sessions and audit. The frontend browses/manages records according to permissions. SQL Server stores relational domain data, MongoDB stores audit, while Redis/RabbitMQ provide caching, operational controls and messaging.
 
-## Why a DDD + modular structure?
+## Workflow and failure cases
 
-It keeps bounded contexts independent, simplifies testing and allows scaling specific capabilities (fleet, auth, audit, messaging) without cross-impact. Refer to the Backend Architecture section for full context.
+1. /api/auth/register creates users; /api/auth/login validates credentials and issues a JWT with session context. /api/auth/me reads the profile; update/profile and update/password mutate it; logout invalidates sessionId. JWT signature is not the only validity check: the session is also verified. The source reference links endpoints and permission decorators.
 
-## How are sessions revoked without killing all tokens?
+2. Brand → associated model → vehicle. VehiclesService checks model existence and uniqueness before persistence and uppercases plates. The aggregate stores plate, chassis, renavam, year, modelId, actor and dates. Search filters plate/model/brand with pagination (page 1, limit 20 defaults). Detailed format rules reside in DTOs/value objects, not only the entity.
 
-`AuthSessionService` stores session identifiers in Redis with TTL and deletes them on logout, so guards reject stale tokens. The TTL is **sliding** — `JwtStrategy` calls `refresh()` on every valid request — and sessions can be individually **locked** (`lock`/`unlock`/`isLocked`), which makes `JwtStrategy` reject them with `401` without affecting other users. The active session lives only in Redis; MongoDB keeps audit history. Details appear in the Security, Audit and Messaging section.
+3. Reads use RepositoryCacheService when repositoryCache is enabled; writes use UnitOfWork and invalidate list/detail caches. They then record audit and publish domain events. SQL commit and external-system delivery are separate steps, not one transaction spanning SQL, Mongo and the broker.
 
-## How do you protect critical operations and the database?
+4. AuditService publishes to the broker with auditAsyncWorker enabled. Publication failure queues a Mongo outbox entry; failure there falls back to direct persistence. With the toggle off it persists directly. The relay runs only in audit-worker, recovers abandoned PROCESSING entries and republishes batches with an attempt limit. Monitor terminal states/logs; fallback cannot eliminate failure of every dependency.
 
-Through Redis-backed layers: read cache (`RepositoryCacheService`), idempotency (`IdempotencyService` + `IdempotencyInterceptor` reading the `Idempotency-Key` header, `409` on duplicates), a distributed lock (`RedisLockService`, owner-token validated to avoid foreign unlocks and deadlocks) and a dedicated rate-limit guard (`100/60s` default, `10/60s` on login, `429` with `retryAfter`). At the application level, `ResilienceService` adds retry, fallback and rollback, while `UnitOfWork` handles DB transactions.
+## Related files
 
-## How do frontend and backend share validation rules?
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
 
-Zod schemas are generated in the backend (`npm run export:schemas`) and imported into the FSD layers for consistent messaging. Learn more in the Frontend and Experience section.
+## Navigation
 
-## What powers observability?
-
-Structured logging, MongoDB audit trail, RabbitMQ events and domain metrics enable troubleshooting and monitoring hooks. Revisit the Quality and Testing section.
+- [Project guide](?menu=en&lang=en&id=18)
+- [Source reference](?menu=en&lang=en&id=19)

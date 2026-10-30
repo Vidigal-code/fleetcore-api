@@ -1,38 +1,66 @@
 # Data and Domain Modeling
 
-The backend uses TypeORM on SQL Server with a pure DDD layer. Persistence is set up through a single migration (`backend/src/migrations/1717845600000-InitSchema.ts`) that defines tables, constraints and audit metadata (`created_at`, `updated_at`, `created_by`).
+Fleet management for brands, models, vehicles, users, sessions and audit. The frontend browses/manages records according to permissions. SQL Server stores relational domain data, MongoDB stores audit, while Redis/RabbitMQ provide caching, operational controls and messaging.
 
-## Relational schema
+## Data contracts
 
-| Table | Key columns | Relationships |
-|-------|-------------|----------------|
-| `users` | `id`, `nickname`, `email`, `password_hash`, `roles` | Seeded admin (`aivacol` / `aivacol123!`, via `UsersService.ensureAdminSeed`) with `UserRole` set (Admin / Operator); referenced by audit metadata. |
-| `brands` | `id`, `name` | Unique constraint on `name`; optional parent for models. |
-| `models` | `id`, `name`, `brand_id` | Foreign key to `brands` (SET NULL on delete) enabling orphan models. |
-| `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `model_id` | Unique constraints on identifiers; cascade delete keeps referential integrity. |
-| `audit_events` (Mongo) | `eventId`, `eventType`, `correlationId`, `requestId`, `userId`, `sessionId`, `method`, `route`, `statusCode`, `success`, `action`, `entity`, `entityId`, `actor`, `payload`, `metadata`, `occurredAt` + worker fields (`status='processed'`, `retries`, `sourceQueue`, `processedAt`) | Persisted by the async `audit-worker` from the `fleetcore.audit` queue; failed deliveries retry via `fleetcore.retry` and park in `fleetcore.dead-letter`. |
-| `audit_outbox` (Mongo) | `routingKey`, `message`, `status` (`pending`/`processing`/`failed`), `attempts`, `lastError` | Publish-side fallback: when RabbitMQ is down `AuditService` stores events here; `AuditOutboxRelayService` (audit-worker) republishes them once the broker recovers. |
+Authentication, roles, rate limiting, idempotency, locks and cache have dedicated modules. Configure controls through AppConfig/feature toggles; Redis installation alone does not enable everything. Correlate audit/logs by correlationId/requestId when present. The frontend uses OpenAPI contracts/schemas; the backend enforces validation/authorization. Generated types are not the primary source to edit.
 
-`backend/seeds/seed_vehicles.json` contains sample fleet data for local development.
+### brand.orm-entity
 
-## Aggregates and repositories
+[backend/src/modules/fleet/infrastructure/entities/brand.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/brand.orm-entity.ts)
 
-- **Aggregates**: `Brand`, `Model`, `Vehicle`, `User` live in `backend/src/modules/**/domain`. They enforce invariants such as unique brand names, valid license plates and role checks.
-- **Repositories**: TypeORM repositories in `backend/src/modules/fleet/infrastructure/repositories` load/persist aggregates; interfaces reside in `domain/*.repository.ts`.
-- **Unit of Work**: `backend/src/shared/unit-of-work/unit-of-work.ts` wraps TypeORM transactions, ensuring multiple repository operations stay atomic.
-- **Domain events**: Emitted from aggregates (e.g. `VehicleCreatedEvent`, `VehicleUpdatedEvent`) and centralised under `backend/src/modules/fleet/domain/events`.
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `models` | `ModelOrmEntity[]` |
 
-## Validation and schemas
+### model.orm-entity
 
-- **Backend DTOs** use `class-validator` plus shared Zod schemas declared in `backend/src/shared/validation/fleet.schema.ts`.
-- **Schema export**: `npm run export:schemas` generates JSON/Zod artefacts consumed by the frontend (`frontend/src/shared/schemas`).
-- **Business rules**: plate regex, RENAVAM validation, chassis length and year bounds are defined once and reused by both API and UI layers.
+[backend/src/modules/fleet/infrastructure/entities/model.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/model.orm-entity.ts)
 
-## Patterns in practice
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `brand` | `BrandOrmEntity \| null` |
+| `brandId` | `string \| null` |
+| `vehicles` | `VehicleOrmEntity[]` |
 
-1. Controllers accept DTOs and hand them to application services.
-2. Services load aggregates via repositories inside a `UnitOfWork` transaction.
-3. Aggregates mutate state, emit domain events and hand persistence back to repositories.
-4. Domain events fan out to caches, messaging and audit pipelines.
+### vehicle.orm-entity
 
-This structure keeps business rules close to the domain, minimises duplication across layers and allows the frontend to share the same validation rules as the API.
+[backend/src/modules/fleet/infrastructure/entities/vehicle.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/vehicle.orm-entity.ts)
+
+| Field | Type |
+| --- | --- |
+| `licensePlate` | `string` |
+| `chassis` | `string` |
+| `renavam` | `string` |
+| `year` | `number` |
+| `model` | `ModelOrmEntity` |
+| `modelId` | `string` |
+
+### user.orm-entity
+
+[backend/src/modules/users/infrastructure/entities/user.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/users/infrastructure/entities/user.orm-entity.ts)
+
+| Field | Type |
+| --- | --- |
+| `nickname` | `string` |
+| `name` | `string` |
+| `email` | `string` |
+| `passwordHash` | `string` |
+| `roles` | `UserRole[]` |
+
+## Related files
+
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
+
+## Navigation
+
+- [Project guide](?menu=en&lang=en&id=18)
+- [Source reference](?menu=en&lang=en&id=19)

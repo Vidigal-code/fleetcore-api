@@ -1,27 +1,33 @@
-# Arquitetura da Solução
+# Arquitetura
 
-Este panorama reforça como o backend, o domínio e os serviços de suporte se conectam.
+Gestão de frota com marcas, modelos, veículos, usuários, sessão e auditoria. O frontend permite consultar e administrar os registros conforme permissões. SQL Server mantém o domínio relacional; MongoDB mantém auditoria; Redis e RabbitMQ atendem cache, controles operacionais e mensageria.
 
-## Backend NestJS
+## Comportamento implementado
 
-- Modularização em `auth`, `fleet`, `users`, `audit` e `messaging`.
-- Guardas globais (`JwtAuthGuard`, `RolesGuard`, `RateLimitGuard`) e `AuthSessionService` com Redis (TTL deslizante + lock).
-- Eventos de domínio propagados por `FleetDomainEventListener` para RabbitMQ.
+NestJS 11, TypeScript 5.7, TypeORM 0.3, Mongoose 8, Redis, RabbitMQ e Cockatiel no backend; Next.js 16.2.7/React 19.2.4, TanStack Query 5, Redux Toolkit e Zod no frontend. Módulos de domínio separam application, domain, infrastructure e interfaces. Existem entradas distintas para API e audit-worker. A arquitetura usa portas/repositórios, UnitOfWork e eventos de domínio; os adaptadores e feature toggles determinam o comportamento efetivo.
 
-Saiba mais na seção Arquitetura Backend do menu.
+```mermaid
+flowchart LR
+  UI[Next.js] --> API[NestJS API]
+  API --> SQL[SQL Server]
+  API --> Cache[Redis]
+  API --> Broker[RabbitMQ]
+  Broker --> Worker[Audit worker]
+  Worker --> Mongo[MongoDB]
+  API --> Outbox[Mongo audit outbox on failure]
+  Outbox --> Worker
+```
 
-## Modelagem e persistência
+## Arquivos relacionados
 
-- Entidades do TypeORM com migração única (`1717845600000-InitSchema.ts`).
-- Agregados que preservam invariantes e utilizam `UnitOfWork` para transações.
-- Seeds (`UsersService.ensureAdminSeed`) e dataset inicial de veículos.
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
 
-Veja detalhes na seção Modelagem de Dados e Domínio.
+## Navegação
 
-## Observabilidade
-
-- Interceptor de auditoria (rotas não-públicas) com evento enriquecido, consumido pelo `audit-worker` e escrito em MongoDB.
-- Métricas de domínio para monitoramento.
-- Resiliência configurável via `ResilienceService` (retry/fallback/rollback) e feature toggles.
-
-Consulte a seção Segurança, Auditoria e Mensageria para o fluxo completo.
+- [Project guide](?menu=pt&lang=pt&id=18)
+- [Source reference](?menu=pt&lang=pt&id=19)

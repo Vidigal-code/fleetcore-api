@@ -1,56 +1,59 @@
 # Introdução ao Desafio
 
-O desafio de gestão de frotas da Aivacol solicita uma plataforma pronta para produção que una backend, frontend, integrações assíncronas e documentação. O repositório `fleetcore-api` entrega:
+Gestão de frota com marcas, modelos, veículos, usuários, sessão e auditoria. O frontend permite consultar e administrar os registros conforme permissões. SQL Server mantém o domínio relacional; MongoDB mantém auditoria; Redis e RabbitMQ atendem cache, controles operacionais e mensageria.
 
-- **Backend**: NestJS 11, TypeORM (SQL Server), cache Redis (com sessões de TTL deslizante, lock distribuído, idempotência e rate limit), mensageria RabbitMQ e trilha de auditoria enriquecida em MongoDB.
-- **Frontend**: Next.js 16 (App Router) com React 19, estruturado com o padrão Feature-Sliced Design, Redux Toolkit e React Query.
-- **Infraestrutura**: Docker Compose para todos os serviços, seeds iniciais, scripts npm e um único `.env` na raiz.
-- **Qualidade & Operações**: testes automatizados, políticas de resiliência, Swagger PT/EN (tema escuro, exemplos bilíngues, Try-it-out) e GitPagedocs bilíngue.
+## Comportamento implementado
 
-## Entregáveis em destaque
+NestJS 11, TypeScript 5.7, TypeORM 0.3, Mongoose 8, Redis, RabbitMQ e Cockatiel no backend; Next.js 16.2.7/React 19.2.4, TanStack Query 5, Redux Toolkit e Zod no frontend. Módulos de domínio separam application, domain, infrastructure e interfaces. Existem entradas distintas para API e audit-worker. A arquitetura usa portas/repositórios, UnitOfWork e eventos de domínio; os adaptadores e feature toggles determinam o comportamento efetivo.
 
-| Entregável | Descrição | Código-fonte |
-|------------|-----------|--------------|
-| REST API | CRUD de marcas, modelos e veículos, gestão de sessões, worker de auditoria | `backend/src/modules`, `backend/src/apps` |
-| Mensageria & auditoria | Publicação/consumo RabbitMQ, writer MongoDB, wrappers de resiliência | `backend/src/modules/messaging`, `backend/src/modules/audit` |
-| Web client | Layout FSD, shell autenticado, dashboards da frota, schemas compartilhados | `frontend/src/app`, `frontend/src/{entities,features,processes,widgets,shared}` |
-| Documentação & tooling | Site GitPagedocs (publicado no GitHub Pages pelo workflow `gitpagedocs-pages.yml`), builders Swagger, exportação de schemas | `gitpagedocs/`, scripts em `backend/package.json` |
-| Infraestrutura | Compose stack, variáveis de ambiente, dataset seed | `docker-compose.yml`, `envexample.txt`, `backend/src/apps/api/app-bootstrap.service.ts`, `backend/seeds` |
-
-## Estrutura do repositório (recorte)
-
-```text
-backend/
-  src/
-    apps/
-      api/                # Bootstrap HTTP, guards, Swagger
-      audit-worker/       # Worker assíncrono que consome fleetcore.audit e grava no MongoDB
-    modules/
-      auth/
-      fleet/
-      audit/
-      messaging/
-      users/
-    shared/               # Configuração, cache, unit of work, resiliência, validação
-frontend/
-  src/
-    app/
-    entities/, features/, widgets/, processes/, shared/
-gitpagedocs/
+```mermaid
+flowchart LR
+  UI[Next.js] --> API[NestJS API]
+  API --> SQL[SQL Server]
+  API --> Cache[Redis]
+  API --> Broker[RabbitMQ]
+  Broker --> Worker[Audit worker]
+  Worker --> Mongo[MongoDB]
+  API --> Outbox[Mongo audit outbox on failure]
+  Outbox --> Worker
 ```
 
-## Como navegar
+## Fluxo e casos de falha
 
-Os capítulos seguem a mesma ordem do menu superior. Cada seção resume a capacidade e indica os arquivos relevantes no repositório.
+1. /api/auth/register cria usuário; /api/auth/login valida credenciais e emite JWT com contexto de sessão. /api/auth/me consulta perfil; update/profile e update/password modificam dados; logout invalida sessionId. O JWT não é a única fonte de validade: a sessão também é verificada. Endpoints e decorators de permissão estão na referência do código.
 
-1. **Introdução ao Desafio** – contexto, entregáveis e layout geral (esta página).
-2. **Requisitos e Critérios** – rastreabilidade entre checklist e código.
-3. **Arquitetura Backend** – limites de módulos, fluxos e serviços de apoio.
-4. **Modelagem de Dados e Domínio** – agregados, migrations e contratos de repositório.
-5. **Segurança, Auditoria e Mensageria** – autenticação, trilha e RabbitMQ.
-6. **Frontend e Experiência** – slices FSD, gestão de estado e temas.
-7. **Infraestrutura e Deployment** – imagens Docker, variáveis de ambiente e scripts.
-8. **Qualidade e Testes** – suites automatizadas, lint e resiliência.
-9. **Guia de Execução e Troubleshooting** – comandos e orientações operacionais.
+2. Marca → modelo vinculado → veículo. VehiclesService valida existência do modelo e unicidade antes de persistir; normaliza placa para maiúsculas. O agregado registra placa, chassi, renavam, ano, modelId e autoria/datas. Busca filtra placa/modelo/marca com paginação (padrão página 1, limite 20). Regras detalhadas de formato estão nos DTOs/value objects, não apenas na entidade.
 
-Use o menu superior ou os botões “Próximo/Anterior” para acessar rapidamente o tópico desejado.
+3. Leitura usa RepositoryCacheService quando repositoryCache está ativo; gravação usa UnitOfWork e invalida caches de lista/detalhe. Depois registra auditoria e publica eventos de domínio. O commit SQL e o envio a sistemas externos são etapas distintas: não descreva o fluxo como uma transação única envolvendo SQL, Mongo e broker.
+
+4. AuditService publica no broker quando auditAsyncWorker está ativo. Se a publicação falha, enfileira outbox no Mongo; se isso também falha, tenta persistência direta. Com o toggle desligado, persiste diretamente. O relay roda somente no audit-worker, recupera entradas PROCESSING abandonadas e republica pendências em lotes com limite de tentativas. Monitore estados terminais e logs; fallback não elimina a possibilidade de falha de todas as dependências.
+
+## Configuração e implantação
+
+Copie envexample.txt para .env; Compose sobe SQL Server/inicializador, Redis, Mongo, RabbitMQ, API, audit-worker e frontend. Suba ambos os processos backend para o fluxo assíncrono. Use scripts generate:openapi/export:schemas/generate:client com API disponível; generate:client referencia docs-json em localhost:3000. Rode backend test/test:e2e/build e frontend test/test:e2e/lint/build conforme dependências do harness. Para lista antiga, confira invalidação/toggle; auditoria ausente, worker/broker/outbox/Mongo; 401 após login, sessão/Redis/segredo. Terraform em infra descreve infraestrutura; a atualização documental não aplica recursos cloud.
+
+## Comandos de execução
+
+```sh
+docker compose up --build
+# Validation in a separately configured test environment
+npm --prefix backend ci
+npm --prefix backend run test
+npm --prefix backend run build
+npm --prefix frontend ci
+npm --prefix frontend run build
+```
+
+## Arquivos relacionados
+
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
+
+## Navegação
+
+- [Project guide](?menu=pt&lang=pt&id=18)
+- [Source reference](?menu=pt&lang=pt&id=19)

@@ -1,54 +1,66 @@
 # Modelado de Datos y Dominio
 
-El sistema se apoya en **TypeORM** con SQL Server. Una única migración (`backend/src/migrations/1717845600000-InitSchema.ts`) provisiona todas las tablas necesarias y las columnas de metadata (`created_at`, `updated_at`, `created_by`).
+Gestión de flota con marcas, modelos, vehículos, usuarios, sesión y auditoría. El frontend consulta/administra según permisos. SQL Server conserva dominio relacional, MongoDB auditoría y Redis/RabbitMQ caché, controles operativos y mensajería.
 
-## Tablas de la base de datos
+## Contratos de datos
 
-| Tabla | Columnas clave | Notas |
-|-------|----------------|-------|
-| `users` | `id`, `nickname`, `name`, `email`, `password_hash`, `roles`, metadata | Seed del admin `aivacol`; roles almacenados como CSV. |
-| `brands` | `id`, `name`, metadata | Restricción de unicidad en `name`. |
-| `models` | `id`, `name`, `brand_id`, metadata | `brand_id` opcional; FK usa `SET NULL`. |
-| `vehicles` | `id`, `license_plate`, `chassis`, `renavam`, `year`, `model_id`, metadata | Unicidad en placa/chasis/renavam; FK elimina en cascada para mantener la integridad referencial. |
+Autenticación, roles, rate limiting, idempotencia, locks y caché tienen módulos propios. Configure controles mediante AppConfig/toggles; instalar Redis no activa todo. Correlacione logs/auditoría por correlationId/requestId cuando existan. Frontend usa OpenAPI/schemas; backend valida y autoriza. Los tipos generados no son fuente principal editable.
 
-## Colección de auditoría (MongoDB)
+### brand.orm-entity
 
-La traza de auditoría no vive en SQL Server: se persiste en la colección `audit_events` de MongoDB (`backend/src/modules/audit/schemas/audit-event.schema.ts`). El documento lo escribe el worker de auditoría con los campos enriquecidos del evento más metadatos de procesamiento:
+[backend/src/modules/fleet/infrastructure/entities/brand.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/brand.orm-entity.ts)
 
-| Grupo | Campos |
-|-------|--------|
-| Identidad del evento | `eventId`, `eventType`, `correlationId`, `requestId` |
-| Actor/sesión | `actor`, `userId`, `sessionId` |
-| Petición | `method`, `route`, `action`, `statusCode`, `success` |
-| Entidad | `entity`, `entityId`, `payload`, `metadata`, `occurredAt` |
-| Procesamiento | `status` (`processed`), `retries`, `sourceQueue`, `processedAt` |
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `models` | `ModelOrmEntity[]` |
 
-Los campos enriquecidos son opcionales (compatibles con documentos previos) y la escritura usa `ResilienceService` (retry/circuit breaker).
+### model.orm-entity
 
-Existe además una segunda colección, `audit_outbox` (`backend/src/modules/audit/schemas/audit-outbox.schema.ts`), usada como **outbox transaccional**: cuando la publicación a RabbitMQ falla (broker caído), el evento se guarda allí con `routingKey`, `message`, `status` (`pending`/`processing`/`failed`), `attempts` y `lastError`. El `AuditOutboxRelayService` (en el `audit-worker`) republica esas entradas a RabbitMQ cuando el broker se recupera, y el flujo normal (consumidor → `audit_events`) continúa desde ahí.
+[backend/src/modules/fleet/infrastructure/entities/model.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/model.orm-entity.ts)
 
-## Capa de dominio
+| Field | Type |
+| --- | --- |
+| `name` | `string` |
+| `brand` | `BrandOrmEntity \| null` |
+| `brandId` | `string \| null` |
+| `vehicles` | `VehicleOrmEntity[]` |
 
-- Los agregados (`User`, `Brand`, `Model`, `Vehicle`) encapsulan invariantes y exponen métodos de mutación con transiciones de estado controladas.
-- Los eventos de dominio (`VehicleCreatedEvent`, etc.) transportan snapshots para mensajería y auditoría.
+### vehicle.orm-entity
 
-## Pipeline de validación
+[backend/src/modules/fleet/infrastructure/entities/vehicle.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/infrastructure/entities/vehicle.orm-entity.ts)
 
-- Los DTO se apoyan en `class-validator` y en esquemas Zod generados desde el backend y consumidos por el frontend (`backend/scripts/export-schemas.ts`).
-- Reglas críticas (regex de placa Mercosur, longitud del chasis, estructura RENAVAM) se definen una sola vez en `backend/src/shared/validation/fleet.schema.ts`.
+| Field | Type |
+| --- | --- |
+| `licensePlate` | `string` |
+| `chassis` | `string` |
+| `renavam` | `string` |
+| `year` | `number` |
+| `model` | `ModelOrmEntity` |
+| `modelId` | `string` |
 
-## Repositorios y Unit of Work
+### user.orm-entity
 
-- Repositorios personalizados (`VehicleTypeOrmRepository`, `ModelTypeOrmRepository`, ...) traducen agregados a filas persistentes.
-- `UnitOfWork` envuelve `EntityManager.transaction()` para que las operaciones complejas (crear/actualizar/eliminar) permanezcan atómicas.
+[backend/src/modules/users/infrastructure/entities/user.orm-entity.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/users/infrastructure/entities/user.orm-entity.ts)
 
-## Seeds y datos de ejemplo
+| Field | Type |
+| --- | --- |
+| `nickname` | `string` |
+| `name` | `string` |
+| `email` | `string` |
+| `passwordHash` | `string` |
+| `roles` | `UserRole[]` |
 
-- `UsersService.ensureAdminSeed()` provisiona al administrador durante el bootstrap.
-- `backend/seeds/seed_vehicles.json` entrega el dataset de ejemplo solicitado por el desafío.
+## Archivos relacionados
 
-## Cumplimiento
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
 
-- Las tablas requeridas (`models`, `vehicles`) más las tablas bonus (`brands`, `users`) están presentes.
-- Las reglas de integridad garantizan datos consistentes y reducen duplicidad.
-- Los objetos de dominio mantienen las reglas de negocio cerca del núcleo, facilitando pruebas y evoluciones futuras.
+## Navegación
+
+- [Project guide](?menu=es&lang=es&id=18)
+- [Source reference](?menu=es&lang=es&id=19)

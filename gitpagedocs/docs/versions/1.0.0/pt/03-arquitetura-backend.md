@@ -1,49 +1,61 @@
 # Arquitetura Backend
 
-O backend foi construído em **NestJS 11** com foco em modularidade, extraindo regras de domínio para serviços e agregados. O projeto segue a estrutura `apps/`, `modules/` e `shared/`, mantendo responsabilidades claras e facilitando testes isolados.
+Gestão de frota com marcas, modelos, veículos, usuários, sessão e auditoria. O frontend permite consultar e administrar os registros conforme permissões. SQL Server mantém o domínio relacional; MongoDB mantém auditoria; Redis e RabbitMQ atendem cache, controles operacionais e mensageria.
 
-## Organização por módulos
+## Fluxo e casos de falha
 
-- `apps/api` — aplicação HTTP principal, registra guards globais (`JwtAuthGuard`, `RolesGuard`, `ThrottlerGuard`, `RateLimitGuard`) e interceptores de auditoria e idempotência.
-- `modules/auth` — autenticação, emissão/validação JWT, `AuthSessionService` (Redis) e controladores `login/me/logout/register`.
-- `modules/fleet` — contexto de frota com serviços para **brands**, **models** e **vehicles**, eventos de domínio e listeners RabbitMQ.
-- `modules/audit` — interceptores, serviço de auditoria e writer MongoDB; o `AuditInterceptor` audita toda rota não-pública com evento enriquecido (`eventId`, `correlationId`, `sessionId`, `route`, `statusCode`, etc.) e o `audit-worker` (`apps/audit-worker`) consome `fleetcore.audit`.
-- `modules/messaging` — integração com RabbitMQ via `@golevelup/nestjs-rabbitmq` e consumer de eventos.
-- `modules/users` — seed `aivacol`, criação e busca de usuários, repositórios TypeORM.
-- `apps/api/security` — guards de borda: `RateLimitGuard`/`RateLimitService` (rate limit Redis dedicado, global) e `IdempotencyInterceptor`.
-- `shared` — cross-cutting concerns: cache Redis (`RepositoryCacheService`), lock distribuído (`RedisLockService`), idempotência (`IdempotencyService`), feature toggles, unit of work, métricas, resiliência e configurações.
+1. /api/auth/register cria usuário; /api/auth/login valida credenciais e emite JWT com contexto de sessão. /api/auth/me consulta perfil; update/profile e update/password modificam dados; logout invalida sessionId. O JWT não é a única fonte de validade: a sessão também é verificada. Endpoints e decorators de permissão estão na referência do código.
 
-## Camadas e padrões
+2. Marca → modelo vinculado → veículo. VehiclesService valida existência do modelo e unicidade antes de persistir; normaliza placa para maiúsculas. O agregado registra placa, chassi, renavam, ano, modelId e autoria/datas. Busca filtra placa/modelo/marca com paginação (padrão página 1, limite 20). Regras detalhadas de formato estão nos DTOs/value objects, não apenas na entidade.
 
-1. **Interface (Controllers/DTOs)** — expõem rotas REST com validação (`class-validator` + objetos Zod compartilhados). Exemplos: `vehicles.controller.ts`, `models.controller.ts`.
-2. **Aplicação (Services)** — concentra regras de uso do domínio, transações (`UnitOfWork`), disparo de eventos e auditoria. Exemplos: `vehicles.service.ts`, `models.service.ts`.
-3. **Domínio (Aggregates/Eventos)** — classes imutáveis (`Vehicle`, `Model`, `Brand`) e eventos (`VehicleCreatedEvent`, etc.) garantem consistência.
-4. **Infraestrutura (Repositórios/Adapters)** — repositórios TypeORM (`VehicleTypeOrmRepository`) e integrações (Redis, RabbitMQ, MongoDB).
+3. Leitura usa RepositoryCacheService quando repositoryCache está ativo; gravação usa UnitOfWork e invalida caches de lista/detalhe. Depois registra auditoria e publica eventos de domínio. O commit SQL e o envio a sistemas externos são etapas distintas: não descreva o fluxo como uma transação única envolvendo SQL, Mongo e broker.
 
-## Resiliência e observabilidade
+4. AuditService publica no broker quando auditAsyncWorker está ativo. Se a publicação falha, enfileira outbox no Mongo; se isso também falha, tenta persistência direta. Com o toggle desligado, persiste diretamente. O relay roda somente no audit-worker, recupera entradas PROCESSING abandonadas e republica pendências em lotes com limite de tentativas. Monitore estados terminais e logs; fallback não elimina a possibilidade de falha de todas as dependências.
 
-- **Resilience Service** (`shared/resilience`): encapsula políticas de retry, circuit breaker e timeout para chamadas externas (RabbitMQ/Audit), além de `executeWithRetry`, `executeWithFallback` (erro controlado → fallback) e `executeWithRollback` (compensações na ordem inversa). O rollback transacional do banco permanece no `UnitOfWork`.
-- **Proteções Redis** (`shared/cache`): `RepositoryCacheService` (cache de leitura), `RedisLockService` (lock distribuído `SET NX EX` + Lua compare-and-del/pexpire) e `IdempotencyService` (header `Idempotency-Key`, 409 em duplicidade) protegem o banco em operações críticas.
-- **Feature toggles** (`shared/features`): permitem habilitar/desabilitar cache, eventos e processamento assíncrono via env (`FEATURE_FLAGS`).
-- **Domain Metrics** (`shared/metrics`): incrementa contadores por evento publicado.
+| Método e caminho | Declaração |
+| --- | --- |
+| `DELETE /api/brands/:id` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `DELETE /api/models/:id` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `DELETE /api/vehicles/:id` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
+| `GET /api/auth/me` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `GET /api/brands/:id` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `GET /api/brands` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `GET /api/models/:id` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `GET /api/models` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `GET /api/vehicles/:id` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
+| `GET /api/vehicles` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
+| `PATCH /api/brands/:id` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `PATCH /api/models/:id` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `PATCH /api/vehicles/:id` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
+| `POST /api/auth/login` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/auth/logout` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/auth/register` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/auth/update/password` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/auth/update/profile` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/brands` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `POST /api/models` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `POST /api/vehicles` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
 
-## Fluxo de requisição
+## Exemplo de requisição
 
-1. Requisição HTTP passa pelo `SanitizeInputPipe`, pelo `RateLimitGuard` (Redis) e pelos guards (JWT + Roles + Throttler). A `JwtStrategy` valida a sessão Redis, renova seu TTL (sliding) e recusa sessões bloqueadas (401). Mutações com `Idempotency-Key` passam pelo `IdempotencyInterceptor` (409 em duplicidade).
-2. Controlador injeta serviço que aplica validações de negócio, utilizando `UnitOfWork` para commits transacionais (e `RedisLockService` para serializar operações concorrentes quando necessário).
-3. Após persistência, o serviço registra auditoria, invalida cache Redis e publica eventos de domínio.
-4. `FleetDomainEventListener` trata os eventos e encaminha payloads para RabbitMQ (mensageria) quando o toggle estiver ativo.
+```http
+POST /api/vehicles HTTP/1.1
+Authorization: Bearer <access-token>
+Content-Type: application/json
 
-## Configuração centralizada
+{"licensePlate":"ABC1D23","chassis":"9BWZZZ377VT004251","renavam":"12345678901","year":2024,"modelId":"00000000-0000-4000-8000-000000000001"}
+```
 
-Config files em `shared/config` garantem tipagem e fallback padrão:
+## Arquivos relacionados
 
-- `app.config.ts`, `database.config.ts`, `redis.config.ts`, `jwt.config.ts`, `audit.config.ts`, `messaging.config.ts`, `swagger.config.ts`, `auth.config.ts`.
-- `AppConfigService` resolve valores com validação (`env.validation.ts`) e fornece acesso sem espalhar chamadas ao `ConfigService`.
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
 
-## Porque essa arquitetura atende o desafio
+## Navegação
 
-- Permite **escala horizontal** (stateless + cache Redis + RabbitMQ).
-- Mantém **isolamento de domínios** (módulo `fleet` não conhece detalhes de auth, auditoria ou mensageria).
-- Facilita **testes unitários** (serviços recebem repositórios/colaboradores via DI) e **integrações** (e2e usa SQLite em memória).
-- Deixa o código pronto para **novos contextos** (ex.: manutenção de motoristas) apenas adicionando módulos.
+- [Project guide](?menu=pt&lang=pt&id=18)
+- [Source reference](?menu=pt&lang=pt&id=19)

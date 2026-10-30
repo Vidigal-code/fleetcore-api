@@ -1,47 +1,61 @@
 # Arquitectura Backend
 
-El backend se basa en **NestJS 11** con un diseño modular orientado al dominio. Se mantienen límites claros de responsabilidad, lo que hace que el código sea mantenible y altamente testeable.
+Gestión de flota con marcas, modelos, vehículos, usuarios, sesión y auditoría. El frontend consulta/administra según permisos. SQL Server conserva dominio relacional, MongoDB auditoría y Redis/RabbitMQ caché, controles operativos y mensajería.
 
-## Panorama de módulos
+## Flujo y casos de fallo
 
-- `apps/api` — bootstrap HTTP; registra guards globales (`JwtAuthGuard`, `RolesGuard`, `ThrottlerGuard`, `RateLimitGuard`) y los interceptores de auditoría e idempotencia. La seguridad dedicada vive en `apps/api/security/` (`RateLimitService`, `RateLimitGuard`, decorador `@AuthRateLimit()`).
-- `apps/audit-worker` — proceso consumidor independiente que lee la cola `fleetcore.audit` y persiste la auditoría en MongoDB; su concurrencia (`prefetchCount`) se rige por `WORKER_CONCURRENCY`.
-- `modules/auth` — autenticación, emisión/validación de JWT, `AuthSessionService` (Redis, con TTL deslizante vía `refresh` y bloqueo vía `lock`/`unlock`/`isLocked`) y endpoints HTTP (`login`, `register`, `logout`, `me`).
-- `modules/fleet` — dominio de flota (marcas, modelos, vehículos) con servicios, agregados y eventos de dominio.
-- `modules/audit` — interceptores, servicio de auditoría y escritor en MongoDB (`AuditWriterService`); eventos enriquecidos con `correlationId`/`requestId`/`sessionId`/`statusCode`.
-- `modules/messaging` — integración con RabbitMQ vía `@golevelup/nestjs-rabbitmq` y el consumidor de eventos de vehículos.
-- `modules/users` — seed del admin (`aivacol`) y operaciones del repositorio de usuarios.
-- `shared` — preocupaciones transversales: caché (`RepositoryCacheService`), lock distribuido (`RedisLockService` en `shared/cache`), idempotencia (`IdempotencyService`), feature toggles, unit of work, métricas, resiliencia (`ResilienceService`) y objetos de configuración.
+1. /api/auth/register crea usuarios; /api/auth/login valida credenciales y emite JWT con sesión. /api/auth/me consulta perfil; update/profile y update/password modifican; logout invalida sessionId. La firma JWT no es la única comprobación: también se verifica sesión. La referencia enlaza rutas y permisos.
 
-## Enfoque por capas
+2. Marca → modelo asociado → vehículo. VehiclesService verifica modelo y unicidad, normalizando matrícula a mayúsculas. El agregado guarda matrícula, chasis, renavam, año, modelId, autor y fechas. Busca filtra matrícula/modelo/marca y pagina (1, límite 20 por defecto). DTOs/value objects contienen validaciones de formato.
 
-1. **Interfaz**: controllers + DTOs (por ejemplo, `vehicles.controller.ts`) validan peticiones con `class-validator` y esquemas derivados de Zod.
-2. **Aplicación**: servicios (por ejemplo, `vehicles.service.ts`) orquestan reglas, transacciones (`UnitOfWork`), auditoría y eventos de dominio.
-3. **Dominio**: agregados (`Vehicle`, `Model`, `Brand`) garantizan invariantes, mientras que los eventos (`VehicleCreatedEvent`) capturan snapshots.
-4. **Infraestructura**: repositorios TypeORM convierten agregados en entidades persistentes; los adaptadores encapsulan Redis/Mongo/RabbitMQ.
+3. Lecturas usan RepositoryCacheService con repositoryCache activo; escrituras usan UnitOfWork e invalidan cachés de lista/detalle. Después auditan y publican eventos. Commit SQL y entrega externa son etapas distintas, no una transacción conjunta SQL/Mongo/broker.
 
-## Resiliencia y feature flags
+4. AuditService publica al broker con auditAsyncWorker activo. Si falla usa outbox Mongo; si también falla intenta escritura directa. Con toggle desactivado escribe directamente. El relay solo ejecuta en audit-worker, recupera PROCESSING abandonadas y republica lotes con límite de intentos. Vigile estados terminales/logs; fallback no evita la caída de todas las dependencias.
 
-- `ResilienceService` ofrece políticas de reintento, circuit breaker y timeout para llamadas externas (mensajería/auditoría), más los helpers `executeWithRetry`, `executeWithFallback` (ruta alternativa ante error controlado) y `executeWithRollback` (compensaciones en orden inverso ante fallo). `UnitOfWork` permanece como rollback transaccional de la base.
-- `FeatureToggleService` lee banderas (`auditAsyncWorker`, `domainEvents`, `repositoryCache`, `swaggerDocs`) para habilitar comportamientos por ambiente.
-- `DomainMetricsService` incrementa contadores por evento publicado.
+| Método y ruta | Declaración |
+| --- | --- |
+| `DELETE /api/brands/:id` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `DELETE /api/models/:id` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `DELETE /api/vehicles/:id` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
+| `GET /api/auth/me` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `GET /api/brands/:id` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `GET /api/brands` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `GET /api/models/:id` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `GET /api/models` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `GET /api/vehicles/:id` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
+| `GET /api/vehicles` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
+| `PATCH /api/brands/:id` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `PATCH /api/models/:id` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `PATCH /api/vehicles/:id` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
+| `POST /api/auth/login` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/auth/logout` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/auth/register` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/auth/update/password` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/auth/update/profile` | [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts) |
+| `POST /api/brands` | [backend/src/modules/fleet/interfaces/http/brands.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/brands.controller.ts) |
+| `POST /api/models` | [backend/src/modules/fleet/interfaces/http/models.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/models.controller.ts) |
+| `POST /api/vehicles` | [backend/src/modules/fleet/interfaces/http/vehicles.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/interfaces/http/vehicles.controller.ts) |
 
-> Todos estos servicios son **aditivos**: la estructura modular y el flujo de petición existentes se preservaron; las protecciones (sesiones deslizantes, lock, idempotencia, rate limit, auditoría enriquecida) se sumaron sin alterar la arquitectura previa.
+## Ejemplo de petición
 
-## Flujo de una petición
+```http
+POST /api/vehicles HTTP/1.1
+Authorization: Bearer <access-token>
+Content-Type: application/json
 
-1. La petición ingresa al pipeline → `SanitizeInputPipe` la limpia → los guards autentican/autorizan.
-2. El controller delega al servicio correspondiente; `UnitOfWork` ejecuta la lógica transaccional.
-3. El servicio persiste agregados, registra eventos de auditoría, invalida la caché Redis y levanta eventos de dominio.
-4. `FleetDomainEventListener` reacciona a los eventos, incrementa métricas y reenvía payloads a RabbitMQ cuando está habilitado.
+{"licensePlate":"ABC1D23","chassis":"9BWZZZ377VT004251","renavam":"12345678901","year":2024,"modelId":"00000000-0000-4000-8000-000000000001"}
+```
 
-## Configuración
+## Archivos relacionados
 
-Archivos tipados en `shared/config` (`app`, `database`, `redis`, `jwt`, `auth`, `audit`, `messaging`, `swagger`, `feature-toggle`, `resilience`) consolidan variables de entorno. `AppConfigService` expone getters con valores seguros validados por `env.validation.ts`.
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
 
-## Por qué satisface el desafío
+## Navegación
 
-- Escala horizontalmente (API sin estado + Redis + RabbitMQ).
-- Mantiene la lógica de dominio aislada de los detalles de infraestructura.
-- Permite pruebas granulares (servicios inyectados vía DI; unit + integración de búsqueda/orden de vehículos + e2e que cubre flujos HTTP reales).
-- Añade ganchos de resiliencia para servicios externos poco confiables.
+- [Project guide](?menu=es&lang=es&id=18)
+- [Source reference](?menu=es&lang=es&id=19)

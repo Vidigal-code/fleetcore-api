@@ -1,23 +1,27 @@
-# Preguntas Conceptuales
+# Preguntas
 
-Respuestas breves a dudas frecuentes durante la revisión técnica.
+Gestión de flota con marcas, modelos, vehículos, usuarios, sesión y auditoría. El frontend consulta/administra según permisos. SQL Server conserva dominio relacional, MongoDB auditoría y Redis/RabbitMQ caché, controles operativos y mensajería.
 
-## ¿Por qué usar DDD y módulos aislados?
+## Flujo y casos de fallo
 
-Mantiene contextos delimitados, facilita pruebas y permite escalar capacidades (flota, auth, auditoría, mensajería) sin efectos colaterales. Consulta la sección Arquitectura Backend para más detalles.
+1. /api/auth/register crea usuarios; /api/auth/login valida credenciales y emite JWT con sesión. /api/auth/me consulta perfil; update/profile y update/password modifican; logout invalida sessionId. La firma JWT no es la única comprobación: también se verifica sesión. La referencia enlaza rutas y permisos.
 
-## ¿Cómo se revocan sesiones sin invalidar todos los tokens?
+2. Marca → modelo asociado → vehículo. VehiclesService verifica modelo y unicidad, normalizando matrícula a mayúsculas. El agregado guarda matrícula, chasis, renavam, año, modelId, autor y fechas. Busca filtra matrícula/modelo/marca y pagina (1, límite 20 por defecto). DTOs/value objects contienen validaciones de formato.
 
-`AuthSessionService` guarda identificadores de sesión en Redis con TTL y los elimina al hacer logout, de modo que los guards rechazan tokens caducados. El TTL es **deslizante** (`refresh` en cada petición válida) y una sesión puede **bloquearse** (`lock`/`unlock`/`isLocked`), devolviendo 401 mientras esté bloqueada. Más detalles en la sección Seguridad, Auditoría y Mensajería.
+3. Lecturas usan RepositoryCacheService con repositoryCache activo; escrituras usan UnitOfWork e invalidan cachés de lista/detalle. Después auditan y publican eventos. Commit SQL y entrega externa son etapas distintas, no una transacción conjunta SQL/Mongo/broker.
 
-## ¿Cómo se protege la base de datos ante duplicados, carreras y abuso?
+4. AuditService publica al broker con auditAsyncWorker activo. Si falla usa outbox Mongo; si también falla intenta escritura directa. Con toggle desactivado escribe directamente. El relay solo ejecuta en audit-worker, recupera PROCESSING abandonadas y republica lotes con límite de intentos. Vigile estados terminales/logs; fallback no evita la caída de todas las dependencias.
 
-Con una capa Redis aditiva: idempotencia (`IdempotencyService` + header `Idempotency-Key`, 409 ante duplicados), lock distribuido (`RedisLockService` con `SET NX` y liberación validada por token), caché de lectura y un rate limit dedicado (`RateLimitGuard`, 429 por usuario/IP/endpoint). La estructura y el flujo previos se mantuvieron.
+## Archivos relacionados
 
-## ¿Cómo comparten validaciones el frontend y el backend?
+- [backend/src/modules/fleet/application/vehicles.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/fleet/application/vehicles.service.ts)
+- [backend/src/modules/auth/interfaces/http/auth.controller.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/auth/interfaces/http/auth.controller.ts)
+- [backend/src/modules/audit/audit.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/audit.service.ts)
+- [backend/src/modules/audit/relays/audit-outbox-relay.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/modules/audit/relays/audit-outbox-relay.service.ts)
+- [backend/src/shared/features/feature-toggle.service.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/backend/src/shared/features/feature-toggle.service.ts)
+- [docker-compose.yml](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/docker-compose.yml)
 
-Los esquemas Zod se generan en el backend (`npm run export:schemas`) y se importan en el FSD para mensajes consistentes. Revisa la sección Frontend y Experiencia.
+## Navegación
 
-## ¿Qué habilita la observabilidad?
-
-Logging estructurado, auditoría enriquecida en MongoDB (con `correlationId`, `requestId`, `sessionId`, `statusCode` y metadatos del worker), eventos RabbitMQ y métricas de dominio permiten investigar incidentes y crear alertas. El worker `audit-worker` consume `fleetcore.audit` de forma asíncrona. Amplía en la sección Calidad y Pruebas.
+- [Project guide](?menu=es&lang=es&id=18)
+- [Source reference](?menu=es&lang=es&id=19)
