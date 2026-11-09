@@ -2,7 +2,7 @@
 
 Inventario extraído de manifests y declaraciones del código. Las versiones con `^` o `~` son rangos declarados; el lockfile determina la versión resuelta.
 
-Commit: `a0b587d48f6701f76facddd40828cd47c0c6fbb2`. GitPageDocs: `0.0.17`.
+Commit: `a0b587d48f6701f76facddd40828cd47c0c6fbb2`. GitPageDocs: `0.0.23`.
 
 ## Dependencias y herramientas
 
@@ -346,3 +346,19 @@ Los nombres proceden solo de archivos de ejemplo y referencias del código. Conf
 - [frontend/tests/unit/auth-slice.spec.ts](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/tests/unit/auth-slice.spec.ts)
 - [frontend/tests/unit/confirm-dialog.spec.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/tests/unit/confirm-dialog.spec.tsx)
 - [frontend/tests/unit/select-field.spec.tsx](https://github.com/Vidigal-code/fleetcore-api/blob/a0b587d48f6701f76facddd40828cd47c0c6fbb2/frontend/tests/unit/select-field.spec.tsx)
+
+## Mantenimiento de la documentación y MCP local
+
+El contenido funcional anterior describe este proyecto. La configuración del visor corresponde a GitPageDocs **0.0.23**; no cambia la versión de la aplicación ni el directorio documental `1.0.0`.
+
+Con `@gitpagedocs/cli` 0.0.23 instalado, ejecute desde la raíz de este repositorio:
+
+```sh
+gitpagedocs mcp start
+```
+
+El cliente MCP inicia un proceso stdio; no hay puerto HTTP ni opción `--cwd`. Configure el directorio de trabajo del proceso como la raíz del proyecto. `list_files`, `read_file` y los recursos `project://readme` y `project://structure` permiten inspeccionar contenido sin proveedor externo. `write_file` escribe el contenido completo del archivo indicado, después de revisarlo.
+
+`update_documentation` llama a un proveedor y solo sustituye la región entre `gitpagedocs:start` y `gitpagedocs:end`; sin esos marcadores, añade una región. No utilice ese flujo para sustituir automáticamente estas páginas completas. `validate_docs` es una revisión por proveedor, no una verificación determinística de todos los enlaces. El comando `gitpagedocs docs` actualiza regiones de README/CONTRIBUTING/SECURITY con contenido estándar de GitPageDocs; no actualiza estas páginas específicas.
+
+Antes de publicar, valide el JSON, las rutas de todos los idiomas, el índice y los enlaces en el visor. La publicación utiliza el workflow del repositorio; el pin del runtime debe actualizarse por separado a una release disponible. Conserve los menús, temas, iconos, rutas públicas y la versión documental existentes.

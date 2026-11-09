@@ -42,7 +42,13 @@
         "en": "gitpagedocs/docs/versions/1.0.0/en/project-guide.md",
         "es": "gitpagedocs/docs/versions/1.0.0/es/project-guide.md"
       },
-      "fullscreenEnabled": true
+      "fullscreenEnabled": true,
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 19,
@@ -56,7 +62,13 @@
         "en": "gitpagedocs/docs/versions/1.0.0/en/source-reference.md",
         "es": "gitpagedocs/docs/versions/1.0.0/es/source-reference.md"
       },
-      "fullscreenEnabled": true
+      "fullscreenEnabled": true,
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 1,
@@ -79,7 +91,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/index.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 2,
@@ -102,7 +119,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/vision-general.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 3,
@@ -125,7 +147,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/arquitectura.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 4,
@@ -148,7 +175,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/backend.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 5,
@@ -171,7 +203,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/frontend.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 6,
@@ -194,7 +231,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/calidad-operaciones.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 7,
@@ -217,7 +259,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/preguntas-conceptuales.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 8,
@@ -240,7 +287,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/01-introduccion.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 9,
@@ -263,7 +315,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/02-requisitos.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 10,
@@ -286,7 +343,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/03-arquitectura-backend.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 11,
@@ -309,7 +371,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/04-modelado-dominio.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 12,
@@ -332,7 +399,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/05-seguridad-auditoria-mensajeria.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 13,
@@ -355,7 +427,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/06-frontend.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 14,
@@ -378,7 +455,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/07-infraestructura-despliegue.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 15,
@@ -401,7 +483,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/08-calidad-pruebas.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     },
     {
       "id": 16,
@@ -424,7 +511,12 @@
         "es": "gitpagedocs/docs/versions/1.0.0/es/09-runbook-resolucion.md"
       },
       "fullscreenEnabled": true,
-      "RouteguideBrand": true
+      "RouteguideBrand": true,
+      "RouteGuideTags": [
+        "h1",
+        "h2",
+        "h3"
+      ]
     }
   ],
   "routes-source-viewer": [
